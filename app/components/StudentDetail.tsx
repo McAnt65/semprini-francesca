@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-// Struttura dati di esempio (sostituibile con i dati da Supabase/Database)
 interface StudentData {
   enrollmentDate: string;
   avatarUrl?: string;
@@ -13,19 +12,25 @@ interface StudentData {
   birthDate: string;
   school: string;
   gradeClass: string;
+
   phone: string;
   whatsapp: string;
   email: string;
+
   address: string;
   city: string;
+
   primaryParent: string;
   primaryParentPhone: string;
   primaryParentWhatsapp: string;
   primaryParentEmail: string;
+
   secondaryParent?: string;
   secondaryParentPhone?: string;
   secondaryParentWhatsapp?: string;
+
   subjects: string[];
+
   textbooks: {
     math?: string;
     physics?: string;
@@ -34,32 +39,43 @@ interface StudentData {
 }
 
 const defaultStudent: StudentData = {
-  enrollmentDate: "12 Settembre 2023",
-  avatarUrl: "/avatars/marco.jpg",
-  firstName: "Marco",
-  lastName: "Bianchi",
-  birthDate: "24/05/2007",
-  school: "Liceo Scientifico G. Galilei",
-  gradeClass: "3ª A",
-  phone: "345 678 9012",
-  whatsapp: "3456789012",
-  email: "marco.bianchi07@email.it",
-  address: "Via delle Rose, 12",
-  city: "47030 San Mauro (FC)",
-  primaryParent: "Laura Rossi",
-  primaryParentPhone: "333 123 4567",
-  primaryParentWhatsapp: "3331234567",
-  primaryParentEmail: "laurarossi@email.it",
-  secondaryParent: "Andrea Bianchi",
-  secondaryParentPhone: "334 987 6543",
-  secondaryParentWhatsapp: "3349876543",
-  subjects: ["Matematica", "Fisica", "Chimica"],
+  enrollmentDate: "",
+  avatarUrl: undefined,
+
+  firstName: "",
+  lastName: "",
+  birthDate: "",
+  school: "",
+  gradeClass: "",
+
+  phone: "",
+  whatsapp: "",
+  email: "",
+
+  address: "",
+  city: "",
+
+  primaryParent: "",
+  primaryParentPhone: "",
+  primaryParentWhatsapp: "",
+  primaryParentEmail: "",
+
+  secondaryParent: "",
+  secondaryParentPhone: "",
+  secondaryParentWhatsapp: "",
+
+  subjects: [],
+
   textbooks: {
-    math: "Bergamini - Matematica.blu 2.0 - Vol. 3",
-    physics: "Amaldi - L'Amaldi per i licei scientifici - Vol. 1",
-    chemistry: "Valitutti - Chimica: concetti e modelli - Vol. 1",
+    math: "",
+    physics: "",
+    chemistry: "",
   },
 };
+
+function cleanPhone(phone: string) {
+  return phone.replace(/[^\d+]/g, "");
+}
 
 export default function StudentDetail({
   student = defaultStudent,
@@ -69,161 +85,312 @@ export default function StudentDetail({
   const router = useRouter();
 
   return (
-    <main className="relative h-dvh w-full overflow-hidden bg-[#f4eddf] select-none">
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="relative h-dvh aspect-[9/16] max-w-full">
-          {/* Grafica di sfondo */}
+    <main className="relative min-h-dvh w-full overflow-x-hidden bg-[#f4eddf]">
+      <div className="mx-auto w-full max-w-[430px]">
+        <div className="relative aspect-[768/1376] w-full">
+          {/* BASE GRAFICA */}
           <Image
-            src="/student-profile-bg.png"
-            alt="Scheda Studente"
+            src="/student-profile-bg-v2.png"
+            alt="Scheda dello studente"
             fill
             priority
+            sizes="(max-width: 768px) 100vw, 768px"
             className="object-contain"
           />
 
-          {/* 1. FRECCIA INDIETRO / TORNA AGLI STUDENTI */}
+          {/* TORNA A I MIEI STUDENTI */}
           <button
             type="button"
             onClick={() => router.back()}
-            className="absolute top-[2.2%] left-[4%] z-20 flex items-center gap-2 text-[#3C2A21] font-serif text-sm cursor-pointer hover:opacity-75 transition-opacity"
-          >
-            ← I miei studenti
-          </button>
+            aria-label="Torna a I miei studenti"
+            className="absolute left-[3%] top-[2.2%] z-20 h-[4%] w-[29%] cursor-pointer bg-transparent"
+          />
 
-          {/* 2. INTESTAZIONE: DATA ISCRIZIONE */}
-          <div className="absolute top-[12%] left-0 right-0 text-center font-serif text-xs text-[#3C2A21]/80 italic">
-            Studente dal {student.enrollmentDate} ♡
+          {/* MODIFICA */}
+          <button
+            type="button"
+            aria-label="Modifica scheda studente"
+            className="absolute right-[3%] top-[2.2%] z-20 h-[4%] w-[18%] cursor-pointer bg-transparent"
+          />
+
+          {/* DATA INIZIO */}
+          <div className="absolute left-[35%] top-[10.9%] w-[48%] text-center font-serif text-[clamp(9px,2.1vw,16px)] text-[#3c2a21]">
+            {student.enrollmentDate}
           </div>
 
-          {/* 3. FOTO STUDENTE */}
-          <div className="absolute top-[15.8%] left-[6.8%] w-[33.5%] h-[20.8%] overflow-hidden rounded-md border border-[#8C6D53]/30 shadow-inner">
-            {student.avatarUrl ? (
+          {/* FOTO */}
+          <div className="absolute left-[7%] top-[14.8%] h-[23%] w-[35%] overflow-hidden">
+            {student.avatarUrl && (
               <Image
                 src={student.avatarUrl}
                 alt={`${student.firstName} ${student.lastName}`}
                 fill
-                className="object-cover"
+                className="object-cover opacity-90"
               />
-            ) : (
-              <div className="w-full h-full bg-[#EFE8D8] flex items-center justify-center text-[#8C6D53] text-xs italic">
-                Nessuna foto
-              </div>
             )}
           </div>
 
-          {/* 4. DATI PERSONALI */}
-          <div className="absolute top-[20.8%] left-[58%] right-[8%] font-serif text-[11px] text-[#3C2A21] leading-[2.1rem]">
-            <p className="truncate">{student.firstName}</p>
-            <p className="truncate">{student.lastName}</p>
-            <p className="truncate">{student.birthDate}</p>
-            <p className="truncate">{student.school}</p>
-            <p className="truncate">{student.gradeClass}</p>
-          </div>
-
-          {/* 5. CONTATTI */}
-          <div className="absolute top-[50.2%] left-[18%] right-[58%] font-serif text-[11px] text-[#3C2A21] leading-[1.85rem]">
-            <p className="truncate">{student.phone}</p>
-            <p className="truncate">{student.whatsapp}</p>
-            <p className="truncate text-[9.5px]">{student.email}</p>
-          </div>
-
-          {/* Pulsanti Azione Contatti */}
-          {/* Chiamata */}
-          <a
-            href={`tel:${student.phone.replace(/\s+/g, "")}`}
-            aria-label="Chiama studente"
-            className="absolute top-[50%] left-[35.5%] w-[5.5%] h-[2.8%] cursor-pointer rounded-full bg-transparent hover:bg-[#3C2A21]/10"
-          />
-          {/* WhatsApp */}
-          <a
-            href={`https://wa.me/${student.whatsapp.replace(/\s+/g, "")}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Invia WhatsApp a studente"
-            className="absolute top-[53.2%] left-[35.5%] w-[5.5%] h-[2.8%] cursor-pointer rounded-full bg-transparent hover:bg-[#3C2A21]/10"
-          />
-          {/* Email */}
-          <a
-            href={`mailto:${student.email}`}
-            aria-label="Invia Email a studente"
-            className="absolute top-[56.6%] left-[35.5%] w-[5.5%] h-[2.8%] cursor-pointer rounded-full bg-transparent hover:bg-[#3C2A21]/10"
-          />
-
-          {/* 6. DOVE ABITA */}
-          <div className="absolute top-[50.2%] left-[58%] right-[8%] font-serif text-[11px] text-[#3C2A21] leading-[1.85rem]">
-            <p className="truncate">{student.address}</p>
-            <p className="truncate">{student.city}</p>
-          </div>
-
-          {/* Pulsante Apri in Maps */}
-          <a
-            href={`https://maps.google.com/?q=${encodeURIComponent(
-              `${student.address}, ${student.city}`
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Apri in Mappe"
-            className="absolute top-[59.2%] left-[48.2%] w-[26.5%] h-[3.2%] cursor-pointer bg-transparent rounded-lg hover:bg-[#3C2A21]/10"
-          />
-
-          {/* 7. FAMIGLIA */}
-          <div className="absolute top-[71.2%] left-[8%] right-[58%] font-serif text-[11px] text-[#3C2A21]">
-            <p className="font-semibold text-[10.5px]">{student.primaryParent}</p>
-            <p className="mt-[2.2rem] truncate text-[9.5px]">{student.primaryParentEmail}</p>
-            <p className="mt-[2.2rem] font-semibold text-[10.5px]">{student.secondaryParent}</p>
-          </div>
-
-          {/* Pulsanti Contatto Genitori */}
-          {/* Genitore 1 - Chiamata */}
-          <a
-            href={`tel:${student.primaryParentPhone.replace(/\s+/g, "")}`}
-            className="absolute top-[75%] left-[27.2%] w-[5.5%] h-[2.8%] cursor-pointer bg-transparent hover:bg-[#3C2A21]/10"
-          />
-          {/* Genitore 1 - WhatsApp */}
-          <a
-            href={`https://wa.me/${student.primaryParentWhatsapp.replace(/\s+/g, "")}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="absolute top-[75%] left-[34.8%] w-[5.5%] h-[2.8%] cursor-pointer bg-transparent hover:bg-[#3C2A21]/10"
-          />
-          {/* Genitore 2 - Chiamata */}
-          {student.secondaryParentPhone && (
-            <a
-              href={`tel:${student.secondaryParentPhone.replace(/\s+/g, "")}`}
-              className="absolute top-[90.5%] left-[13.5%] w-[5.5%] h-[2.8%] cursor-pointer bg-transparent hover:bg-[#3C2A21]/10"
+          {/* AGGIUNGI FOTO */}
+          {!student.avatarUrl && (
+            <button
+              type="button"
+              aria-label="Aggiungi fotografia"
+              className="absolute left-[14%] top-[24%] z-20 h-[9%] w-[22%] cursor-pointer bg-transparent"
             />
           )}
-          {/* Genitore 2 - WhatsApp */}
-          {student.secondaryParentWhatsapp && (
+
+          {/* DATI PERSONALI */}
+          <Field
+            value={student.firstName}
+            left="64%"
+            top="20.0%"
+            width="19%"
+          />
+
+          <Field
+            value={student.lastName}
+            left="64%"
+            top="23.8%"
+            width="19%"
+          />
+
+          <Field
+            value={student.birthDate}
+            left="64%"
+            top="27.4%"
+            width="19%"
+          />
+
+          <Field
+            value={student.school}
+            left="64%"
+            top="31.2%"
+            width="19%"
+          />
+
+          <Field
+            value={student.gradeClass}
+            left="64%"
+            top="34.9%"
+            width="19%"
+          />
+
+          {/* CONTATTI */}
+          <Field
+            value={student.phone}
+            left="20%"
+            top="46.8%"
+            width="21%"
+          />
+
+          <Field
+            value={student.whatsapp}
+            left="20%"
+            top="50.1%"
+            width="21%"
+          />
+
+          <Field
+            value={student.email}
+            left="20%"
+            top="53.6%"
+            width="21%"
+            small
+          />
+
+          {/* PULSANTI CONTATTI */}
+          {student.phone && (
             <a
-              href={`https://wa.me/${student.secondaryParentWhatsapp.replace(/\s+/g, "")}`}
+              href={`tel:${cleanPhone(student.phone)}`}
+              aria-label="Chiama studente"
+              className="absolute left-[36.6%] top-[45.8%] z-20 h-[3.5%] w-[5.8%]"
+            />
+          )}
+
+          {student.whatsapp && (
+            <a
+              href={`https://wa.me/${cleanPhone(student.whatsapp)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="absolute top-[90.5%] left-[20.8%] w-[5.5%] h-[2.8%] cursor-pointer bg-transparent hover:bg-[#3C2A21]/10"
+              aria-label="WhatsApp studente"
+              className="absolute left-[36.6%] top-[49.3%] z-20 h-[3.5%] w-[5.8%]"
             />
           )}
 
-          {/* 8. MATERIE SEGUITE */}
-          <div className="absolute top-[71.2%] left-[58%] right-[8%] font-serif text-[11px] text-[#3C2A21]">
-            <p className="truncate">{student.subjects.join(", ")}</p>
-          </div>
+          {student.email && (
+            <a
+              href={`mailto:${student.email}`}
+              aria-label="Email studente"
+              className="absolute left-[36.6%] top-[52.8%] z-20 h-[3.5%] w-[5.8%]"
+            />
+          )}
 
-          {/* 9. LIBRI DI TESTO */}
-          <div className="absolute top-[81.8%] left-[58%] right-[8%] font-serif text-[9.5px] text-[#3C2A21] leading-[1.75rem]">
-            <p className="truncate">{student.textbooks.math || "-"}</p>
-            <p className="truncate">{student.textbooks.physics || "-"}</p>
-            <p className="truncate">{student.textbooks.chemistry || "-"}</p>
-          </div>
-
-          {/* Pulsante Vedi Dettagli Libri */}
-          <Link
-            href={`/studenti/${student.firstName.toLowerCase()}/libri`}
-            aria-label="Vedi dettagli libri"
-            className="absolute top-[93%] left-[53.5%] w-[26.5%] h-[3.2%] cursor-pointer bg-transparent rounded-lg hover:bg-[#3C2A21]/10"
+          {/* DOVE ABITA */}
+          <Field
+            value={student.address}
+            left="57.5%"
+            top="46.8%"
+            width="31%"
           />
 
+          <Field
+            value={student.city}
+            left="57.5%"
+            top="52.0%"
+            width="24%"
+          />
+
+          {(student.address || student.city) && (
+            <a
+              href={`https://maps.google.com/?q=${encodeURIComponent(
+                `${student.address} ${student.city}`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Apri indirizzo in Maps"
+              className="absolute left-[50%] top-[56.3%] z-20 h-[4%] w-[28%]"
+            />
+          )}
+
+          {/* FAMIGLIA */}
+          <Field
+            value={student.primaryParent}
+            left="8%"
+            top="67.6%"
+            width="35%"
+          />
+
+          <Field
+            value={student.primaryParentEmail}
+            left="17%"
+            top="75.1%"
+            width="25%"
+            small
+          />
+
+          <Field
+            value={student.secondaryParent || ""}
+            left="8%"
+            top="82.0%"
+            width="35%"
+          />
+
+          {/* GENITORE 1 */}
+          {student.primaryParentPhone && (
+            <a
+              href={`tel:${cleanPhone(student.primaryParentPhone)}`}
+              aria-label="Chiama genitore"
+              className="absolute left-[32%] top-[72.5%] z-20 h-[3.7%] w-[6%]"
+            />
+          )}
+
+          {student.primaryParentWhatsapp && (
+            <a
+              href={`https://wa.me/${cleanPhone(
+                student.primaryParentWhatsapp
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp genitore"
+              className="absolute left-[38.5%] top-[72.5%] z-20 h-[3.7%] w-[6%]"
+            />
+          )}
+
+          {/* GENITORE 2 */}
+          {student.secondaryParentPhone && (
+            <a
+              href={`tel:${cleanPhone(student.secondaryParentPhone)}`}
+              aria-label="Chiama secondo genitore"
+              className="absolute left-[8%] top-[91.2%] z-20 h-[3.7%] w-[6%]"
+            />
+          )}
+
+          {student.secondaryParentWhatsapp && (
+            <a
+              href={`https://wa.me/${cleanPhone(
+                student.secondaryParentWhatsapp
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp secondo genitore"
+              className="absolute left-[15%] top-[91.2%] z-20 h-[3.7%] w-[6%]"
+            />
+          )}
+
+          {/* MATERIE */}
+          <Field
+            value={student.subjects.join(" · ")}
+            left="63%"
+            top="68.7%"
+            width="29%"
+          />
+
+          {/* LIBRI */}
+          <Field
+            value={student.textbooks.math || ""}
+            left="64%"
+            top="81.6%"
+            width="28%"
+            small
+          />
+
+          <Field
+            value={student.textbooks.physics || ""}
+            left="64%"
+            top="85.2%"
+            width="28%"
+            small
+          />
+
+          <Field
+            value={student.textbooks.chemistry || ""}
+            left="64%"
+            top="88.8%"
+            width="28%"
+            small
+          />
+
+          {/* DETTAGLIO LIBRI */}
+          <Link
+            href="/studenti/libri"
+            aria-label="Vedi dettagli libri"
+            className="absolute left-[52%] top-[92.5%] z-20 h-[4%] w-[30%]"
+          />
         </div>
       </div>
     </main>
+  );
+}
+
+function Field({
+  value,
+  left,
+  top,
+  width,
+  small = false,
+}: {
+  value: string;
+  left: string;
+  top: string;
+  width: string;
+  small?: boolean;
+}) {
+  if (!value) return null;
+
+  return (
+    <div
+      className={`absolute overflow-hidden whitespace-nowrap font-serif text-[#3c2a21] ${
+        small
+          ? "text-[clamp(7px,1.65vw,12px)]"
+          : "text-[clamp(8px,1.9vw,14px)]"
+      }`}
+      style={{
+        left,
+        top,
+        width,
+      }}
+    >
+      {value}
+    </div>
   );
 }
