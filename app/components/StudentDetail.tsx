@@ -73,6 +73,13 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
     setDraft((prev) => ({ ...prev, [field]: value }));
   }
 
+  function updateTextbook(field: keyof StudentData["textbooks"], value: string) {
+    setDraft((prev) => ({
+      ...prev,
+      textbooks: { ...prev.textbooks, [field]: value },
+    }));
+  }
+
   function toggleEdit() {
     if (isEditing) {
       setSaved(draft);
@@ -110,6 +117,12 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
             className="absolute right-[3%] top-[2.2%] z-30 h-[4%] w-[18%] cursor-pointer bg-transparent"
           />
 
+          {isEditing && (
+            <div className="pointer-events-none absolute right-[3.4%] top-[2.38%] z-20 bg-[#f3e6ca]/90 px-2 font-serif text-[clamp(8px,1.7vw,11px)] italic text-[#4b3528]">
+              Salva
+            </div>
+          )}
+
           {fullName && (
             <div className="absolute left-[22%] top-[7.0%] w-[56%] overflow-hidden text-center font-serif text-[clamp(10px,2.5vw,16px)] italic text-[#3c2a21]">
               {fullName}
@@ -117,35 +130,19 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
           )}
 
           {isEditing ? (
-            <TransparentInput
-              value={draft.enrollmentDate}
-              onChange={(v) => updateField("enrollmentDate", v)}
-              left="45%"
-              top="10.45%"
-              width="30%"
-              align="center"
-            />
+            <TransparentInput value={draft.enrollmentDate} onChange={(v) => updateField("enrollmentDate", v)} left="45%" top="10.45%" width="30%" align="center" />
           ) : (
             <Field value={saved.enrollmentDate} left="45%" top="10.62%" width="30%" align="center" />
           )}
 
           <div className="absolute left-[7%] top-[14.8%] h-[23%] w-[35%] overflow-hidden">
             {current.avatarUrl && (
-              <Image
-                src={current.avatarUrl}
-                alt={`${current.firstName} ${current.lastName}`}
-                fill
-                className="object-cover opacity-90"
-              />
+              <Image src={current.avatarUrl} alt={`${current.firstName} ${current.lastName}`} fill className="object-cover opacity-90" />
             )}
           </div>
 
           {!current.avatarUrl && (
-            <button
-              type="button"
-              aria-label="Aggiungi fotografia"
-              className="absolute left-[14%] top-[24%] z-20 h-[9%] w-[22%] cursor-pointer bg-transparent"
-            />
+            <button type="button" aria-label="Aggiungi fotografia" className="absolute left-[14%] top-[24%] z-20 h-[9%] w-[22%] cursor-pointer bg-transparent" />
           )}
 
           {isEditing ? (
@@ -166,42 +163,78 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
             </>
           )}
 
-          <Field value={current.phone} left="20%" top="46.8%" width="21%" />
-          <Field value={current.whatsapp} left="20%" top="50.1%" width="21%" />
-          <Field value={current.email} left="20%" top="53.6%" width="21%" small />
-
-          {current.phone && <a href={`tel:${cleanPhone(current.phone)}`} aria-label="Chiama studente" className="absolute left-[36.6%] top-[45.8%] z-20 h-[3.5%] w-[5.8%]" />}
-          {current.whatsapp && <a href={`https://wa.me/${cleanPhone(current.whatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp studente" className="absolute left-[36.6%] top-[49.3%] z-20 h-[3.5%] w-[5.8%]" />}
-          {current.email && <a href={`mailto:${current.email}`} aria-label="Email studente" className="absolute left-[36.6%] top-[52.8%] z-20 h-[3.5%] w-[5.8%]" />}
-
-          <Field value={current.address} left="57.5%" top="46.8%" width="31%" />
-          <Field value={current.city} left="57.5%" top="52.0%" width="24%" />
-
-          {(current.address || current.city) && (
-            <a
-              href={`https://maps.google.com/?q=${encodeURIComponent(`${current.address} ${current.city}`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Apri indirizzo in Maps"
-              className="absolute left-[50%] top-[56.3%] z-20 h-[4%] w-[28%]"
-            />
+          {isEditing ? (
+            <>
+              <TransparentInput value={draft.phone} onChange={(v) => updateField("phone", v)} left="20%" top="46.55%" width="20%" />
+              <TransparentInput value={draft.whatsapp} onChange={(v) => updateField("whatsapp", v)} left="20%" top="49.88%" width="20%" />
+              <TransparentInput value={draft.email} onChange={(v) => updateField("email", v)} left="20%" top="53.28%" width="20%" small />
+              <TransparentInput value={draft.address} onChange={(v) => updateField("address", v)} left="57.5%" top="46.55%" width="31%" />
+              <TransparentInput value={draft.city} onChange={(v) => updateField("city", v)} left="57.5%" top="51.75%" width="27%" />
+            </>
+          ) : (
+            <>
+              <Field value={saved.phone} left="20%" top="46.8%" width="21%" />
+              <Field value={saved.whatsapp} left="20%" top="50.1%" width="21%" />
+              <Field value={saved.email} left="20%" top="53.6%" width="21%" small />
+              <Field value={saved.address} left="57.5%" top="46.8%" width="31%" />
+              <Field value={saved.city} left="57.5%" top="52.0%" width="27%" />
+            </>
           )}
 
-          <Field value={current.primaryParent} left="8%" top="67.6%" width="35%" />
-          <Field value={current.primaryParentEmail} left="17%" top="75.1%" width="25%" small />
-          <Field value={current.secondaryParent || ""} left="8%" top="82.0%" width="35%" />
+          {!isEditing && current.phone && <a href={`tel:${cleanPhone(current.phone)}`} aria-label="Chiama studente" className="absolute left-[36.6%] top-[45.8%] z-20 h-[3.5%] w-[5.8%]" />}
+          {!isEditing && current.whatsapp && <a href={`https://wa.me/${cleanPhone(current.whatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp studente" className="absolute left-[36.6%] top-[49.3%] z-20 h-[3.5%] w-[5.8%]" />}
+          {!isEditing && current.email && <a href={`mailto:${current.email}`} aria-label="Email studente" className="absolute left-[36.6%] top-[52.8%] z-20 h-[3.5%] w-[5.8%]" />}
 
-          {current.primaryParentPhone && <a href={`tel:${cleanPhone(current.primaryParentPhone)}`} aria-label="Chiama genitore" className="absolute left-[32%] top-[72.5%] z-20 h-[3.7%] w-[6%]" />}
-          {current.primaryParentWhatsapp && <a href={`https://wa.me/${cleanPhone(current.primaryParentWhatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp genitore" className="absolute left-[38.5%] top-[72.5%] z-20 h-[3.7%] w-[6%]" />}
-          {current.secondaryParentPhone && <a href={`tel:${cleanPhone(current.secondaryParentPhone)}`} aria-label="Chiama secondo genitore" className="absolute left-[8%] top-[91.2%] z-20 h-[3.7%] w-[6%]" />}
-          {current.secondaryParentWhatsapp && <a href={`https://wa.me/${cleanPhone(current.secondaryParentWhatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp secondo genitore" className="absolute left-[15%] top-[91.2%] z-20 h-[3.7%] w-[6%]" />}
+          {!isEditing && (current.address || current.city) && (
+            <a href={`https://maps.google.com/?q=${encodeURIComponent(`${current.address} ${current.city}`)}`} target="_blank" rel="noopener noreferrer" aria-label="Apri indirizzo in Maps" className="absolute left-[50%] top-[56.3%] z-20 h-[4%] w-[28%]" />
+          )}
 
-          <Field value={current.subjects.join(" · ")} left="63%" top="68.7%" width="29%" />
-          <Field value={current.textbooks.math || ""} left="64%" top="81.6%" width="28%" small />
-          <Field value={current.textbooks.physics || ""} left="64%" top="85.2%" width="28%" small />
-          <Field value={current.textbooks.chemistry || ""} left="64%" top="88.8%" width="28%" small />
+          {isEditing ? (
+            <>
+              <TransparentInput value={draft.primaryParent} onChange={(v) => updateField("primaryParent", v)} left="8%" top="67.35%" width="35%" />
+              <TransparentInput value={draft.primaryParentPhone} onChange={(v) => updateField("primaryParentPhone", v)} left="8%" top="70.15%" width="28%" small />
+              <TransparentInput value={draft.primaryParentEmail} onChange={(v) => updateField("primaryParentEmail", v)} left="17%" top="74.85%" width="25%" small />
+              <TransparentInput value={draft.secondaryParent || ""} onChange={(v) => updateField("secondaryParent", v)} left="8%" top="81.75%" width="35%" />
+              <TransparentInput value={draft.secondaryParentPhone || ""} onChange={(v) => updateField("secondaryParentPhone", v)} left="8%" top="84.55%" width="28%" small />
+            </>
+          ) : (
+            <>
+              <Field value={saved.primaryParent} left="8%" top="67.6%" width="35%" />
+              <Field value={saved.primaryParentPhone} left="8%" top="70.4%" width="28%" small />
+              <Field value={saved.primaryParentEmail} left="17%" top="75.1%" width="25%" small />
+              <Field value={saved.secondaryParent || ""} left="8%" top="82.0%" width="35%" />
+              <Field value={saved.secondaryParentPhone || ""} left="8%" top="84.8%" width="28%" small />
+            </>
+          )}
 
-          <Link href="/studenti/libri" aria-label="Vedi dettagli libri" className="absolute left-[52%] top-[92.5%] z-20 h-[4%] w-[30%]" />
+          {!isEditing && current.primaryParentPhone && <a href={`tel:${cleanPhone(current.primaryParentPhone)}`} aria-label="Chiama genitore" className="absolute left-[32%] top-[72.5%] z-20 h-[3.7%] w-[6%]" />}
+          {!isEditing && current.primaryParentWhatsapp && <a href={`https://wa.me/${cleanPhone(current.primaryParentWhatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp genitore" className="absolute left-[38.5%] top-[72.5%] z-20 h-[3.7%] w-[6%]" />}
+          {!isEditing && current.secondaryParentPhone && <a href={`tel:${cleanPhone(current.secondaryParentPhone)}`} aria-label="Chiama secondo genitore" className="absolute left-[8%] top-[91.2%] z-20 h-[3.7%] w-[6%]" />}
+          {!isEditing && current.secondaryParentWhatsapp && <a href={`https://wa.me/${cleanPhone(current.secondaryParentWhatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp secondo genitore" className="absolute left-[15%] top-[91.2%] z-20 h-[3.7%] w-[6%]" />}
+
+          {isEditing ? (
+            <>
+              <TransparentInput
+                value={draft.subjects.join(", ")}
+                onChange={(v) => updateField("subjects", v.split(",").map((item) => item.trim()).filter(Boolean))}
+                left="63%"
+                top="68.45%"
+                width="29%"
+              />
+              <TransparentInput value={draft.textbooks.math || ""} onChange={(v) => updateTextbook("math", v)} left="64%" top="81.35%" width="28%" small />
+              <TransparentInput value={draft.textbooks.physics || ""} onChange={(v) => updateTextbook("physics", v)} left="64%" top="84.95%" width="28%" small />
+              <TransparentInput value={draft.textbooks.chemistry || ""} onChange={(v) => updateTextbook("chemistry", v)} left="64%" top="88.55%" width="28%" small />
+            </>
+          ) : (
+            <>
+              <Field value={saved.subjects.join(" · ")} left="63%" top="68.7%" width="29%" />
+              <Field value={saved.textbooks.math || ""} left="64%" top="81.6%" width="28%" small />
+              <Field value={saved.textbooks.physics || ""} left="64%" top="85.2%" width="28%" small />
+              <Field value={saved.textbooks.chemistry || ""} left="64%" top="88.8%" width="28%" small />
+            </>
+          )}
+
+          {!isEditing && <Link href="/studenti/libri" aria-label="Vedi dettagli libri" className="absolute left-[52%] top-[92.5%] z-20 h-[4%] w-[30%]" />}
         </div>
       </div>
     </main>
@@ -211,10 +244,7 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
 function Field({ value, left, top, width, small = false, align = "left" }: { value: string; left: string; top: string; width: string; small?: boolean; align?: "left" | "center" }) {
   if (!value) return null;
   return (
-    <div
-      className={`absolute overflow-hidden whitespace-nowrap font-serif text-[#3c2a21] ${small ? "text-[clamp(7px,1.5vw,11px)]" : "text-[clamp(8px,1.75vw,12px)]"} ${align === "center" ? "text-center" : "text-left"}`}
-      style={{ left, top, width }}
-    >
+    <div className={`absolute overflow-hidden whitespace-nowrap font-serif text-[#3c2a21] ${small ? "text-[clamp(7px,1.5vw,11px)]" : "text-[clamp(8px,1.75vw,12px)]"} ${align === "center" ? "text-center" : "text-left"}`} style={{ left, top, width }}>
       {value}
     </div>
   );
