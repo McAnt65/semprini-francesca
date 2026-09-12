@@ -1,26 +1,51 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4eddf;
+  --foreground: #4b3024;
+  --ink-sepia: #4b3024;
+  --ink-sepia-soft: #6f5745;
+  --paper-cream: #f4eddf;
+  --paper-light: #fbf4e7;
+  --font-register-serif: Georgia, "Times New Roman", Times, serif;
+  --font-register-script: "Segoe Script", "Lucida Handwriting", "Brush Script MT", cursive;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-register-serif);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  min-height: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-register-serif);
+}
+
+.font-register {
+  font-family: var(--font-register-serif);
+}
+
+.font-handwritten {
+  font-family: var(--font-register-script);
+}
+
+.text-sepia {
+  color: var(--ink-sepia);
+}
+
+.text-sepia-soft {
+  color: var(--ink-sepia-soft);
+}
+
+::selection {
+  background: #dcc8a8;
+  color: var(--ink-sepia);
 }
