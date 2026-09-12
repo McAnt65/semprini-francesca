@@ -81,10 +81,10 @@ export default function StudentPersonalDataPage() {
             className="absolute left-[11.2%] top-[59.9%] z-30 h-[4.9%] w-[36.2%] bg-transparent disabled:cursor-default"
           />
 
-          <Field label="Nome" labelTop="32.2%" inputTop="34.0%" placeholder="Inserisci il nome…" />
-          <Field label="Cognome" labelTop="41.9%" inputTop="43.7%" placeholder="Inserisci il cognome…" />
-          <Field label="Data di nascita" labelTop="51.8%" inputTop="53.5%" type="date" />
-          <Field label="Mio studente da…" labelTop="62.0%" inputTop="63.7%" type="date" />
+          <Field label="Nome" labelTop="32.1%" inputTop="34.0%" placeholder="Inserisci il nome…" />
+          <Field label="Cognome" labelTop="41.8%" inputTop="43.7%" placeholder="Inserisci il cognome…" />
+          <Field label="Data di nascita" labelTop="51.7%" inputTop="53.5%" type="date" />
+          <Field label="Mio studente da…" labelTop="61.9%" inputTop="63.7%" type="date" />
 
           <button
             type="button"
@@ -119,7 +119,7 @@ function Field({
   return (
     <>
       <span
-        className="pointer-events-none absolute left-[49.3%] z-30 w-[39.3%] font-register text-[clamp(10px,2.7vw,14px)] leading-none text-[#4b3024]"
+        className="pointer-events-none absolute left-[49.3%] z-30 w-[39.3%] font-field-label text-[clamp(11px,2.95vw,15px)] leading-none text-bordeaux"
         style={{ top: labelTop }}
       >
         {label}
@@ -129,7 +129,7 @@ function Field({
         type={type}
         placeholder={placeholder}
         aria-label={label}
-        className="absolute left-[49.3%] z-30 h-[4.25%] w-[39.3%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 font-register text-[clamp(10px,2.8vw,14px)] text-[#4b3024] !shadow-none !outline-none !ring-0 placeholder:italic placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0"
+        className="absolute left-[49.3%] z-30 h-[4.25%] w-[39.3%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 font-register text-[clamp(10px,2.8vw,14px)] text-[#5a4031] !shadow-none !outline-none !ring-0 placeholder:font-handwritten placeholder:italic placeholder:text-[#8f735d]/55 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0"
         style={{ top: inputTop }}
       />
     </>
