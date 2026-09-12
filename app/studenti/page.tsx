@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -102,14 +101,11 @@ export default function StudentsPage() {
   return (
     <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-[#4b3024]">
       <div className="mx-auto w-full max-w-[430px] px-0 sm:py-3">
-        <div className="relative aspect-[1024/1792] w-full overflow-hidden bg-[#f4e7cf] shadow-[0_10px_40px_rgba(72,48,30,0.16)] sm:rounded-[28px]">
-          <Image
-            src="/students-register-bg.png"
+        <div className="relative aspect-[977/1610] w-full overflow-hidden bg-[#f4e7cf] shadow-[0_10px_40px_rgba(72,48,30,0.16)] sm:rounded-[28px]">
+          <img
+            src="/students-register-bg.png?v=20260912-2"
             alt="Registro illustrato degli studenti"
-            fill
-            priority
-            sizes="(max-width: 430px) 100vw, 430px"
-            className="object-cover"
+            className="absolute inset-0 h-full w-full object-cover"
           />
 
           <button
@@ -125,8 +121,8 @@ export default function StudentsPage() {
             className="absolute right-[3.2%] top-[1.4%] z-30 h-[5.2%] w-[21%] bg-transparent"
           />
 
-          <div className="absolute left-[4.2%] right-[4.2%] top-[20.6%] z-20 flex items-center gap-2.5">
-            <div className="relative flex-1 rounded-[14px] border border-[#a98663]/35 bg-[#f8ecd6]/96 px-4 py-2 shadow-[0_3px_10px_rgba(79,52,31,0.08)]">
+          <div className="absolute left-[4.2%] right-[4.2%] top-[21.3%] z-20 flex items-center gap-2.5">
+            <div className="relative flex-1 rounded-[14px] border border-[#a98663]/35 bg-[#f8ecd6]/94 px-4 py-2 shadow-[0_3px_10px_rgba(79,52,31,0.08)]">
               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#71503b]">⌕</span>
               <input
                 value={query}
@@ -139,13 +135,13 @@ export default function StudentsPage() {
 
             <Link
               href="/studenti/nuovo"
-              className="shrink-0 rounded-[14px] border border-[#a98663]/40 bg-[#f1dfbf]/96 px-3 py-2 font-serif text-[clamp(11px,3.1vw,15px)] italic text-[#4b3024] shadow-[0_3px_10px_rgba(79,52,31,0.08)]"
+              className="shrink-0 rounded-[14px] border border-[#a98663]/40 bg-[#f1dfbf]/94 px-3 py-2 font-serif text-[clamp(11px,3.1vw,15px)] italic text-[#4b3024] shadow-[0_3px_10px_rgba(79,52,31,0.08)]"
             >
               + Nuovo
             </Link>
           </div>
 
-          <div className="absolute left-[5.4%] right-[5.4%] top-[29.7%] z-20 grid grid-cols-3 gap-2">
+          <div className="absolute left-[5.4%] right-[5.4%] top-[30.4%] z-20 grid grid-cols-3 gap-2">
             <SubjectCard
               label="Matematica"
               count={subjectCounts.Matematica}
@@ -169,7 +165,7 @@ export default function StudentsPage() {
             />
           </div>
 
-          <section className="absolute bottom-[16.0%] left-[3.5%] right-[3.5%] top-[38.7%] z-20 overflow-hidden rounded-[18px] border border-[#8d684a]/45 bg-[#f7ead2]/95 shadow-[inset_0_0_20px_rgba(104,72,45,0.06)]">
+          <section className="absolute bottom-[15.4%] left-[3.5%] right-[3.5%] top-[39.4%] z-20 overflow-hidden rounded-[18px] border border-[#8d684a]/45 bg-[#f7ead2]/95 shadow-[inset_0_0_20px_rgba(104,72,45,0.06)]">
             <div className="border-b border-[#9b7658]/30 bg-[#f5e6ca]/95 px-3 py-2">
               <div className="flex items-center justify-between gap-2">
                 <p className="font-serif text-[clamp(9px,2.5vw,12px)] italic text-[#725542]">
