@@ -26,7 +26,7 @@ export default function StudentPersonalDataPage() {
       <div className="mx-auto w-full max-w-[430px] py-0 sm:py-3">
         <div className="relative w-full overflow-hidden sm:rounded-[28px]">
           <Image
-            src="/student-personal-bg.png?v=6"
+            src="/student-personal-bg-clean.png"
             alt="Fotografia e dati personali dello studente"
             width={977}
             height={1610}
@@ -48,7 +48,6 @@ export default function StudentPersonalDataPage() {
             className="absolute right-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] bg-transparent"
           />
 
-          {/* Area foto: la copertura neutra nasconde qualsiasi segnaposto stampato nella tavola. */}
           <div className="absolute left-[12.4%] top-[30.2%] z-20 h-[22.3%] w-[34.2%] overflow-hidden bg-[#f2e8d6]">
             {photoPreview && (
               <Image
@@ -82,30 +81,10 @@ export default function StudentPersonalDataPage() {
             className="absolute left-[11.2%] top-[59.9%] z-30 h-[4.9%] w-[36.2%] bg-transparent disabled:cursor-default"
           />
 
-          <Field
-            label="Nome"
-            labelTop="32.2%"
-            inputTop="34.0%"
-            placeholder="Inserisci il nome…"
-          />
-          <Field
-            label="Cognome"
-            labelTop="41.9%"
-            inputTop="43.7%"
-            placeholder="Inserisci il cognome…"
-          />
-          <Field
-            label="Data di nascita"
-            labelTop="51.8%"
-            inputTop="53.5%"
-            type="date"
-          />
-          <Field
-            label="Mio studente da…"
-            labelTop="62.0%"
-            inputTop="63.7%"
-            type="date"
-          />
+          <Field label="Nome" labelTop="32.2%" inputTop="34.0%" placeholder="Inserisci il nome…" />
+          <Field label="Cognome" labelTop="41.9%" inputTop="43.7%" placeholder="Inserisci il cognome…" />
+          <Field label="Data di nascita" labelTop="51.8%" inputTop="53.5%" type="date" />
+          <Field label="Mio studente da…" labelTop="62.0%" inputTop="63.7%" type="date" />
 
           <button
             type="button"
@@ -150,7 +129,7 @@ function Field({
         type={type}
         placeholder={placeholder}
         aria-label={label}
-        className="absolute left-[49.3%] z-30 h-[4.25%] w-[39.3%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 font-register text-[clamp(10px,2.8vw,14px)] text-[#4b3024] !shadow-none !outline-none !ring-0 placeholder:italic placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0"
+        className="absolute left-[49.3%] z-30 h-[4.25%] w-[39.3%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 font-register text-[clamp(10px,2.8vw,14px)] text-[#4b3024] !shadow-none !outline-none !ring-0 placeholder:italic placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0"
         style={{ top: inputTop }}
       />
     </>
