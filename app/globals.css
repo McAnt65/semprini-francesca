@@ -5,10 +5,12 @@
   --foreground: #4b3024;
   --ink-sepia: #4b3024;
   --ink-sepia-soft: #6f5745;
+  --ink-bordeaux: #6f2638;
   --paper-cream: #f4eddf;
   --paper-light: #fbf4e7;
   --font-register-serif: Georgia, "Times New Roman", Times, serif;
   --font-register-script: "Segoe Script", "Lucida Handwriting", "Brush Script MT", cursive;
+  --font-field-label: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
 }
 
 @theme inline {
@@ -37,12 +39,23 @@ body {
   font-family: var(--font-register-script);
 }
 
+.font-field-label {
+  font-family: var(--font-field-label);
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
 .text-sepia {
   color: var(--ink-sepia);
 }
 
 .text-sepia-soft {
   color: var(--ink-sepia-soft);
+}
+
+.text-bordeaux {
+  color: var(--ink-bordeaux);
 }
 
 ::selection {
