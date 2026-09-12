@@ -23,10 +23,10 @@ export default function StudentPersonalDataPage() {
 
   return (
     <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-[#4b3024]">
-      <div className="mx-auto w-full max-w-[430px]">
-        <div className="relative w-full">
+      <div className="mx-auto w-full max-w-[430px] py-0 sm:py-3">
+        <div className="relative w-full overflow-hidden sm:rounded-[28px]">
           <Image
-            src="/student-personal-bg.png"
+            src="/student-personal-bg.png?v=6"
             alt="Fotografia e dati personali dello studente"
             width={977}
             height={1610}
@@ -45,19 +45,20 @@ export default function StudentPersonalDataPage() {
           <Link
             href="/menu"
             aria-label="Torna al menù"
-            className="absolute right-[10.0%] top-[1.2%] z-30 h-[5.2%] w-[24%] bg-transparent"
+            className="absolute right-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] bg-transparent"
           />
 
-          {photoPreview && (
-            <div className="absolute left-[12.3%] top-[31.7%] z-20 h-[19.9%] w-[31.5%] overflow-hidden">
+          {/* Area foto: la copertura neutra nasconde qualsiasi segnaposto stampato nella tavola. */}
+          <div className="absolute left-[12.4%] top-[30.2%] z-20 h-[22.3%] w-[34.2%] overflow-hidden bg-[#f2e8d6]">
+            {photoPreview && (
               <Image
                 src={photoPreview}
                 alt="Anteprima fotografia studente"
                 fill
                 className="object-cover"
               />
-            </div>
-          )}
+            )}
+          </div>
 
           <input
             ref={fileInputRef}
@@ -83,26 +84,26 @@ export default function StudentPersonalDataPage() {
 
           <Field
             label="Nome"
-            labelTop="31.8%"
-            inputTop="34.1%"
+            labelTop="32.2%"
+            inputTop="34.0%"
             placeholder="Inserisci il nome…"
           />
           <Field
             label="Cognome"
-            labelTop="41.4%"
+            labelTop="41.9%"
             inputTop="43.7%"
             placeholder="Inserisci il cognome…"
           />
           <Field
             label="Data di nascita"
-            labelTop="51.3%"
-            inputTop="53.6%"
+            labelTop="51.8%"
+            inputTop="53.5%"
             type="date"
           />
           <Field
             label="Mio studente da…"
-            labelTop="61.5%"
-            inputTop="63.8%"
+            labelTop="62.0%"
+            inputTop="63.7%"
             type="date"
           />
 
@@ -139,7 +140,7 @@ function Field({
   return (
     <>
       <span
-        className="pointer-events-none absolute left-[49.2%] z-30 w-[39.5%] font-register text-[clamp(10px,2.8vw,14px)] leading-none text-[#4b3024]"
+        className="pointer-events-none absolute left-[49.3%] z-30 w-[39.3%] font-register text-[clamp(10px,2.7vw,14px)] leading-none text-[#4b3024]"
         style={{ top: labelTop }}
       >
         {label}
@@ -149,7 +150,7 @@ function Field({
         type={type}
         placeholder={placeholder}
         aria-label={label}
-        className="absolute left-[49.2%] z-30 h-[4.35%] w-[39.5%] appearance-none border-0 bg-transparent px-[2.8%] font-register text-[clamp(10px,2.9vw,14px)] text-[#4b3024] outline-none shadow-none ring-0 placeholder:italic placeholder:text-[#8f735d]/45 focus:border-0 focus:bg-transparent focus:outline-none focus:ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0"
+        className="absolute left-[49.3%] z-30 h-[4.25%] w-[39.3%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 font-register text-[clamp(10px,2.8vw,14px)] text-[#4b3024] !shadow-none !outline-none !ring-0 placeholder:italic placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0"
         style={{ top: inputTop }}
       />
     </>
