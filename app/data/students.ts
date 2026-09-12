@@ -26,6 +26,8 @@ export interface StudentRecord {
     chemistry?: string;
   };
   personalNotes?: string;
+  nextLesson?: string;
+  updatedAt?: string;
 }
 
 export const students: StudentRecord[] = [
@@ -56,6 +58,8 @@ export const students: StudentRecord[] = [
       chemistry: "",
     },
     personalNotes: "",
+    nextLesson: "",
+    updatedAt: "2026-09-12T08:00:00+02:00",
   },
 ];
 
