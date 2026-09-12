@@ -119,7 +119,7 @@ function Field({
   return (
     <>
       <span
-        className="pointer-events-none absolute left-[49.3%] z-30 w-[39.3%] font-field-label text-[clamp(11px,2.95vw,15px)] leading-none text-bordeaux"
+        className="pointer-events-none absolute left-[51.8%] z-30 w-[36.8%] font-field-label text-[clamp(11px,2.95vw,15px)] leading-none text-bordeaux"
         style={{ top: labelTop }}
       >
         {label}
