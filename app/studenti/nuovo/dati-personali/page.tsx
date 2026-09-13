@@ -83,8 +83,8 @@ export default function StudentPersonalDataPage() {
 
           <Field label="Nome" labelTop="32.1%" inputTop="34.45%" placeholder="Inserisci il nome…" />
           <Field label="Cognome" labelTop="41.8%" inputTop="44.15%" placeholder="Inserisci il cognome…" />
-          <Field label="Data di nascita" labelTop="51.7%" inputTop="53.95%" type="date" />
-          <Field label="Mio studente da…" labelTop="61.9%" inputTop="64.15%" type="date" />
+          <Field label="Data di nascita" labelTop="51.7%" inputTop="54.35%" type="date" />
+          <Field label="Mio studente da…" labelTop="61.9%" inputTop="64.55%" type="date" />
 
           <button
             type="button"
