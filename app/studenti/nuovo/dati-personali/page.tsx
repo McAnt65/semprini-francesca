@@ -38,7 +38,7 @@ export default function StudentPersonalDataPage() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="absolute left-[11.2%] top-[54.0%] z-30 flex h-[4.9%] w-[36.2%] items-center justify-center bg-transparent pl-[7%] font-entry-elegant text-[clamp(10px,2.55vw,13px)] text-[#5b3a2d]"
+            className="absolute left-[11.2%] top-[54.0%] z-30 flex h-[4.9%] w-[36.2%] items-center justify-center bg-transparent font-field-label text-[clamp(9px,2.35vw,12px)] text-[#6f1723]"
           >
             Carica fotografia
           </button>
@@ -46,9 +46,9 @@ export default function StudentPersonalDataPage() {
           <button
             type="button"
             disabled={!photoPreview}
-            className="absolute left-[11.2%] top-[59.9%] z-30 flex h-[4.9%] w-[36.2%] items-center justify-center bg-transparent pl-[7%] font-entry-elegant text-[clamp(9px,2.35vw,12px)] text-[#5b3a2d] disabled:opacity-60"
+            className="absolute left-[11.2%] top-[59.9%] z-30 flex h-[4.9%] w-[36.2%] items-center justify-center bg-transparent font-field-label text-[clamp(9px,2.35vw,12px)] text-[#6f1723] disabled:opacity-60"
           >
-            Trasforma in acquerello
+            Acquerello
           </button>
 
           <Field label="Nome" labelTop="32.1%" inputTop="34.45%" placeholder="Inserisci il nome…" />
