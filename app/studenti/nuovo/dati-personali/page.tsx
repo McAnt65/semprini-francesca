@@ -119,7 +119,7 @@ function Field({
   return (
     <>
       <span
-        className="pointer-events-none absolute left-[51.8%] z-30 w-[36.8%] font-field-label text-[clamp(11px,2.95vw,15px)] leading-none text-bordeaux"
+        className="pointer-events-none absolute left-[51.8%] z-30 w-[36.8%] font-field-label text-[clamp(9px,2.45vw,12px)] leading-none text-bordeaux"
         style={{ top: labelTop }}
       >
         {label}
@@ -129,7 +129,7 @@ function Field({
         type={type}
         placeholder={placeholder}
         aria-label={label}
-        className="absolute left-[49.3%] z-30 h-[4.25%] w-[39.3%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 font-register text-[clamp(10px,2.8vw,14px)] text-[#5a4031] !shadow-none !outline-none !ring-0 placeholder:font-handwritten placeholder:italic placeholder:text-[#8f735d]/55 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0"
+        className="absolute left-[49.3%] z-30 h-[4.25%] w-[39.3%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 font-register text-[clamp(12px,3.35vw,17px)] font-medium text-[#5a4031] !shadow-none !outline-none !ring-0 placeholder:font-handwritten placeholder:font-normal placeholder:italic placeholder:text-[#8f735d]/55 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0"
         style={{ top: inputTop }}
       />
     </>
