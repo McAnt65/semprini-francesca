@@ -116,6 +116,27 @@ function Field({
   type?: "text" | "date";
   placeholder?: string;
 }) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  function openDatePicker() {
+    const input = inputRef.current;
+    if (!input) return;
+
+    input.focus();
+
+    const dateInput = input as HTMLInputElement & { showPicker?: () => void };
+    if (typeof dateInput.showPicker === "function") {
+      try {
+        dateInput.showPicker();
+        return;
+      } catch {
+        // Fallback per browser che non consentono showPicker in alcuni contesti.
+      }
+    }
+
+    input.click();
+  }
+
   return (
     <>
       <span
@@ -126,12 +147,23 @@ function Field({
       </span>
 
       <input
+        ref={inputRef}
         type={type}
         placeholder={placeholder}
         aria-label={label}
         className="absolute left-[49.3%] z-30 h-[4.25%] w-[39.3%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 text-center font-entry-elegant text-[clamp(13px,3.45vw,18px)] text-[#5b3a2d] !shadow-none !outline-none !ring-0 placeholder:font-entry-elegant placeholder:font-normal placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0"
         style={{ top: inputTop }}
       />
+
+      {type === "date" && (
+        <button
+          type="button"
+          onClick={openDatePicker}
+          aria-label={`Apri calendario per ${label}`}
+          className="absolute left-[84.2%] z-40 h-[4.25%] w-[5.2%] cursor-pointer bg-transparent"
+          style={{ top: inputTop }}
+        />
+      )}
     </>
   );
 }
