@@ -11,6 +11,7 @@
   --font-register-serif: Georgia, "Times New Roman", Times, serif;
   --font-register-script: "Segoe Script", "Lucida Handwriting", "Brush Script MT", cursive;
   --font-field-label: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  --font-entry-elegant: Baskerville, "Baskerville Old Face", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
 }
 
 @theme inline {
@@ -43,6 +44,13 @@ body {
   font-family: var(--font-field-label);
   font-style: italic;
   font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.font-entry-elegant {
+  font-family: var(--font-entry-elegant);
+  font-style: italic;
+  font-weight: 500;
   letter-spacing: 0.01em;
 }
 
