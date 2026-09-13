@@ -129,7 +129,7 @@ function Field({
         type={type}
         placeholder={placeholder}
         aria-label={label}
-        className="absolute left-[49.3%] z-30 h-[4.25%] w-[39.3%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 text-center font-handwritten text-[clamp(13px,3.45vw,18px)] font-medium text-[#5a3829] !shadow-none !outline-none !ring-0 placeholder:font-handwritten placeholder:font-normal placeholder:italic placeholder:text-[#8f735d]/48 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0"
+        className="absolute left-[49.3%] z-30 h-[4.25%] w-[39.3%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 text-center font-entry-elegant text-[clamp(13px,3.45vw,18px)] text-[#5b3a2d] !shadow-none !outline-none !ring-0 placeholder:font-entry-elegant placeholder:font-normal placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0"
         style={{ top: inputTop }}
       />
     </>
