@@ -54,6 +54,10 @@ body {
   letter-spacing: 0.01em;
 }
 
+input[type="date"].font-entry-elegant {
+  font-size: clamp(12px, 3vw, 15px);
+}
+
 .text-sepia {
   color: var(--ink-sepia);
 }
