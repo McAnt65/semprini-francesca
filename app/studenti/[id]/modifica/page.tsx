@@ -27,31 +27,31 @@ export default function StudentEditMenuPage({
           <Link
             href={`/studenti/${id}`}
             aria-label="Torna al profilo dello studente"
-            className="absolute left-[2.5%] top-[1.5%] z-20 h-[6%] w-[13%]"
+            className="antique-clickable absolute left-[2.5%] top-[1.5%] z-20 h-[6%] w-[13%] rounded-[10px]"
           />
 
           <Link
             href={`/studenti/${id}/modifica/dati-personali`}
             aria-label="Fotografia e dati personali"
-            className="absolute left-[5%] top-[25.5%] z-20 h-[14.5%] w-[90%] rounded-[18px]"
+            className="antique-clickable absolute left-[5%] top-[25.5%] z-20 h-[14.5%] w-[90%] rounded-[18px]"
           />
 
           <Link
             href={`/studenti/${id}/modifica/scuola`}
             aria-label="Scuola, materie e libri di riferimento"
-            className="absolute left-[5%] top-[42%] z-20 h-[14.5%] w-[90%] rounded-[18px]"
+            className="antique-clickable absolute left-[5%] top-[42%] z-20 h-[14.5%] w-[90%] rounded-[18px]"
           />
 
           <Link
             href={`/studenti/${id}/modifica/famiglia`}
             aria-label="Dove abita e famiglia"
-            className="absolute left-[5%] top-[58.5%] z-20 h-[14.5%] w-[90%] rounded-[18px]"
+            className="antique-clickable absolute left-[5%] top-[58.5%] z-20 h-[14.5%] w-[90%] rounded-[18px]"
           />
 
           <Link
             href={`/studenti/${id}/modifica/note`}
             aria-label="Note personali"
-            className="absolute left-[5%] top-[75%] z-20 h-[14.5%] w-[90%] rounded-[18px]"
+            className="antique-clickable absolute left-[5%] top-[75%] z-20 h-[14.5%] w-[90%] rounded-[18px]"
           />
         </div>
       </div>

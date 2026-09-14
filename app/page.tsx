@@ -42,7 +42,7 @@ export default function Home() {
             type="button"
             onClick={entraNelRegistro}
             aria-label="Entra nel registro"
-            className="absolute z-50 left-[8%] top-[76%] h-[18%] w-[84%] cursor-pointer bg-transparent border-none outline-none"
+            className="antique-clickable absolute z-50 left-[8%] top-[76%] h-[18%] w-[84%] rounded-[18px] bg-transparent border-none outline-none"
             style={{
               WebkitTapHighlightColor: "transparent",
               touchAction: "manipulation",

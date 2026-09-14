@@ -105,8 +105,8 @@ export default function StudentPersonalDataPage() {
         <div className="relative w-full overflow-hidden sm:rounded-[28px]">
           <Image src="/student-personal-bg-clean.png" alt="Dati personali dello studente" width={977} height={1610} priority sizes="(max-width: 430px) 100vw, 430px" className="block h-auto w-full select-none" />
 
-          <button type="button" onClick={() => router.back()} aria-label="Indietro" className="absolute left-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] bg-transparent" />
-          <Link href="/menu" aria-label="Torna al menù" className="absolute right-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] bg-transparent" />
+          <button type="button" onClick={() => router.back()} aria-label="Indietro" className="antique-clickable absolute left-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] rounded-[12px] bg-transparent" />
+          <Link href="/menu" aria-label="Torna al menù" className="antique-clickable absolute right-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] rounded-[12px] bg-transparent" />
 
           <div
             className="absolute left-[12.4%] top-[30.2%] z-20 h-[22.3%] w-[34.2%] overflow-hidden bg-[#f2e8d6]"
@@ -140,7 +140,7 @@ export default function StudentPersonalDataPage() {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             aria-label="Carica immagine"
-            className="absolute left-[20.2%] top-[54.62%] z-30 flex h-[4.9%] w-[26.4%] cursor-pointer items-center justify-center bg-transparent font-field-label text-[clamp(10px,2.5vw,13px)] leading-none text-[#6f1723]"
+            className="antique-clickable absolute left-[20.2%] top-[54.62%] z-30 flex h-[4.9%] w-[26.4%] items-center justify-center rounded-[10px] bg-transparent font-field-label text-[clamp(10px,2.5vw,13px)] leading-none text-[#6f1723]"
           >
             Carica immagine
           </button>
@@ -151,7 +151,7 @@ export default function StudentPersonalDataPage() {
             disabled={!photoPreview || isProcessingWatercolor}
             aria-label="Applica effetto acquerello"
             aria-pressed={isWatercolor}
-            className="absolute left-[20.2%] top-[60.52%] z-30 flex h-[4.9%] w-[26.4%] items-center justify-center bg-transparent font-field-label text-[clamp(10px,2.5vw,13px)] leading-none text-[#6f1723] enabled:cursor-pointer disabled:cursor-default disabled:opacity-45"
+            className="antique-clickable absolute left-[20.2%] top-[60.52%] z-30 flex h-[4.9%] w-[26.4%] items-center justify-center rounded-[10px] bg-transparent font-field-label text-[clamp(10px,2.5vw,13px)] leading-none text-[#6f1723] disabled:opacity-45"
           >
             Acquerello
           </button>
@@ -161,8 +161,8 @@ export default function StudentPersonalDataPage() {
           <Field label="Data di nascita" labelTop="51.7%" inputTop="54.35%" type="date" value={birthDate} onChange={setBirthDate} />
           <Field label="Mio studente da…" labelTop="61.9%" inputTop="64.55%" type="date" value={studentSince} onChange={setStudentSince} />
 
-          <button type="button" onClick={handleSave} aria-label="Salva dati personali" className="absolute bottom-[2.2%] left-[22.5%] z-30 h-[5.6%] w-[22.8%] bg-transparent" />
-          <button type="button" onClick={handleNext} aria-label="Avanti" className="absolute bottom-[2.2%] right-[26.4%] z-30 h-[5.6%] w-[22.2%] bg-transparent" />
+          <button type="button" onClick={handleSave} aria-label="Salva dati personali" className="antique-clickable absolute bottom-[2.2%] left-[22.5%] z-30 h-[5.6%] w-[22.8%] rounded-[12px] bg-transparent" />
+          <button type="button" onClick={handleNext} aria-label="Avanti" className="antique-clickable absolute bottom-[2.2%] right-[26.4%] z-30 h-[5.6%] w-[22.2%] rounded-[12px] bg-transparent" />
         </div>
       </div>
     </main>
@@ -430,7 +430,7 @@ function Field({ label, labelTop, inputTop, type = "text", placeholder, value, o
     <>
       <span className="pointer-events-none absolute left-[51.8%] z-30 w-[36.8%] font-field-label text-[clamp(9px,2.35vw,12px)] leading-none text-[#6f1723]" style={{ top: labelTop }}>{label}</span>
       <input ref={inputRef} type={type} placeholder={placeholder} value={value} onChange={(event) => onChange(event.target.value)} aria-label={label} className="absolute left-[49.3%] z-30 h-[4.25%] w-[39.3%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 text-center font-entry-elegant text-[clamp(13px,3.45vw,18px)] text-[#5b3a2d] !shadow-none !outline-none !ring-0 placeholder:font-entry-elegant placeholder:font-normal placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0" style={{ top: inputTop }} />
-      {type === "date" && <button type="button" onClick={openDatePicker} aria-label={`Apri calendario per ${label}`} className="absolute left-[84.2%] z-40 h-[4.25%] w-[5.2%] cursor-pointer bg-transparent" style={{ top: inputTop }} />}
+      {type === "date" && <button type="button" onClick={openDatePicker} aria-label={`Apri calendario per ${label}`} className="antique-clickable absolute left-[84.2%] z-40 h-[4.25%] w-[5.2%] rounded-[6px] bg-transparent" style={{ top: inputTop }} />}
     </>
   );
 }

@@ -24,13 +24,13 @@ export default function NewStudentSchoolSubjectsBooksPage() {
             type="button"
             onClick={() => router.back()}
             aria-label="Indietro"
-            className="absolute left-[3%] top-[1.5%] z-30 h-[5%] w-[24%] bg-transparent"
+            className="antique-clickable absolute left-[3%] top-[1.5%] z-30 h-[5%] w-[24%] rounded-[12px] bg-transparent"
           />
 
           <Link
             href="/menu"
             aria-label="Torna al menù"
-            className="absolute right-[3%] top-[1.5%] z-30 h-[5%] w-[21%] bg-transparent"
+            className="antique-clickable absolute right-[3%] top-[1.5%] z-30 h-[5%] w-[21%] rounded-[12px] bg-transparent"
           />
 
           <section className="absolute left-[7%] right-[7%] top-[25%] z-20 rounded-[18px] border border-[#9b7658]/35 bg-[#f8ecd6]/90 px-5 py-6 text-center shadow-[0_8px_24px_rgba(72,48,30,0.12)]">

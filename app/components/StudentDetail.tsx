@@ -107,14 +107,14 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
             type="button"
             onClick={() => router.back()}
             aria-label="Torna a I miei studenti"
-            className="absolute left-[3%] top-[2.2%] z-20 h-[4%] w-[29%] cursor-pointer bg-transparent"
+            className="antique-clickable absolute left-[3%] top-[2.2%] z-20 h-[4%] w-[29%] rounded-[10px] bg-transparent"
           />
 
           <button
             type="button"
             onClick={toggleEdit}
             aria-label={isEditing ? "Salva scheda studente" : "Modifica scheda studente"}
-            className="absolute right-[3%] top-[2.2%] z-30 h-[4%] w-[18%] cursor-pointer bg-transparent"
+            className="antique-clickable absolute right-[3%] top-[2.2%] z-30 h-[4%] w-[18%] rounded-[10px] bg-transparent"
           />
 
           {isEditing && (
@@ -142,7 +142,7 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
           </div>
 
           {!current.avatarUrl && (
-            <button type="button" aria-label="Aggiungi fotografia" className="absolute left-[14%] top-[24%] z-20 h-[9%] w-[22%] cursor-pointer bg-transparent" />
+            <button type="button" aria-label="Aggiungi fotografia" className="antique-clickable absolute left-[14%] top-[24%] z-20 h-[9%] w-[22%] rounded-[12px] bg-transparent" />
           )}
 
           {isEditing ? (
@@ -181,12 +181,12 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
             </>
           )}
 
-          {!isEditing && current.phone && <a href={`tel:${cleanPhone(current.phone)}`} aria-label="Chiama studente" className="absolute left-[36.6%] top-[45.8%] z-20 h-[3.5%] w-[5.8%]" />}
-          {!isEditing && current.whatsapp && <a href={`https://wa.me/${cleanPhone(current.whatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp studente" className="absolute left-[36.6%] top-[49.3%] z-20 h-[3.5%] w-[5.8%]" />}
-          {!isEditing && current.email && <a href={`mailto:${current.email}`} aria-label="Email studente" className="absolute left-[36.6%] top-[52.8%] z-20 h-[3.5%] w-[5.8%]" />}
+          {!isEditing && current.phone && <a href={`tel:${cleanPhone(current.phone)}`} aria-label="Chiama studente" className="antique-clickable absolute left-[36.6%] top-[45.8%] z-20 h-[3.5%] w-[5.8%] rounded-full" />}
+          {!isEditing && current.whatsapp && <a href={`https://wa.me/${cleanPhone(current.whatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp studente" className="antique-clickable absolute left-[36.6%] top-[49.3%] z-20 h-[3.5%] w-[5.8%] rounded-full" />}
+          {!isEditing && current.email && <a href={`mailto:${current.email}`} aria-label="Email studente" className="antique-clickable absolute left-[36.6%] top-[52.8%] z-20 h-[3.5%] w-[5.8%] rounded-full" />}
 
           {!isEditing && (current.address || current.city) && (
-            <a href={`https://maps.google.com/?q=${encodeURIComponent(`${current.address} ${current.city}`)}`} target="_blank" rel="noopener noreferrer" aria-label="Apri indirizzo in Maps" className="absolute left-[50%] top-[56.3%] z-20 h-[4%] w-[28%]" />
+            <a href={`https://maps.google.com/?q=${encodeURIComponent(`${current.address} ${current.city}`)}`} target="_blank" rel="noopener noreferrer" aria-label="Apri indirizzo in Maps" className="antique-clickable absolute left-[50%] top-[56.3%] z-20 h-[4%] w-[28%] rounded-[10px]" />
           )}
 
           {isEditing ? (
@@ -207,10 +207,10 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
             </>
           )}
 
-          {!isEditing && current.primaryParentPhone && <a href={`tel:${cleanPhone(current.primaryParentPhone)}`} aria-label="Chiama genitore" className="absolute left-[32%] top-[72.5%] z-20 h-[3.7%] w-[6%]" />}
-          {!isEditing && current.primaryParentWhatsapp && <a href={`https://wa.me/${cleanPhone(current.primaryParentWhatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp genitore" className="absolute left-[38.5%] top-[72.5%] z-20 h-[3.7%] w-[6%]" />}
-          {!isEditing && current.secondaryParentPhone && <a href={`tel:${cleanPhone(current.secondaryParentPhone)}`} aria-label="Chiama secondo genitore" className="absolute left-[8%] top-[91.2%] z-20 h-[3.7%] w-[6%]" />}
-          {!isEditing && current.secondaryParentWhatsapp && <a href={`https://wa.me/${cleanPhone(current.secondaryParentWhatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp secondo genitore" className="absolute left-[15%] top-[91.2%] z-20 h-[3.7%] w-[6%]" />}
+          {!isEditing && current.primaryParentPhone && <a href={`tel:${cleanPhone(current.primaryParentPhone)}`} aria-label="Chiama genitore" className="antique-clickable absolute left-[32%] top-[72.5%] z-20 h-[3.7%] w-[6%] rounded-full" />}
+          {!isEditing && current.primaryParentWhatsapp && <a href={`https://wa.me/${cleanPhone(current.primaryParentWhatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp genitore" className="antique-clickable absolute left-[38.5%] top-[72.5%] z-20 h-[3.7%] w-[6%] rounded-full" />}
+          {!isEditing && current.secondaryParentPhone && <a href={`tel:${cleanPhone(current.secondaryParentPhone)}`} aria-label="Chiama secondo genitore" className="antique-clickable absolute left-[8%] top-[91.2%] z-20 h-[3.7%] w-[6%] rounded-full" />}
+          {!isEditing && current.secondaryParentWhatsapp && <a href={`https://wa.me/${cleanPhone(current.secondaryParentWhatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp secondo genitore" className="antique-clickable absolute left-[15%] top-[91.2%] z-20 h-[3.7%] w-[6%] rounded-full" />}
 
           {isEditing ? (
             <>
@@ -234,7 +234,7 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
             </>
           )}
 
-          {!isEditing && <Link href="/studenti/libri" aria-label="Vedi dettagli libri" className="absolute left-[52%] top-[92.5%] z-20 h-[4%] w-[30%]" />}
+          {!isEditing && <Link href="/studenti/libri" aria-label="Vedi dettagli libri" className="antique-clickable absolute left-[52%] top-[92.5%] z-20 h-[4%] w-[30%] rounded-[10px]" />}
         </div>
       </div>
     </main>

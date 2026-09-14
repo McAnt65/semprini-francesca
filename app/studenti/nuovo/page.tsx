@@ -24,19 +24,19 @@ export default function NewStudentPage() {
             type="button"
             onClick={() => router.back()}
             aria-label="Indietro"
-            className="absolute left-[3%] top-[1.5%] z-30 h-[5%] w-[24%] bg-transparent"
+            className="antique-clickable absolute left-[3%] top-[1.5%] z-30 h-[5%] w-[24%] rounded-[12px] bg-transparent"
           />
 
           <Link
             href="/menu"
             aria-label="Torna al menù"
-            className="absolute right-[3%] top-[1.5%] z-30 h-[5%] w-[21%] bg-transparent"
+            className="antique-clickable absolute right-[3%] top-[1.5%] z-30 h-[5%] w-[21%] rounded-[12px] bg-transparent"
           />
 
           <Link
             href="/studenti/nuovo/dati-personali"
             aria-label="Fotografia e dati personali"
-            className="absolute left-[4.5%] right-[4.5%] top-[23.5%] z-30 h-[14%] rounded-[18px] bg-transparent"
+            className="antique-clickable absolute left-[4.5%] right-[4.5%] top-[23.5%] z-30 h-[14%] rounded-[18px] bg-transparent"
           />
         </div>
       </div>
