@@ -9,13 +9,17 @@ export default function StudentPersonalDataPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isWatercolor, setIsWatercolor] = useState(false);
 
   function handlePhotoChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      if (typeof reader.result === "string") setPhotoPreview(reader.result);
+      if (typeof reader.result === "string") {
+        setPhotoPreview(reader.result);
+        setIsWatercolor(false);
+      }
     };
     reader.readAsDataURL(file);
   }
@@ -30,7 +34,22 @@ export default function StudentPersonalDataPage() {
           <Link href="/menu" aria-label="Torna al menù" className="absolute right-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] bg-transparent" />
 
           <div className="absolute left-[12.4%] top-[30.2%] z-20 h-[22.3%] w-[34.2%] overflow-hidden bg-[#f2e8d6]">
-            {photoPreview && <Image src={photoPreview} alt="Anteprima" fill className="object-cover" />}
+            {photoPreview && (
+              <Image
+                src={photoPreview}
+                alt="Anteprima"
+                fill
+                className="object-cover transition-all duration-500"
+                style={
+                  isWatercolor
+                    ? {
+                        filter:
+                          "saturate(0.72) contrast(0.88) brightness(1.08) sepia(0.18)",
+                      }
+                    : undefined
+                }
+              />
+            )}
           </div>
 
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
@@ -38,15 +57,19 @@ export default function StudentPersonalDataPage() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="absolute left-[20.2%] top-[54.62%] z-30 flex h-[4.9%] w-[26.4%] items-center justify-center bg-transparent font-field-label text-[clamp(10px,2.5vw,13px)] leading-none text-[#6f1723]"
+            aria-label="Carica immagine"
+            className="absolute left-[20.2%] top-[54.62%] z-30 flex h-[4.9%] w-[26.4%] cursor-pointer items-center justify-center bg-transparent font-field-label text-[clamp(10px,2.5vw,13px)] leading-none text-[#6f1723]"
           >
             Carica immagine
           </button>
 
           <button
             type="button"
+            onClick={() => setIsWatercolor((value) => !value)}
             disabled={!photoPreview}
-            className="absolute left-[20.2%] top-[60.52%] z-30 flex h-[4.9%] w-[26.4%] items-center justify-center bg-transparent font-field-label text-[clamp(10px,2.5vw,13px)] leading-none text-[#6f1723] disabled:opacity-60"
+            aria-label="Applica effetto acquerello"
+            aria-pressed={isWatercolor}
+            className="absolute left-[20.2%] top-[60.52%] z-30 flex h-[4.9%] w-[26.4%] items-center justify-center bg-transparent font-field-label text-[clamp(10px,2.5vw,13px)] leading-none text-[#6f1723] enabled:cursor-pointer disabled:cursor-default disabled:opacity-45"
           >
             Acquerello
           </button>
