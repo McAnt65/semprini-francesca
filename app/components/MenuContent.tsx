@@ -23,47 +23,47 @@ export default function MenuContent() {
         
         {/* I miei studenti */}
         <Link href="/studenti" className="flex flex-col items-center justify-center p-3 rounded-xl bg-[#F5EFEB]/40 hover:bg-[#F5EFEB]/80 transition-all border border-[#8C6D53]/20 text-center group">
-          <span className="font-serif text-sm text-[#3C2A21] group-hover:scale-105 transition-transform">I miei studenti</span>
+          <span className="font-serif text-sm text-[#3C2A21]">I miei studenti</span>
         </Link>
 
         {/* Calendario */}
         <Link href="/calendario" className="flex flex-col items-center justify-center p-3 rounded-xl bg-[#F5EFEB]/40 hover:bg-[#F5EFEB]/80 transition-all border border-[#8C6D53]/20 text-center group">
-          <span className="font-serif text-sm text-[#3C2A21] group-hover:scale-105 transition-transform">Calendario</span>
+          <span className="font-serif text-sm text-[#3C2A21]">Calendario</span>
         </Link>
 
         {/* Materie */}
         <Link href="/materie" className="flex flex-col items-center justify-center p-3 rounded-xl bg-[#F5EFEB]/40 hover:bg-[#F5EFEB]/80 transition-all border border-[#8C6D53]/20 text-center group">
-          <span className="font-serif text-sm text-[#3C2A21] group-hover:scale-105 transition-transform">Materie</span>
+          <span className="font-serif text-sm text-[#3C2A21]">Materie</span>
         </Link>
 
         {/* Libri di testo */}
         <Link href="/libri" className="flex flex-col items-center justify-center p-3 rounded-xl bg-[#F5EFEB]/40 hover:bg-[#F5EFEB]/80 transition-all border border-[#8C6D53]/20 text-center group">
-          <span className="font-serif text-sm text-[#3C2A21] group-hover:scale-105 transition-transform">Libri di testo</span>
+          <span className="font-serif text-sm text-[#3C2A21]">Libri di testo</span>
         </Link>
 
         {/* Archivio condiviso */}
         <Link href="/archivio-condiviso" className="flex flex-col items-center justify-center p-3 rounded-xl bg-[#F5EFEB]/40 hover:bg-[#F5EFEB]/80 transition-all border border-[#8C6D53]/20 text-center group">
-          <span className="font-serif text-sm text-[#3C2A21] group-hover:scale-105 transition-transform">Archivio condiviso</span>
+          <span className="font-serif text-sm text-[#3C2A21]">Archivio condiviso</span>
         </Link>
 
         {/* Archivio personale */}
         <Link href="/archivio-personale" className="flex flex-col items-center justify-center p-3 rounded-xl bg-[#F5EFEB]/40 hover:bg-[#F5EFEB]/80 transition-all border border-[#8C6D53]/20 text-center group">
-          <span className="font-serif text-sm text-[#3C2A21] group-hover:scale-105 transition-transform">Archivio personale</span>
+          <span className="font-serif text-sm text-[#3C2A21]">Archivio personale</span>
         </Link>
 
         {/* Richieste lezioni */}
         <Link href="/richieste" className="flex flex-col items-center justify-center p-3 rounded-xl bg-[#F5EFEB]/40 hover:bg-[#F5EFEB]/80 transition-all border border-[#8C6D53]/20 text-center group">
-          <span className="font-serif text-sm text-[#3C2A21] group-hover:scale-105 transition-transform">Richieste lezioni</span>
+          <span className="font-serif text-sm text-[#3C2A21]">Richieste lezioni</span>
         </Link>
 
         {/* Lezioni a domicilio */}
         <Link href="/domicilio" className="flex flex-col items-center justify-center p-3 rounded-xl bg-[#F5EFEB]/40 hover:bg-[#F5EFEB]/80 transition-all border border-[#8C6D53]/20 text-center group">
-          <span className="font-serif text-sm text-[#3C2A21] group-hover:scale-105 transition-transform">Lezioni a domicilio</span>
+          <span className="font-serif text-sm text-[#3C2A21]">Lezioni a domicilio</span>
         </Link>
 
         {/* Tariffe e pagamenti */}
         <Link href="/tariffe" className="flex flex-col items-center justify-center p-3 rounded-xl bg-[#F5EFEB]/40 hover:bg-[#F5EFEB]/80 transition-all border border-[#8C6D53]/20 text-center group">
-          <span className="font-serif text-sm text-[#3C2A21] group-hover:scale-105 transition-transform">Tariffe e pagamenti</span>
+          <span className="font-serif text-sm text-[#3C2A21]">Tariffe e pagamenti</span>
         </Link>
 
       </div>
