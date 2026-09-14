@@ -38,7 +38,7 @@ export default function StudentPersonalDataPage() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="absolute left-[20.2%] top-[54.45%] z-30 flex h-[4.9%] w-[26.4%] items-center justify-center bg-transparent font-field-label text-[clamp(10px,2.5vw,13px)] leading-none text-[#6f1723]"
+            className="absolute left-[20.2%] top-[54.62%] z-30 flex h-[4.9%] w-[26.4%] items-center justify-center bg-transparent font-field-label text-[clamp(10px,2.5vw,13px)] leading-none text-[#6f1723]"
           >
             Carica immagine
           </button>
@@ -46,7 +46,7 @@ export default function StudentPersonalDataPage() {
           <button
             type="button"
             disabled={!photoPreview}
-            className="absolute left-[20.2%] top-[60.35%] z-30 flex h-[4.9%] w-[26.4%] items-center justify-center bg-transparent font-field-label text-[clamp(10px,2.5vw,13px)] leading-none text-[#6f1723] disabled:opacity-60"
+            className="absolute left-[20.2%] top-[60.52%] z-30 flex h-[4.9%] w-[26.4%] items-center justify-center bg-transparent font-field-label text-[clamp(10px,2.5vw,13px)] leading-none text-[#6f1723] disabled:opacity-60"
           >
             Acquerello
           </button>
