@@ -2,18 +2,69 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const WATER_SCALE = 0.72;
+const DRAFT_STORAGE_KEY = "semprini:new-student:personal-data";
+
+type PersonalDataDraft = {
+  firstName: string;
+  lastName: string;
+  birthDate: string;
+  studentSince: string;
+  originalPhotoPreview: string | null;
+  photoPreview: string | null;
+  isWatercolor: boolean;
+};
 
 export default function StudentPersonalDataPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [studentSince, setStudentSince] = useState("");
   const [originalPhotoPreview, setOriginalPhotoPreview] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isWatercolor, setIsWatercolor] = useState(false);
   const [isProcessingWatercolor, setIsProcessingWatercolor] = useState(false);
+
+  useEffect(() => {
+    const draft = loadDraft();
+    if (!draft) return;
+
+    queueMicrotask(() => {
+      setFirstName(draft.firstName);
+      setLastName(draft.lastName);
+      setBirthDate(draft.birthDate);
+      setStudentSince(draft.studentSince);
+      setOriginalPhotoPreview(draft.originalPhotoPreview);
+      setPhotoPreview(draft.photoPreview);
+      setIsWatercolor(draft.isWatercolor);
+    });
+  }, []);
+
+  function collectDraft(): PersonalDataDraft {
+    return {
+      firstName,
+      lastName,
+      birthDate,
+      studentSince,
+      originalPhotoPreview,
+      photoPreview,
+      isWatercolor,
+    };
+  }
+
+  function handleSave() {
+    saveDraft(collectDraft());
+  }
+
+  function handleNext() {
+    saveDraft(collectDraft());
+    router.push("/studenti/nuovo/scuola-materie-libri");
+  }
 
   function handlePhotoChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -105,17 +156,51 @@ export default function StudentPersonalDataPage() {
             Acquerello
           </button>
 
-          <Field label="Nome" labelTop="32.1%" inputTop="34.45%" placeholder="Inserisci il nome…" />
-          <Field label="Cognome" labelTop="41.8%" inputTop="44.15%" placeholder="Inserisci il cognome…" />
-          <Field label="Data di nascita" labelTop="51.7%" inputTop="54.35%" type="date" />
-          <Field label="Mio studente da…" labelTop="61.9%" inputTop="64.55%" type="date" />
+          <Field label="Nome" labelTop="32.1%" inputTop="34.45%" placeholder="Inserisci il nome…" value={firstName} onChange={setFirstName} />
+          <Field label="Cognome" labelTop="41.8%" inputTop="44.15%" placeholder="Inserisci il cognome…" value={lastName} onChange={setLastName} />
+          <Field label="Data di nascita" labelTop="51.7%" inputTop="54.35%" type="date" value={birthDate} onChange={setBirthDate} />
+          <Field label="Mio studente da…" labelTop="61.9%" inputTop="64.55%" type="date" value={studentSince} onChange={setStudentSince} />
 
-          <button type="button" aria-label="Salva dati personali" className="absolute bottom-[2.2%] left-[22.5%] z-30 h-[5.6%] w-[22.8%] bg-transparent" />
-          <button type="button" aria-label="Avanti" className="absolute bottom-[2.2%] right-[26.4%] z-30 h-[5.6%] w-[22.2%] bg-transparent" />
+          <button type="button" onClick={handleSave} aria-label="Salva dati personali" className="absolute bottom-[2.2%] left-[22.5%] z-30 h-[5.6%] w-[22.8%] bg-transparent" />
+          <button type="button" onClick={handleNext} aria-label="Avanti" className="absolute bottom-[2.2%] right-[26.4%] z-30 h-[5.6%] w-[22.2%] bg-transparent" />
         </div>
       </div>
     </main>
   );
+}
+
+function loadDraft(): PersonalDataDraft | null {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const storedDraft = window.localStorage.getItem(DRAFT_STORAGE_KEY) ?? window.sessionStorage.getItem(DRAFT_STORAGE_KEY);
+    if (!storedDraft) return null;
+    const draft = JSON.parse(storedDraft) as Partial<PersonalDataDraft>;
+
+    return {
+      firstName: typeof draft.firstName === "string" ? draft.firstName : "",
+      lastName: typeof draft.lastName === "string" ? draft.lastName : "",
+      birthDate: typeof draft.birthDate === "string" ? draft.birthDate : "",
+      studentSince: typeof draft.studentSince === "string" ? draft.studentSince : "",
+      originalPhotoPreview: typeof draft.originalPhotoPreview === "string" ? draft.originalPhotoPreview : null,
+      photoPreview: typeof draft.photoPreview === "string" ? draft.photoPreview : null,
+      isWatercolor: draft.isWatercolor === true,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function saveDraft(draft: PersonalDataDraft) {
+  const serializedDraft = JSON.stringify(draft);
+
+  try {
+    window.localStorage.setItem(DRAFT_STORAGE_KEY, serializedDraft);
+  } catch {
+    try {
+      window.sessionStorage.setItem(DRAFT_STORAGE_KEY, serializedDraft);
+    } catch {}
+  }
 }
 
 function loadImage(src: string) {
@@ -327,7 +412,7 @@ function addPigmentBlooms(context: CanvasRenderingContext2D, width: number, heig
   context.restore();
 }
 
-function Field({ label, labelTop, inputTop, type = "text", placeholder }: { label: string; labelTop: string; inputTop: string; type?: "text" | "date"; placeholder?: string; }) {
+function Field({ label, labelTop, inputTop, type = "text", placeholder, value, onChange }: { label: string; labelTop: string; inputTop: string; type?: "text" | "date"; placeholder?: string; value: string; onChange: (value: string) => void; }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   function openDatePicker() {
@@ -344,7 +429,7 @@ function Field({ label, labelTop, inputTop, type = "text", placeholder }: { labe
   return (
     <>
       <span className="pointer-events-none absolute left-[51.8%] z-30 w-[36.8%] font-field-label text-[clamp(9px,2.35vw,12px)] leading-none text-[#6f1723]" style={{ top: labelTop }}>{label}</span>
-      <input ref={inputRef} type={type} placeholder={placeholder} aria-label={label} className="absolute left-[49.3%] z-30 h-[4.25%] w-[39.3%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 text-center font-entry-elegant text-[clamp(13px,3.45vw,18px)] text-[#5b3a2d] !shadow-none !outline-none !ring-0 placeholder:font-entry-elegant placeholder:font-normal placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0" style={{ top: inputTop }} />
+      <input ref={inputRef} type={type} placeholder={placeholder} value={value} onChange={(event) => onChange(event.target.value)} aria-label={label} className="absolute left-[49.3%] z-30 h-[4.25%] w-[39.3%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 text-center font-entry-elegant text-[clamp(13px,3.45vw,18px)] text-[#5b3a2d] !shadow-none !outline-none !ring-0 placeholder:font-entry-elegant placeholder:font-normal placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0" style={{ top: inputTop }} />
       {type === "date" && <button type="button" onClick={openDatePicker} aria-label={`Apri calendario per ${label}`} className="absolute left-[84.2%] z-40 h-[4.25%] w-[5.2%] cursor-pointer bg-transparent" style={{ top: inputTop }} />}
     </>
   );

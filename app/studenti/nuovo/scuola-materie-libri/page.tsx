@@ -1,0 +1,48 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+export default function NewStudentSchoolSubjectsBooksPage() {
+  const router = useRouter();
+
+  return (
+    <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-[#4b3024]">
+      <div className="mx-auto w-full max-w-[430px] py-0 sm:py-3">
+        <div className="relative aspect-[1024/1792] w-full overflow-hidden bg-[#f4e7cf] sm:rounded-[28px]">
+          <Image
+            src="/student-edit-menu.png"
+            alt="Scuola, materie e libri di riferimento"
+            fill
+            priority
+            sizes="(max-width: 430px) 100vw, 430px"
+            className="object-cover"
+          />
+
+          <button
+            type="button"
+            onClick={() => router.back()}
+            aria-label="Indietro"
+            className="absolute left-[3%] top-[1.5%] z-30 h-[5%] w-[24%] bg-transparent"
+          />
+
+          <Link
+            href="/menu"
+            aria-label="Torna al menù"
+            className="absolute right-[3%] top-[1.5%] z-30 h-[5%] w-[21%] bg-transparent"
+          />
+
+          <section className="absolute left-[7%] right-[7%] top-[25%] z-20 rounded-[18px] border border-[#9b7658]/35 bg-[#f8ecd6]/90 px-5 py-6 text-center shadow-[0_8px_24px_rgba(72,48,30,0.12)]">
+            <p className="font-field-label text-[clamp(13px,3.6vw,17px)] leading-tight text-[#6f1723]">
+              Scuola · Materie · Libri di riferimento
+            </p>
+            <p className="mt-3 font-entry-elegant text-[clamp(12px,3.2vw,15px)] leading-snug text-[#5b3a2d]">
+              Sezione in preparazione.
+            </p>
+          </section>
+        </div>
+      </div>
+    </main>
+  );
+}
