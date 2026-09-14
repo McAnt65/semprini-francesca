@@ -261,9 +261,8 @@ function SubjectCard({
         active ? "border-[#60412f]/65 ring-1 ring-[#6c4b36]/35" : "border-[#98765a]/25"
       }`}
     >
-      <span className="block truncate font-serif text-[clamp(9px,2.5vw,12px)] italic text-[#4b3024]">{label}</span>
-      <span className="mt-0.5 block font-serif text-[clamp(8px,2.2vw,10px)] text-[#6c5140]">
-        {count} {count === 1 ? "studente" : "studenti"}
+      <span className="sr-only">
+        {label}: {count} {count === 1 ? "studente" : "studenti"}
       </span>
     </button>
   );
