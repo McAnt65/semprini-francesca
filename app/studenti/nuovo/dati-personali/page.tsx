@@ -40,14 +40,17 @@ export default function StudentPersonalDataPage() {
                 alt="Anteprima"
                 fill
                 className="object-cover transition-all duration-500"
-                style={
-                  isWatercolor
-                    ? {
-                        filter:
-                          "saturate(0.72) contrast(0.88) brightness(1.08) sepia(0.18)",
-                      }
-                    : undefined
-                }
+                style={{
+                  objectPosition: "50% 45%",
+                  transform: isWatercolor ? "scale(1.025)" : "scale(1.01)",
+                  filter: isWatercolor
+                    ? "saturate(0.58) contrast(0.78) brightness(1.14) sepia(0.28) blur(0.55px)"
+                    : "saturate(0.96) contrast(0.96) brightness(1.02)",
+                  WebkitMaskImage:
+                    "radial-gradient(ellipse at center, black 56%, rgba(0,0,0,0.92) 68%, rgba(0,0,0,0.55) 82%, transparent 100%)",
+                  maskImage:
+                    "radial-gradient(ellipse at center, black 56%, rgba(0,0,0,0.92) 68%, rgba(0,0,0,0.55) 82%, transparent 100%)",
+                }}
               />
             )}
           </div>
