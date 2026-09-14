@@ -206,12 +206,10 @@ export default function StudentsPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-[1.18fr_1fr_.9fr_.92fr] gap-2 border-b border-[#9b7658]/25 px-3 py-1.5 font-serif text-[clamp(7px,2vw,9px)] uppercase tracking-[0.08em] text-[#765844]">
-              <span>Nome</span>
-              <span>Scuola</span>
-              <span>Materie</span>
-              <span>Lezione</span>
-            </div>
+            <div
+              aria-hidden="true"
+              className="grid grid-cols-[1.18fr_1fr_.9fr_.92fr] gap-2 border-b border-[#9b7658]/25 px-3 py-1.5 font-serif text-[clamp(7px,2vw,9px)] uppercase tracking-[0.08em] text-[#765844]"
+            />
 
             <div className="h-[calc(100%-76px)] overflow-y-auto overscroll-contain [scrollbar-color:#9a7657_transparent] [scrollbar-width:thin]">
               {visibleStudents.map((student) => (
