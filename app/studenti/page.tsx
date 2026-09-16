@@ -8,8 +8,6 @@ import { students, type StudentRecord } from "../data/students";
 type SubjectFilter = "Tutte" | "Matematica" | "Fisica" | "Chimica";
 type SortMode = "az" | "lesson" | "recent";
 
-const SUBJECTS: SubjectFilter[] = ["Tutte", "Matematica", "Fisica", "Chimica"];
-
 function normalizeSubject(value: string) {
   const normalized = value.trim().toLowerCase();
   if (normalized.startsWith("mat")) return "Matematica";
@@ -50,26 +48,12 @@ export default function StudentsPage() {
   const [subject, setSubject] = useState<SubjectFilter>("Tutte");
   const [sortMode, setSortMode] = useState<SortMode>("az");
 
-  const subjectCounts = useMemo(() => {
-    const counts = { Matematica: 0, Fisica: 0, Chimica: 0 };
-
-    students.forEach((student) => {
-      const unique = new Set(student.subjects.map(normalizeSubject));
-      if (unique.has("Matematica")) counts.Matematica += 1;
-      if (unique.has("Fisica")) counts.Fisica += 1;
-      if (unique.has("Chimica")) counts.Chimica += 1;
-    });
-
-    return counts;
-  }, []);
-
   const visibleStudents = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
     const filtered = students.filter((student) => {
       const normalizedSubjects = student.subjects.map(normalizeSubject);
       const matchesSubject = subject === "Tutte" || normalizedSubjects.includes(subject);
-
       if (!matchesSubject) return false;
       if (!normalizedQuery) return true;
 
@@ -103,7 +87,7 @@ export default function StudentsPage() {
       <div className="mx-auto w-full max-w-[430px] px-0 sm:py-3">
         <div className="relative aspect-[977/1610] w-full overflow-hidden bg-[#f4e7cf] shadow-[0_10px_40px_rgba(72,48,30,0.16)] sm:rounded-[28px]">
           <img
-            src="/students-register-bg.png?v=20260912-2"
+            src="/students-register-bg.png?v=20260916-1"
             alt="Registro illustrato degli studenti"
             className="absolute inset-0 h-full w-full object-cover"
           />
@@ -112,112 +96,101 @@ export default function StudentsPage() {
             type="button"
             onClick={() => router.back()}
             aria-label="Indietro"
-            className="absolute left-[3.2%] top-[1.4%] z-30 h-[5.2%] w-[23%] bg-transparent"
+            className="antique-clickable absolute left-[3.2%] top-[1.4%] z-30 h-[5.2%] w-[23%] bg-transparent"
           />
 
           <Link
             href="/menu"
             aria-label="Torna al menù"
-            className="absolute right-[3.2%] top-[1.4%] z-30 h-[5.2%] w-[21%] bg-transparent"
+            className="antique-clickable absolute right-[3.2%] top-[1.4%] z-30 h-[5.2%] w-[21%] bg-transparent"
           />
 
-          <div className="absolute left-[4.2%] right-[4.2%] top-[21.3%] z-20 flex items-center gap-2.5">
-            <div className="relative flex-1 rounded-[14px] border border-[#a98663]/35 bg-[#f8ecd6]/94 px-4 py-2 shadow-[0_3px_10px_rgba(79,52,31,0.08)]">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#71503b]">⌕</span>
-              <input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Cerca uno studente…"
-                aria-label="Cerca uno studente"
-                className="w-full bg-transparent pl-6 pr-1 font-serif text-[clamp(12px,3.4vw,16px)] italic text-[#4b3024] outline-none placeholder:text-[#8b6f5a]/70"
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder=""
+            aria-label="Cerca uno studente"
+            className="absolute left-[7.2%] top-[22.0%] z-30 h-[4.7%] w-[58%] rounded-[14px] border-0 bg-transparent px-[5%] font-serif text-[clamp(12px,3.4vw,16px)] italic text-[#4b3024] outline-none focus:bg-[#f8ecd6]/95"
+          />
+
+          <Link
+            href="/studenti/nuovo"
+            aria-label="Nuovo studente"
+            className="antique-clickable absolute right-[4.2%] top-[21.7%] z-30 h-[5.1%] w-[27%] rounded-[14px] bg-transparent"
+          />
+
+          <button
+            type="button"
+            onClick={() => setSubject(subject === "Matematica" ? "Tutte" : "Matematica")}
+            aria-label="Filtra Matematica"
+            aria-pressed={subject === "Matematica"}
+            className="antique-clickable absolute left-[5.2%] top-[27.1%] z-30 h-[11.9%] w-[29.1%] rounded-[12px] bg-transparent"
+          />
+          <button
+            type="button"
+            onClick={() => setSubject(subject === "Fisica" ? "Tutte" : "Fisica")}
+            aria-label="Filtra Fisica"
+            aria-pressed={subject === "Fisica"}
+            className="antique-clickable absolute left-[35.4%] top-[27.1%] z-30 h-[11.9%] w-[29.1%] rounded-[12px] bg-transparent"
+          />
+          <button
+            type="button"
+            onClick={() => setSubject(subject === "Chimica" ? "Tutte" : "Chimica")}
+            aria-label="Filtra Chimica"
+            aria-pressed={subject === "Chimica"}
+            className="antique-clickable absolute right-[5.2%] top-[27.1%] z-30 h-[11.9%] w-[29.1%] rounded-[12px] bg-transparent"
+          />
+
+          <section className="absolute bottom-[15.4%] left-[3.5%] right-[3.5%] top-[39.4%] z-20 overflow-hidden bg-transparent">
+            <div className="relative h-[12.2%] bg-transparent">
+              <button
+                type="button"
+                onClick={() => setSubject("Tutte")}
+                aria-label="Mostra tutti gli studenti"
+                aria-pressed={subject === "Tutte"}
+                className="antique-clickable absolute left-[2.5%] top-[35%] h-[38%] w-[18%] rounded-full bg-transparent"
               />
+              <button
+                type="button"
+                onClick={() => setSubject("Matematica")}
+                aria-label="Mostra studenti di Matematica"
+                aria-pressed={subject === "Matematica"}
+                className="antique-clickable absolute left-[21.5%] top-[35%] h-[38%] w-[23%] rounded-full bg-transparent"
+              />
+              <button
+                type="button"
+                onClick={() => setSubject("Fisica")}
+                aria-label="Mostra studenti di Fisica"
+                aria-pressed={subject === "Fisica"}
+                className="antique-clickable absolute left-[45.5%] top-[35%] h-[38%] w-[17%] rounded-full bg-transparent"
+              />
+              <button
+                type="button"
+                onClick={() => setSubject("Chimica")}
+                aria-label="Mostra studenti di Chimica"
+                aria-pressed={subject === "Chimica"}
+                className="antique-clickable absolute left-[63.5%] top-[35%] h-[38%] w-[20%] rounded-full bg-transparent"
+              />
+
+              <select
+                value={sortMode}
+                onChange={(event) => setSortMode(event.target.value as SortMode)}
+                aria-label="Ordina studenti"
+                className="absolute right-[2%] top-[2%] h-[42%] w-[31%] cursor-pointer opacity-0"
+              >
+                <option value="az">A–Z</option>
+                <option value="lesson">Prossima lezione</option>
+                <option value="recent">Più recenti</option>
+              </select>
             </div>
 
-            <Link
-              href="/studenti/nuovo"
-              className="shrink-0 rounded-[14px] border border-[#a98663]/40 bg-[#f1dfbf]/94 px-3 py-2 font-serif text-[clamp(11px,3.1vw,15px)] italic text-[#4b3024] shadow-[0_3px_10px_rgba(79,52,31,0.08)]"
-            >
-              + Nuovo
-            </Link>
-          </div>
-
-          <div className="absolute left-[5.4%] right-[5.4%] top-[30.4%] z-20 grid grid-cols-3 gap-2">
-            <SubjectCard
-              label="Matematica"
-              count={subjectCounts.Matematica}
-              active={subject === "Matematica"}
-              tone="sage"
-              onClick={() => setSubject(subject === "Matematica" ? "Tutte" : "Matematica")}
-            />
-            <SubjectCard
-              label="Fisica"
-              count={subjectCounts.Fisica}
-              active={subject === "Fisica"}
-              tone="blue"
-              onClick={() => setSubject(subject === "Fisica" ? "Tutte" : "Fisica")}
-            />
-            <SubjectCard
-              label="Chimica"
-              count={subjectCounts.Chimica}
-              active={subject === "Chimica"}
-              tone="rose"
-              onClick={() => setSubject(subject === "Chimica" ? "Tutte" : "Chimica")}
-            />
-          </div>
-
-          <section className="absolute bottom-[15.4%] left-[3.5%] right-[3.5%] top-[39.4%] z-20 overflow-hidden rounded-[18px] border border-[#8d684a]/45 bg-[#f7ead2]/95 shadow-[inset_0_0_20px_rgba(104,72,45,0.06)]">
-            <div className="border-b border-[#9b7658]/30 bg-[#f5e6ca]/95 px-3 py-2">
-              <div className="flex items-center justify-between gap-2">
-                <p className="font-serif text-[clamp(9px,2.5vw,12px)] italic text-[#725542]">
-                  {visibleStudents.length} {visibleStudents.length === 1 ? "studente" : "studenti"}
-                  {subject !== "Tutte" ? ` · ${subject}` : ""}
-                </p>
-
-                <label className="flex items-center gap-1 font-serif text-[clamp(8px,2.3vw,11px)] italic text-[#725542]">
-                  <span>Ordina:</span>
-                  <select
-                    value={sortMode}
-                    onChange={(event) => setSortMode(event.target.value as SortMode)}
-                    aria-label="Ordina studenti"
-                    className="max-w-[128px] bg-transparent font-serif text-[#4b3024] outline-none"
-                  >
-                    <option value="az">A–Z</option>
-                    <option value="lesson">Prossima lezione</option>
-                    <option value="recent">Più recenti</option>
-                  </select>
-                </label>
-              </div>
-
-              <div className="mt-1.5 flex gap-1 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {SUBJECTS.map((item) => (
-                  <button
-                    type="button"
-                    key={item}
-                    onClick={() => setSubject(item)}
-                    className={`shrink-0 rounded-full border px-2 py-0.5 font-serif text-[clamp(8px,2.2vw,10px)] italic transition ${
-                      subject === item
-                        ? "border-[#74543f]/45 bg-[#dcc8a8]/75 text-[#493023]"
-                        : "border-[#9e7b5f]/25 bg-[#f8ecd7]/55 text-[#80634d]"
-                    }`}
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div
-              aria-hidden="true"
-              className="grid grid-cols-[1.18fr_1fr_.9fr_.92fr] gap-2 border-b border-[#9b7658]/25 px-3 py-1.5 font-serif text-[clamp(7px,2vw,9px)] uppercase tracking-[0.08em] text-[#765844]"
-            />
-
-            <div className="h-[calc(100%-76px)] overflow-y-auto overscroll-contain [scrollbar-color:#9a7657_transparent] [scrollbar-width:thin]">
+            <div className="h-[87.8%] overflow-y-auto overscroll-contain px-[2%] [scrollbar-color:#9a7657_transparent] [scrollbar-width:thin]">
               {visibleStudents.map((student) => (
                 <StudentRow key={student.id} student={student} />
               ))}
 
               {visibleStudents.length === 0 && (
-                <div className="flex h-full min-h-36 items-center justify-center px-6 text-center">
+                <div className="flex min-h-36 items-center justify-center px-6 text-center">
                   <p className="font-serif text-sm italic text-[#80644f]">
                     Nessuno studente corrisponde alla ricerca.
                   </p>
@@ -231,46 +204,11 @@ export default function StudentsPage() {
   );
 }
 
-function SubjectCard({
-  label,
-  count,
-  active,
-  tone,
-  onClick,
-}: {
-  label: "Matematica" | "Fisica" | "Chimica";
-  count: number;
-  active: boolean;
-  tone: "sage" | "blue" | "rose";
-  onClick: () => void;
-}) {
-  const tones = {
-    sage: "bg-[#dfe3cf]/95",
-    blue: "bg-[#d8e1e7]/95",
-    rose: "bg-[#ead2c6]/95",
-  };
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`min-w-0 rounded-[11px] border px-1.5 py-2 text-center shadow-[0_2px_7px_rgba(78,55,35,0.08)] transition ${tones[tone]} ${
-        active ? "border-[#60412f]/65 ring-1 ring-[#6c4b36]/35" : "border-[#98765a]/25"
-      }`}
-    >
-      <span className="sr-only">
-        {label}: {count} {count === 1 ? "studente" : "studenti"}
-      </span>
-    </button>
-  );
-}
-
 function StudentRow({ student }: { student: StudentRecord }) {
   const subjects = student.subjects.map(normalizeSubject);
 
   return (
-    <div className="grid min-h-[58px] grid-cols-[1.18fr_1fr_.9fr_.92fr] gap-2 border-b border-[#a8886e]/22 px-3 py-2.5 text-[#4b3024]">
+    <div className="grid min-h-[58px] grid-cols-[1.18fr_1fr_.9fr_.92fr] gap-2 border-b border-[#a8886e]/22 px-2 py-2.5 text-[#4b3024]">
       <div className="min-w-0">
         <Link
           href={`/studenti/${student.id}`}
@@ -301,17 +239,8 @@ function StudentRow({ student }: { student: StudentRecord }) {
 }
 
 function SubjectTag({ subject }: { subject: string }) {
-  const tone =
-    subject === "Matematica"
-      ? "bg-[#dce2ce]"
-      : subject === "Fisica"
-        ? "bg-[#d8e1e7]"
-        : subject === "Chimica"
-          ? "bg-[#ead1c5]"
-          : "bg-[#e8dcc5]";
-
   return (
-    <span className={`rounded-[5px] px-1.5 py-0.5 font-serif text-[clamp(7px,1.9vw,9px)] italic text-[#594234] ${tone}`}>
+    <span className="rounded-[5px] bg-transparent px-1 py-0.5 font-serif text-[clamp(7px,1.9vw,9px)] italic text-[#594234]">
       {subject}
     </span>
   );
