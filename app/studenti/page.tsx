@@ -116,7 +116,7 @@ export default function StudentsPage() {
           <Link
             href="/studenti/nuovo"
             aria-label="Nuovo studente"
-            className="antique-clickable absolute right-[4.2%] top-[21.7%] z-30 h-[5.1%] w-[27%] rounded-[14px] bg-transparent"
+            className="antique-clickable absolute left-[67.5%] top-[21.3%] z-30 h-[6.2%] w-[28.4%] rounded-[16px] bg-transparent"
           />
 
           <button
