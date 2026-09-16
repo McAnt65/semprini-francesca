@@ -108,9 +108,9 @@ export default function StudentsPage() {
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder=""
+            placeholder="Cerca studente"
             aria-label="Cerca uno studente"
-            className="absolute left-[7.2%] top-[22.0%] z-30 h-[4.7%] w-[58%] rounded-[14px] border-0 bg-transparent px-[5%] font-serif text-[clamp(12px,3.4vw,16px)] italic text-[#4b3024] outline-none focus:bg-[#f8ecd6]/95"
+            className="absolute left-[6.2%] top-[21.3%] z-30 h-[6.2%] w-[59.5%] border-0 bg-transparent px-[7.2%] font-serif text-[clamp(12px,3.4vw,16px)] italic text-[#4b3024] outline-none placeholder:text-[#8b6f5a]/75 focus:bg-transparent focus:placeholder:text-transparent"
           />
 
           <Link
