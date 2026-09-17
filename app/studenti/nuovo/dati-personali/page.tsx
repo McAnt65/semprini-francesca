@@ -181,6 +181,23 @@ export default function StudentPersonalDataPage() {
           <Field label="WhatsApp" left="41.4%" top="67.8%" width="52.7%" type="tel" variant="contact" value={whatsapp} onChange={setWhatsapp} />
           <Field label="Email" left="41.4%" top="74.5%" width="52.7%" type="email" variant="contact" value={email} onChange={setEmail} />
 
+          <ContactAction
+            href={phone.trim() ? `tel:${phone.replace(/[^\d+]/g, "")}` : null}
+            label="Chiama lo studente"
+            top="61.35%"
+          />
+          <ContactAction
+            href={whatsapp.trim() ? `https://wa.me/${toWhatsAppNumber(whatsapp)}` : null}
+            label="Apri WhatsApp"
+            top="67.8%"
+            external
+          />
+          <ContactAction
+            href={email.trim() ? `mailto:${email.trim()}` : null}
+            label="Scrivi una email"
+            top="74.5%"
+          />
+
           <button type="button" onClick={handleSave} aria-label="Salva dati personali" className="antique-clickable absolute bottom-[4.65%] left-[8.7%] z-30 h-[5.2%] w-[23.2%] rounded-[12px] bg-transparent" />
           <button type="button" onClick={handleNext} aria-label="Avanti" className="antique-clickable absolute bottom-[4.65%] right-[8.4%] z-30 h-[5.2%] w-[23.2%] rounded-[12px] bg-transparent" />
           {saveMessage && (
@@ -495,4 +512,28 @@ function Field({ label, left, top, width, displayWidth, type = "text", variant =
 function formatDate(value: string) {
   const [year, month, day] = value.split("-");
   return year && month && day ? `${day}/${month}/${year}` : value;
+}
+
+function toWhatsAppNumber(value: string) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.startsWith("00")) return digits.slice(2);
+  if (digits.startsWith("39")) return digits;
+  return `39${digits}`;
+}
+
+function ContactAction({ href, label, top, external = false }: { href: string | null; label: string; top: string; external?: boolean }) {
+  if (!href) {
+    return <span aria-hidden="true" className="pointer-events-none absolute left-[88.4%] z-40 h-[3.55%] w-[5.7%]" style={{ top }} />;
+  }
+
+  return (
+    <a
+      href={href}
+      aria-label={label}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noreferrer" : undefined}
+      className="antique-clickable absolute left-[88.4%] z-40 h-[3.55%] w-[5.7%] rounded-[6px] bg-transparent"
+      style={{ top }}
+    />
+  );
 }
