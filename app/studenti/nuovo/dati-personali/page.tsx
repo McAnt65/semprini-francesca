@@ -124,7 +124,7 @@ export default function StudentPersonalDataPage() {
     <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-[#4b3024]">
       <div className="mx-auto w-full max-w-[430px] py-0 sm:py-3">
         <div className="relative aspect-[941/1672] w-full overflow-hidden sm:rounded-[28px]">
-          <Image src="/student-personal-bg-clean.png?v=3" alt="Fotografia, dati personali e contatti dello studente" fill unoptimized priority sizes="(max-width: 430px) 100vw, 430px" className="select-none object-fill" />
+          <Image src="/student-personal-bg-clean.png?v=4" alt="Fotografia, dati personali e contatti dello studente" fill unoptimized priority sizes="(max-width: 430px) 100vw, 430px" className="select-none object-fill" />
 
           <button type="button" onClick={() => router.back()} aria-label="Indietro" className="antique-clickable absolute left-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] rounded-[12px] bg-transparent" />
           <Link href="/menu" aria-label="Torna al menù" className="antique-clickable absolute right-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] rounded-[12px] bg-transparent" />
