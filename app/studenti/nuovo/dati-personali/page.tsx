@@ -175,11 +175,11 @@ export default function StudentPersonalDataPage() {
 
           <Field label="Nome" left="41.4%" top="34.15%" width="52.7%" placeholder="Inserisci il nome…" value={firstName} onChange={setFirstName} />
           <Field label="Cognome" left="41.4%" top="40.35%" width="52.7%" placeholder="Inserisci il cognome…" value={lastName} onChange={setLastName} />
-          <Field label="Data di nascita" left="41.4%" top="46.55%" width="25.5%" type="date" value={birthDate} onChange={setBirthDate} dateButtonLeft="62.1%" />
-          <Field label="Mio studente da…" left="69.6%" top="46.55%" width="24.5%" type="date" value={studentSince} onChange={setStudentSince} dateButtonLeft="89.1%" />
-          <Field label="Telefono" left="41.4%" top="61.35%" width="52.7%" type="tel" value={phone} onChange={setPhone} />
-          <Field label="WhatsApp" left="41.4%" top="67.8%" width="52.7%" type="tel" value={whatsapp} onChange={setWhatsapp} />
-          <Field label="Email" left="41.4%" top="74.5%" width="52.7%" type="email" value={email} onChange={setEmail} />
+          <Field label="Data di nascita" left="41.4%" top="46.55%" width="25.5%" type="date" variant="date" value={birthDate} onChange={setBirthDate} dateButtonLeft="62.1%" />
+          <Field label="Mio studente da…" left="69.6%" top="46.55%" width="24.5%" type="date" variant="date" value={studentSince} onChange={setStudentSince} dateButtonLeft="89.1%" />
+          <Field label="Telefono" left="41.4%" top="61.35%" width="52.7%" type="tel" variant="contact" value={phone} onChange={setPhone} />
+          <Field label="WhatsApp" left="41.4%" top="67.8%" width="52.7%" type="tel" variant="contact" value={whatsapp} onChange={setWhatsapp} />
+          <Field label="Email" left="41.4%" top="74.5%" width="52.7%" type="email" variant="contact" value={email} onChange={setEmail} />
 
           <button type="button" onClick={handleSave} aria-label="Salva dati personali" className="antique-clickable absolute bottom-[4.65%] left-[8.7%] z-30 h-[5.2%] w-[23.2%] rounded-[12px] bg-transparent" />
           <button type="button" onClick={handleNext} aria-label="Avanti" className="antique-clickable absolute bottom-[4.65%] right-[8.4%] z-30 h-[5.2%] w-[23.2%] rounded-[12px] bg-transparent" />
@@ -460,8 +460,13 @@ function addPigmentBlooms(context: CanvasRenderingContext2D, width: number, heig
   context.restore();
 }
 
-function Field({ label, left, top, width, type = "text", placeholder, value, onChange, dateButtonLeft }: { label: string; left: string; top: string; width: string; type?: "text" | "date" | "tel" | "email"; placeholder?: string; value: string; onChange: (value: string) => void; dateButtonLeft?: string; }) {
+function Field({ label, left, top, width, type = "text", variant = "default", placeholder, value, onChange, dateButtonLeft }: { label: string; left: string; top: string; width: string; type?: "text" | "date" | "tel" | "email"; variant?: "default" | "date" | "contact"; placeholder?: string; value: string; onChange: (value: string) => void; dateButtonLeft?: string; }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const textSize = variant === "date"
+    ? "text-[clamp(11px,2.65vw,14px)] tracking-[-0.045em]"
+    : variant === "contact"
+      ? "text-[clamp(12px,2.9vw,15px)]"
+      : "text-[clamp(13px,3.45vw,18px)]";
 
   function openDatePicker() {
     const input = inputRef.current;
@@ -476,7 +481,7 @@ function Field({ label, left, top, width, type = "text", placeholder, value, onC
 
   return (
     <>
-      <input ref={inputRef} type={type} placeholder={placeholder} value={value} onChange={(event) => onChange(event.target.value)} aria-label={label} className="absolute z-30 h-[3.55%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 text-center font-entry-elegant text-[clamp(13px,3.45vw,18px)] text-[#5b3a2d] !shadow-none !outline-none !ring-0 placeholder:font-entry-elegant placeholder:font-normal placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0" style={{ left, top, width }} />
+      <input ref={inputRef} type={type} placeholder={placeholder} value={value} onChange={(event) => onChange(event.target.value)} aria-label={label} className={`absolute z-30 h-[3.55%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 text-center font-entry-elegant ${textSize} text-[#5b3a2d] !shadow-none !outline-none !ring-0 placeholder:font-entry-elegant placeholder:font-normal placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0`} style={{ left, top, width }} />
       {type === "date" && dateButtonLeft && <button type="button" onClick={openDatePicker} aria-label={`Apri calendario per ${label}`} className="antique-clickable absolute z-40 h-[3.55%] w-[5.2%] rounded-[6px] bg-transparent" style={{ left: dateButtonLeft, top }} />}
     </>
   );
