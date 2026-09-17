@@ -29,6 +29,7 @@ export default function StudentPersonalDataPage() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isWatercolor, setIsWatercolor] = useState(false);
   const [isProcessingWatercolor, setIsProcessingWatercolor] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("");
 
   useEffect(() => {
     const draft = loadDraft();
@@ -58,23 +59,31 @@ export default function StudentPersonalDataPage() {
   }
 
   function handleSave() {
-    saveDraft(collectDraft());
+    const saved = saveDraft(collectDraft());
+    setSaveMessage(saved ? "Dati salvati" : "Impossibile salvare: prova con una fotografia più leggera");
   }
 
   function handleNext() {
-    saveDraft(collectDraft());
+    const saved = saveDraft(collectDraft());
+    if (!saved) {
+      setSaveMessage("Impossibile salvare: prova con una fotografia più leggera");
+      return;
+    }
+
     router.push("/studenti/nuovo/scuola-materie-libri");
   }
 
-  function handlePhotoChange(event: ChangeEvent<HTMLInputElement>) {
+  async function handlePhotoChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       if (typeof reader.result === "string") {
-        setOriginalPhotoPreview(reader.result);
-        setPhotoPreview(reader.result);
+        const storedPreview = await createStoredPhotoPreview(reader.result);
+        setOriginalPhotoPreview(storedPreview);
+        setPhotoPreview(storedPreview);
         setIsWatercolor(false);
+        setSaveMessage("");
       }
     };
     reader.readAsDataURL(file);
@@ -102,8 +111,8 @@ export default function StudentPersonalDataPage() {
   return (
     <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-[#4b3024]">
       <div className="mx-auto w-full max-w-[430px] py-0 sm:py-3">
-        <div className="relative w-full overflow-hidden sm:rounded-[28px]">
-          <Image src="/student-personal-bg-clean.png" alt="Dati personali dello studente" width={977} height={1610} priority sizes="(max-width: 430px) 100vw, 430px" className="block h-auto w-full select-none" />
+        <div className="relative aspect-[977/1610] w-full overflow-hidden sm:rounded-[28px]">
+          <Image src="/student-personal-bg-clean.png?v=2" alt="Dati personali dello studente" fill unoptimized priority sizes="(max-width: 430px) 100vw, 430px" className="select-none object-fill" />
 
           <button type="button" onClick={() => router.back()} aria-label="Indietro" className="antique-clickable absolute left-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] rounded-[12px] bg-transparent" />
           <Link href="/menu" aria-label="Torna al menù" className="antique-clickable absolute right-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] rounded-[12px] bg-transparent" />
@@ -163,6 +172,11 @@ export default function StudentPersonalDataPage() {
 
           <button type="button" onClick={handleSave} aria-label="Salva dati personali" className="antique-clickable absolute bottom-[2.2%] left-[22.5%] z-30 h-[5.6%] w-[22.8%] rounded-[12px] bg-transparent" />
           <button type="button" onClick={handleNext} aria-label="Avanti" className="antique-clickable absolute bottom-[2.2%] right-[26.4%] z-30 h-[5.6%] w-[22.2%] rounded-[12px] bg-transparent" />
+          {saveMessage && (
+            <p role="status" className="absolute bottom-[0.35%] left-[8%] right-[8%] z-40 text-center font-field-label text-[10px] leading-none text-[#6f1723]">
+              {saveMessage}
+            </p>
+          )}
         </div>
       </div>
     </main>
@@ -196,11 +210,31 @@ function saveDraft(draft: PersonalDataDraft) {
 
   try {
     window.localStorage.setItem(DRAFT_STORAGE_KEY, serializedDraft);
+    return true;
   } catch {
     try {
       window.sessionStorage.setItem(DRAFT_STORAGE_KEY, serializedDraft);
-    } catch {}
+      return true;
+    } catch {
+      return false;
+    }
   }
+}
+
+async function createStoredPhotoPreview(src: string) {
+  const image = await loadImage(src);
+  const longestSide = Math.max(image.naturalWidth, image.naturalHeight);
+  const scale = Math.min(1, 1000 / longestSide);
+  const width = Math.max(1, Math.round(image.naturalWidth * scale));
+  const height = Math.max(1, Math.round(image.naturalHeight * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+  if (!context) return src;
+
+  context.drawImage(image, 0, 0, width, height);
+  return canvas.toDataURL("image/jpeg", 0.82);
 }
 
 function loadImage(src: string) {
