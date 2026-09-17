@@ -13,6 +13,9 @@ type PersonalDataDraft = {
   lastName: string;
   birthDate: string;
   studentSince: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
   originalPhotoPreview: string | null;
   photoPreview: string | null;
   isWatercolor: boolean;
@@ -25,6 +28,9 @@ export default function StudentPersonalDataPage() {
   const [lastName, setLastName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [studentSince, setStudentSince] = useState("");
+  const [phone, setPhone] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [email, setEmail] = useState("");
   const [originalPhotoPreview, setOriginalPhotoPreview] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isWatercolor, setIsWatercolor] = useState(false);
@@ -40,6 +46,9 @@ export default function StudentPersonalDataPage() {
       setLastName(draft.lastName);
       setBirthDate(draft.birthDate);
       setStudentSince(draft.studentSince);
+      setPhone(draft.phone);
+      setWhatsapp(draft.whatsapp);
+      setEmail(draft.email);
       setOriginalPhotoPreview(draft.originalPhotoPreview);
       setPhotoPreview(draft.photoPreview);
       setIsWatercolor(draft.isWatercolor);
@@ -52,6 +61,9 @@ export default function StudentPersonalDataPage() {
       lastName,
       birthDate,
       studentSince,
+      phone,
+      whatsapp,
+      email,
       originalPhotoPreview,
       photoPreview,
       isWatercolor,
@@ -111,14 +123,14 @@ export default function StudentPersonalDataPage() {
   return (
     <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-[#4b3024]">
       <div className="mx-auto w-full max-w-[430px] py-0 sm:py-3">
-        <div className="relative aspect-[977/1610] w-full overflow-hidden sm:rounded-[28px]">
-          <Image src="/student-personal-bg-clean.png?v=2" alt="Dati personali dello studente" fill unoptimized priority sizes="(max-width: 430px) 100vw, 430px" className="select-none object-fill" />
+        <div className="relative aspect-[941/1672] w-full overflow-hidden sm:rounded-[28px]">
+          <Image src="/student-personal-bg-clean.png?v=3" alt="Fotografia, dati personali e contatti dello studente" fill unoptimized priority sizes="(max-width: 430px) 100vw, 430px" className="select-none object-fill" />
 
           <button type="button" onClick={() => router.back()} aria-label="Indietro" className="antique-clickable absolute left-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] rounded-[12px] bg-transparent" />
           <Link href="/menu" aria-label="Torna al menù" className="antique-clickable absolute right-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] rounded-[12px] bg-transparent" />
 
           <div
-            className="absolute left-[12.4%] top-[30.2%] z-20 h-[22.3%] w-[34.2%] overflow-hidden bg-[#f2e8d6]"
+            className="absolute left-[5.25%] top-[28.55%] z-20 h-[24.05%] w-[30.2%] overflow-hidden bg-[#f2e8d6]"
             style={{
               WebkitMaskImage: photoPreview
                 ? "radial-gradient(ellipse at center, black 48%, rgba(0,0,0,0.9) 62%, rgba(0,0,0,0.42) 80%, transparent 100%)"
@@ -149,10 +161,8 @@ export default function StudentPersonalDataPage() {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             aria-label="Carica immagine"
-            className="antique-clickable absolute left-[20.2%] top-[54.62%] z-30 flex h-[4.9%] w-[26.4%] items-center justify-center rounded-[10px] bg-transparent font-field-label text-[clamp(10px,2.5vw,13px)] leading-none text-[#6f1723]"
-          >
-            Carica immagine
-          </button>
+            className="antique-clickable absolute left-[6.2%] top-[52.78%] z-30 h-[4.15%] w-[28.3%] rounded-[10px] bg-transparent"
+          />
 
           <button
             type="button"
@@ -160,18 +170,19 @@ export default function StudentPersonalDataPage() {
             disabled={!photoPreview || isProcessingWatercolor}
             aria-label="Applica effetto acquerello"
             aria-pressed={isWatercolor}
-            className="antique-clickable absolute left-[20.2%] top-[60.52%] z-30 flex h-[4.9%] w-[26.4%] items-center justify-center rounded-[10px] bg-transparent font-field-label text-[clamp(10px,2.5vw,13px)] leading-none text-[#6f1723] disabled:opacity-45"
-          >
-            Acquerello
-          </button>
+            className="antique-clickable absolute left-[6.2%] top-[57.35%] z-30 h-[4.15%] w-[28.3%] rounded-[10px] bg-transparent disabled:opacity-45"
+          />
 
-          <Field label="Nome" labelTop="32.1%" inputTop="34.45%" placeholder="Inserisci il nome…" value={firstName} onChange={setFirstName} />
-          <Field label="Cognome" labelTop="41.8%" inputTop="44.15%" placeholder="Inserisci il cognome…" value={lastName} onChange={setLastName} />
-          <Field label="Data di nascita" labelTop="51.7%" inputTop="54.35%" type="date" value={birthDate} onChange={setBirthDate} />
-          <Field label="Mio studente da…" labelTop="61.9%" inputTop="64.55%" type="date" value={studentSince} onChange={setStudentSince} />
+          <Field label="Nome" left="41.4%" top="34.15%" width="52.7%" placeholder="Inserisci il nome…" value={firstName} onChange={setFirstName} />
+          <Field label="Cognome" left="41.4%" top="40.35%" width="52.7%" placeholder="Inserisci il cognome…" value={lastName} onChange={setLastName} />
+          <Field label="Data di nascita" left="41.4%" top="46.55%" width="25.5%" type="date" value={birthDate} onChange={setBirthDate} dateButtonLeft="62.1%" />
+          <Field label="Mio studente da…" left="69.6%" top="46.55%" width="24.5%" type="date" value={studentSince} onChange={setStudentSince} dateButtonLeft="89.1%" />
+          <Field label="Telefono" left="41.4%" top="61.35%" width="52.7%" type="tel" value={phone} onChange={setPhone} />
+          <Field label="WhatsApp" left="41.4%" top="67.8%" width="52.7%" type="tel" value={whatsapp} onChange={setWhatsapp} />
+          <Field label="Email" left="41.4%" top="74.5%" width="52.7%" type="email" value={email} onChange={setEmail} />
 
-          <button type="button" onClick={handleSave} aria-label="Salva dati personali" className="antique-clickable absolute bottom-[2.2%] left-[22.5%] z-30 h-[5.6%] w-[22.8%] rounded-[12px] bg-transparent" />
-          <button type="button" onClick={handleNext} aria-label="Avanti" className="antique-clickable absolute bottom-[2.2%] right-[26.4%] z-30 h-[5.6%] w-[22.2%] rounded-[12px] bg-transparent" />
+          <button type="button" onClick={handleSave} aria-label="Salva dati personali" className="antique-clickable absolute bottom-[4.65%] left-[8.7%] z-30 h-[5.2%] w-[23.2%] rounded-[12px] bg-transparent" />
+          <button type="button" onClick={handleNext} aria-label="Avanti" className="antique-clickable absolute bottom-[4.65%] right-[8.4%] z-30 h-[5.2%] w-[23.2%] rounded-[12px] bg-transparent" />
           {saveMessage && (
             <p role="status" className="absolute bottom-[0.35%] left-[8%] right-[8%] z-40 text-center font-field-label text-[10px] leading-none text-[#6f1723]">
               {saveMessage}
@@ -196,6 +207,9 @@ function loadDraft(): PersonalDataDraft | null {
       lastName: typeof draft.lastName === "string" ? draft.lastName : "",
       birthDate: typeof draft.birthDate === "string" ? draft.birthDate : "",
       studentSince: typeof draft.studentSince === "string" ? draft.studentSince : "",
+      phone: typeof draft.phone === "string" ? draft.phone : "",
+      whatsapp: typeof draft.whatsapp === "string" ? draft.whatsapp : "",
+      email: typeof draft.email === "string" ? draft.email : "",
       originalPhotoPreview: typeof draft.originalPhotoPreview === "string" ? draft.originalPhotoPreview : null,
       photoPreview: typeof draft.photoPreview === "string" ? draft.photoPreview : null,
       isWatercolor: draft.isWatercolor === true,
@@ -446,7 +460,7 @@ function addPigmentBlooms(context: CanvasRenderingContext2D, width: number, heig
   context.restore();
 }
 
-function Field({ label, labelTop, inputTop, type = "text", placeholder, value, onChange }: { label: string; labelTop: string; inputTop: string; type?: "text" | "date"; placeholder?: string; value: string; onChange: (value: string) => void; }) {
+function Field({ label, left, top, width, type = "text", placeholder, value, onChange, dateButtonLeft }: { label: string; left: string; top: string; width: string; type?: "text" | "date" | "tel" | "email"; placeholder?: string; value: string; onChange: (value: string) => void; dateButtonLeft?: string; }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   function openDatePicker() {
@@ -462,9 +476,8 @@ function Field({ label, labelTop, inputTop, type = "text", placeholder, value, o
 
   return (
     <>
-      <span className="pointer-events-none absolute left-[51.8%] z-30 w-[36.8%] font-field-label text-[clamp(9px,2.35vw,12px)] leading-none text-[#6f1723]" style={{ top: labelTop }}>{label}</span>
-      <input ref={inputRef} type={type} placeholder={placeholder} value={value} onChange={(event) => onChange(event.target.value)} aria-label={label} className="absolute left-[49.3%] z-30 h-[4.25%] w-[39.3%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 text-center font-entry-elegant text-[clamp(13px,3.45vw,18px)] text-[#5b3a2d] !shadow-none !outline-none !ring-0 placeholder:font-entry-elegant placeholder:font-normal placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0" style={{ top: inputTop }} />
-      {type === "date" && <button type="button" onClick={openDatePicker} aria-label={`Apri calendario per ${label}`} className="antique-clickable absolute left-[84.2%] z-40 h-[4.25%] w-[5.2%] rounded-[6px] bg-transparent" style={{ top: inputTop }} />}
+      <input ref={inputRef} type={type} placeholder={placeholder} value={value} onChange={(event) => onChange(event.target.value)} aria-label={label} className="absolute z-30 h-[3.55%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 text-center font-entry-elegant text-[clamp(13px,3.45vw,18px)] text-[#5b3a2d] !shadow-none !outline-none !ring-0 placeholder:font-entry-elegant placeholder:font-normal placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0" style={{ left, top, width }} />
+      {type === "date" && dateButtonLeft && <button type="button" onClick={openDatePicker} aria-label={`Apri calendario per ${label}`} className="antique-clickable absolute z-40 h-[3.55%] w-[5.2%] rounded-[6px] bg-transparent" style={{ left: dateButtonLeft, top }} />}
     </>
   );
 }
