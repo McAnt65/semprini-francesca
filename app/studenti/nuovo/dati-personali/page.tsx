@@ -175,8 +175,8 @@ export default function StudentPersonalDataPage() {
 
           <Field label="Nome" left="41.4%" top="34.15%" width="52.7%" placeholder="Inserisci il nome…" value={firstName} onChange={setFirstName} />
           <Field label="Cognome" left="41.4%" top="40.35%" width="52.7%" placeholder="Inserisci il cognome…" value={lastName} onChange={setLastName} />
-          <Field label="Data di nascita" left="41.4%" top="46.55%" width="20.7%" type="date" variant="date" value={birthDate} onChange={setBirthDate} dateButtonLeft="62.1%" />
-          <Field label="Mio studente da…" left="69.6%" top="46.55%" width="19.5%" type="date" variant="date" value={studentSince} onChange={setStudentSince} dateButtonLeft="89.1%" />
+          <Field label="Data di nascita" left="41.4%" top="46.55%" width="25.5%" displayWidth="20.7%" type="date" variant="date" value={birthDate} onChange={setBirthDate} dateButtonLeft="62.1%" />
+          <Field label="Mio studente da…" left="69.6%" top="46.55%" width="24.5%" displayWidth="19.5%" type="date" variant="date" value={studentSince} onChange={setStudentSince} dateButtonLeft="89.1%" />
           <Field label="Telefono" left="41.4%" top="61.35%" width="52.7%" type="tel" variant="contact" value={phone} onChange={setPhone} />
           <Field label="WhatsApp" left="41.4%" top="67.8%" width="52.7%" type="tel" variant="contact" value={whatsapp} onChange={setWhatsapp} />
           <Field label="Email" left="41.4%" top="74.5%" width="52.7%" type="email" variant="contact" value={email} onChange={setEmail} />
@@ -460,7 +460,7 @@ function addPigmentBlooms(context: CanvasRenderingContext2D, width: number, heig
   context.restore();
 }
 
-function Field({ label, left, top, width, type = "text", variant = "default", placeholder, value, onChange, dateButtonLeft }: { label: string; left: string; top: string; width: string; type?: "text" | "date" | "tel" | "email"; variant?: "default" | "date" | "contact"; placeholder?: string; value: string; onChange: (value: string) => void; dateButtonLeft?: string; }) {
+function Field({ label, left, top, width, displayWidth, type = "text", variant = "default", placeholder, value, onChange, dateButtonLeft }: { label: string; left: string; top: string; width: string; displayWidth?: string; type?: "text" | "date" | "tel" | "email"; variant?: "default" | "date" | "contact"; placeholder?: string; value: string; onChange: (value: string) => void; dateButtonLeft?: string; }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const textSize = variant === "date"
     ? "text-[clamp(11px,2.65vw,14px)] tracking-[-0.045em]"
@@ -481,8 +481,18 @@ function Field({ label, left, top, width, type = "text", variant = "default", pl
 
   return (
     <>
-      <input ref={inputRef} type={type} placeholder={placeholder} value={value} onChange={(event) => onChange(event.target.value)} aria-label={label} className={`absolute z-30 h-[3.55%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 text-center font-entry-elegant ${textSize} text-[#5b3a2d] !shadow-none !outline-none !ring-0 placeholder:font-entry-elegant placeholder:font-normal placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0`} style={{ left, top, width }} />
+      <input ref={inputRef} type={type} placeholder={placeholder} value={value} onChange={(event) => onChange(event.target.value)} aria-label={label} className={`absolute z-30 h-[3.55%] appearance-none !border-0 !bg-transparent px-[2.5%] py-0 text-center font-entry-elegant ${textSize} ${variant === "date" ? "text-transparent caret-transparent" : "text-[#5b3a2d]"} !shadow-none !outline-none !ring-0 placeholder:font-entry-elegant placeholder:font-normal placeholder:text-[#8f735d]/45 focus:!border-0 focus:!bg-transparent focus:!outline-none focus:!ring-0 [&::-webkit-calendar-picker-indicator]:opacity-0`} style={{ left, top, width }} />
+      {variant === "date" && value && (
+        <span className="pointer-events-none absolute z-40 flex h-[3.55%] items-center justify-center font-entry-elegant text-[clamp(10px,2.35vw,12px)] tracking-[-0.035em] text-[#5b3a2d]" style={{ left, top, width: displayWidth ?? width }}>
+          {formatDate(value)}
+        </span>
+      )}
       {type === "date" && dateButtonLeft && <button type="button" onClick={openDatePicker} aria-label={`Apri calendario per ${label}`} className="antique-clickable absolute z-40 h-[3.55%] w-[5.2%] rounded-[6px] bg-transparent" style={{ left: dateButtonLeft, top }} />}
     </>
   );
+}
+
+function formatDate(value: string) {
+  const [year, month, day] = value.split("-");
+  return year && month && day ? `${day}/${month}/${year}` : value;
 }
