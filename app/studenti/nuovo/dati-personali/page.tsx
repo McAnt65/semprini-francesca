@@ -127,7 +127,7 @@ export default function StudentPersonalDataPage() {
           <Image src="/student-personal-bg-clean.png?v=4" alt="Fotografia, dati personali e contatti dello studente" fill unoptimized priority sizes="(max-width: 430px) 100vw, 430px" className="select-none object-fill" />
 
           <button type="button" onClick={() => router.back()} aria-label="Indietro" className="antique-clickable absolute left-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] rounded-[12px] bg-transparent" />
-          <Link href="/menu" aria-label="Torna al menù" className="antique-clickable absolute right-[3.1%] top-[1.2%] z-30 h-[5.2%] w-[24%] rounded-[12px] bg-transparent" />
+          <Link href="/menu" aria-label="Torna al menù" className="antique-clickable absolute right-[0.8%] top-[0.8%] z-30 h-[4.4%] w-[14.5%] rounded-[12px] bg-transparent" />
 
           <div
             className="absolute left-[5.25%] top-[28.55%] z-20 h-[24.05%] w-[30.2%] overflow-hidden bg-[#f2e8d6]"
@@ -175,8 +175,8 @@ export default function StudentPersonalDataPage() {
 
           <Field label="Nome" left="41.4%" top="34.15%" width="52.7%" placeholder="Inserisci il nome…" value={firstName} onChange={setFirstName} />
           <Field label="Cognome" left="41.4%" top="40.35%" width="52.7%" placeholder="Inserisci il cognome…" value={lastName} onChange={setLastName} />
-          <Field label="Data di nascita" left="41.4%" top="46.55%" width="25.5%" type="date" variant="date" value={birthDate} onChange={setBirthDate} dateButtonLeft="62.1%" />
-          <Field label="Mio studente da…" left="69.6%" top="46.55%" width="24.5%" type="date" variant="date" value={studentSince} onChange={setStudentSince} dateButtonLeft="89.1%" />
+          <Field label="Data di nascita" left="41.4%" top="46.55%" width="20.7%" type="date" variant="date" value={birthDate} onChange={setBirthDate} dateButtonLeft="62.1%" />
+          <Field label="Mio studente da…" left="69.6%" top="46.55%" width="19.5%" type="date" variant="date" value={studentSince} onChange={setStudentSince} dateButtonLeft="89.1%" />
           <Field label="Telefono" left="41.4%" top="61.35%" width="52.7%" type="tel" variant="contact" value={phone} onChange={setPhone} />
           <Field label="WhatsApp" left="41.4%" top="67.8%" width="52.7%" type="tel" variant="contact" value={whatsapp} onChange={setWhatsapp} />
           <Field label="Email" left="41.4%" top="74.5%" width="52.7%" type="email" variant="contact" value={email} onChange={setEmail} />
