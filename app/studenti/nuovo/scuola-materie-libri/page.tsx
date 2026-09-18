@@ -106,9 +106,9 @@ export default function NewStudentSchoolSubjectsBooksPage() {
 
           <TextField label="Nome della scuola" value={schoolName} onChange={setSchoolName} left="39.7%" top="35.45%" width="54.7%" />
 
-          <select value={schoolClass} onChange={(event) => { setSchoolClass(event.target.value); setSaveMessage(""); }} aria-label="Classe" className="absolute left-[6.3%] top-[48.55%] z-30 h-[2.55%] w-[37.3%] appearance-none border-0 bg-transparent px-[2%] text-center font-entry-elegant text-[clamp(11px,3.1vw,16px)] text-[#5b3a2d] outline-none">
+          <select value={schoolClass} onChange={(event) => { setSchoolClass(event.target.value); setSaveMessage(""); }} aria-label="Classe" className="absolute left-[6.3%] top-[48.55%] z-30 h-[2.55%] w-[37.3%] appearance-none border-0 bg-transparent px-[2%] text-center font-entry-elegant text-[clamp(10px,2.9vw,15px)] text-[#5b3a2d] outline-none">
             <option value="">Seleziona…</option>
-            <option>1ª</option><option>2ª</option><option>3ª</option><option>4ª</option><option>5ª</option>
+            <option>1° anno</option><option>2° anno</option><option>3° anno</option><option>4° anno</option><option>5° anno</option>
           </select>
 
           <TextField label="Sezione" value={section} onChange={setSection} left="46.8%" top="48.55%" width="26.8%" />
