@@ -1,17 +1,259 @@
 "use client";
 
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function NewStudentNotesPage() {
+const DRAFT_STORAGE_KEY = "semprini:new-student:personal-notes";
+
+type PersonalNotesDraft = {
+  personalNotes: string;
+  reminders: string;
+};
+
+const EMPTY_DRAFT: PersonalNotesDraft = {
+  personalNotes: "",
+  reminders: "",
+};
+
+export default function NewStudentPersonalNotesPage() {
   const router = useRouter();
 
+  const [draft, setDraft] =
+    useState<PersonalNotesDraft>(EMPTY_DRAFT);
+
+  const [saveMessage, setSaveMessage] =
+    useState("");
+
+  useEffect(() => {
+    const saved = loadDraft();
+
+    if (saved) {
+      queueMicrotask(() => setDraft(saved));
+    }
+  }, []);
+
+  function updateField(
+    field: keyof PersonalNotesDraft,
+    value: string
+  ) {
+    setDraft((current) => ({
+      ...current,
+      [field]: value,
+    }));
+
+    setSaveMessage("");
+  }
+
+  function saveCurrentDraft() {
+    const saved = saveDraft(draft);
+
+    setSaveMessage(
+      saved
+        ? "Dati salvati"
+        : "Impossibile salvare i dati"
+    );
+
+    return saved;
+  }
+
+  function goBack() {
+    saveCurrentDraft();
+    router.back();
+  }
+
+  function goToMenu() {
+    saveCurrentDraft();
+    router.push("/menu");
+  }
+
+  function goNext() {
+    if (!saveCurrentDraft()) return;
+
+    router.push("/studenti/nuovo/diario");
+  }
+
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-[#efe3ce] px-6 text-[#4b3024]">
-      <section className="w-full max-w-[430px] rounded-[28px] border border-[#9b7658]/35 bg-[#f8ecd6] px-8 py-12 text-center shadow-[0_8px_24px_rgba(72,48,30,0.12)]">
-        <h1 className="font-field-label text-2xl text-[#6f1723]">Note personali</h1>
-        <p className="mt-4 font-entry-elegant">La quarta pagina del profilo sarà il prossimo passaggio.</p>
-        <button type="button" onClick={() => router.back()} className="antique-clickable mt-8 rounded-full border border-[#8b6a50]/40 px-7 py-3 font-entry-elegant">Indietro</button>
-      </section>
+    <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-[#4b3024]">
+
+      <div className="mx-auto w-full max-w-[430px] py-0 sm:py-3">
+
+        <div className="relative aspect-[941/1672] w-full overflow-hidden sm:rounded-[28px]">
+
+          {/* SFONDO */}
+
+          <Image
+            src="/student-notes-bg.png"
+            alt="Note personali dello studente"
+            fill
+            unoptimized
+            priority
+            sizes="(max-width: 430px) 100vw, 430px"
+            className="select-none object-fill"
+          />
+
+          {/* =====================================================
+              NAVIGAZIONE SUPERIORE
+             ===================================================== */}
+
+          <button
+            type="button"
+            onClick={goBack}
+            aria-label="Indietro"
+            className="antique-clickable absolute left-[1.8%] top-[0.7%] z-30 h-[5.8%] w-[19.8%] rounded-[12px] bg-transparent"
+          />
+
+          <button
+            type="button"
+            onClick={goToMenu}
+            aria-label="Torna al menù"
+            className="antique-clickable absolute right-[1.6%] top-[0.7%] z-30 h-[5.8%] w-[18.8%] rounded-[12px] bg-transparent"
+          />
+
+          {/* =====================================================
+              NOTE PERSONALI
+             ===================================================== */}
+
+          <textarea
+            aria-label="Note personali"
+            value={draft.personalNotes}
+            onChange={(event) =>
+              updateField(
+                "personalNotes",
+                event.target.value
+              )
+            }
+            className="absolute left-[7.8%] top-[22.1%] z-30 h-[36.3%] w-[68.5%] resize-none border-0 bg-transparent px-[2%] py-[1.5%] font-entry-elegant text-[clamp(11px,2.85vw,15px)] leading-[1.45] text-[#5b3a2d] outline-none selection:bg-[#dcc8a8]"
+          />
+
+          {/* =====================================================
+              PROMEMORIA E SPUNTI
+             ===================================================== */}
+
+          <textarea
+            aria-label="Promemoria e spunti"
+            value={draft.reminders}
+            onChange={(event) =>
+              updateField(
+                "reminders",
+                event.target.value
+              )
+            }
+            className="absolute left-[14.2%] top-[66.4%] z-30 h-[13.4%] w-[59.1%] resize-none border-0 bg-transparent px-[2%] py-[1.5%] font-entry-elegant text-[clamp(10px,2.65vw,14px)] leading-[1.4] text-[#5b3a2d] outline-none selection:bg-[#dcc8a8]"
+          />
+
+          {/* =====================================================
+              SALVA
+             ===================================================== */}
+
+          <button
+            type="button"
+            onClick={saveCurrentDraft}
+            aria-label="Salva note personali"
+            className="antique-clickable absolute bottom-[1.65%] left-[25.3%] z-30 h-[5.1%] w-[18.8%] rounded-[12px] bg-transparent"
+          />
+
+          {/* =====================================================
+              AVANTI
+             ===================================================== */}
+
+          <button
+            type="button"
+            onClick={goNext}
+            aria-label="Avanti"
+            className="antique-clickable absolute bottom-[1.65%] left-[58.4%] z-30 h-[5.1%] w-[19.4%] rounded-[12px] bg-transparent"
+          />
+
+          {/* =====================================================
+              MESSAGGIO SALVATAGGIO
+             ===================================================== */}
+
+          {saveMessage && (
+            <p
+              role="status"
+              className="absolute bottom-[0.35%] left-[27%] right-[27%] z-40 text-center font-field-label text-[10px] leading-none text-[#6f2638]"
+            >
+              {saveMessage}
+            </p>
+          )}
+
+        </div>
+      </div>
     </main>
   );
+}
+
+/* =========================================================
+   CARICAMENTO BOZZA
+   ========================================================= */
+
+function loadDraft():
+  | PersonalNotesDraft
+  | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const stored =
+      window.localStorage.getItem(
+        DRAFT_STORAGE_KEY
+      ) ??
+      window.sessionStorage.getItem(
+        DRAFT_STORAGE_KEY
+      );
+
+    if (!stored) {
+      return null;
+    }
+
+    const parsed = JSON.parse(
+      stored
+    ) as Partial<PersonalNotesDraft>;
+
+    return {
+      personalNotes:
+        typeof parsed.personalNotes === "string"
+          ? parsed.personalNotes
+          : "",
+
+      reminders:
+        typeof parsed.reminders === "string"
+          ? parsed.reminders
+          : "",
+    };
+  } catch {
+    return null;
+  }
+}
+
+/* =========================================================
+   SALVATAGGIO BOZZA
+   ========================================================= */
+
+function saveDraft(
+  draft: PersonalNotesDraft
+) {
+  const serialized =
+    JSON.stringify(draft);
+
+  try {
+    window.localStorage.setItem(
+      DRAFT_STORAGE_KEY,
+      serialized
+    );
+
+    return true;
+  } catch {
+    try {
+      window.sessionStorage.setItem(
+        DRAFT_STORAGE_KEY,
+        serialized
+      );
+
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }

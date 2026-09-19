@@ -1,263 +1,524 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
+import type { StudentRecord } from "../data/students";
 
-interface StudentData {
-  enrollmentDate: string;
-  avatarUrl?: string;
-  firstName: string;
-  lastName: string;
-  birthDate: string;
-  school: string;
-  gradeClass: string;
-  phone: string;
-  whatsapp: string;
-  email: string;
-  address: string;
-  city: string;
-  primaryParent: string;
-  primaryParentPhone: string;
-  primaryParentWhatsapp: string;
-  primaryParentEmail: string;
-  secondaryParent?: string;
-  secondaryParentPhone?: string;
-  secondaryParentWhatsapp?: string;
-  subjects: string[];
-  textbooks: { math?: string; physics?: string; chemistry?: string };
-}
-
-const defaultStudent: StudentData = {
-  enrollmentDate: "",
-  avatarUrl: undefined,
-  firstName: "",
-  lastName: "",
-  birthDate: "",
-  school: "",
-  gradeClass: "",
-  phone: "",
-  whatsapp: "",
-  email: "",
-  address: "",
-  city: "",
-  primaryParent: "",
-  primaryParentPhone: "",
-  primaryParentWhatsapp: "",
-  primaryParentEmail: "",
-  secondaryParent: "",
-  secondaryParentPhone: "",
-  secondaryParentWhatsapp: "",
-  subjects: [],
-  textbooks: { math: "", physics: "", chemistry: "" },
-};
-
-function cleanPhone(phone: string) {
-  return phone.replace(/[^\d+]/g, "");
-}
-
-export default function StudentDetail({ student = defaultStudent }: { student?: StudentData }) {
+export default function StudentDetail({
+  student,
+}: {
+  student: StudentRecord;
+}) {
   const router = useRouter();
-  const [saved, setSaved] = useState<StudentData>(student);
-  const [draft, setDraft] = useState<StudentData>(student);
-  const [isEditing, setIsEditing] = useState(false);
 
-  const current = isEditing ? draft : saved;
-  const fullName = useMemo(
-    () => `${current.firstName} ${current.lastName}`.trim(),
-    [current.firstName, current.lastName]
+  const fullName =
+    `${student.firstName} ${student.lastName}`.trim();
+
+  const narrative = useMemo(
+    () => buildNarrative(student),
+    [student]
   );
 
-  function updateField<K extends keyof StudentData>(field: K, value: StudentData[K]) {
-    setDraft((prev) => ({ ...prev, [field]: value }));
+  const books = [
+    student.textbooks.math,
+    student.textbooks.physics,
+    student.textbooks.chemistry,
+  ].filter(
+    (book): book is string =>
+      typeof book === "string" &&
+      book.trim().length > 0
+  );
+
+  function callPhone(phone: string) {
+    const cleaned = cleanPhoneForCall(phone);
+
+    if (!cleaned) return;
+
+    window.location.href = `tel:${cleaned}`;
   }
 
-  function updateTextbook(field: keyof StudentData["textbooks"], value: string) {
-    setDraft((prev) => ({
-      ...prev,
-      textbooks: { ...prev.textbooks, [field]: value },
-    }));
+  function openWhatsApp(phone: string) {
+    const cleaned = cleanPhoneForWhatsApp(phone);
+
+    if (!cleaned) return;
+
+    window.open(
+      `https://wa.me/${cleaned}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
   }
 
-  function toggleEdit() {
-    if (isEditing) {
-      setSaved(draft);
-      setIsEditing(false);
-    } else {
-      setDraft(saved);
-      setIsEditing(true);
-    }
+  function sendMail(email: string) {
+    if (!email.trim()) return;
+
+    window.location.href = `mailto:${email.trim()}`;
+  }
+
+  function openMaps() {
+    const destination = [
+      student.address,
+      student.city,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    if (!destination) return;
+
+    window.open(
+      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        destination
+      )}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
   }
 
   return (
-    <main className="min-h-dvh w-full overflow-x-hidden bg-[#f4eddf]">
-      <div className="mx-auto w-full max-w-[430px]">
-        <div className="relative aspect-[768/1376] w-full">
+    <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-[#4b3024]">
+      <div className="mx-auto w-full max-w-[430px] py-0 sm:py-3">
+        <div className="relative aspect-[941/1672] w-full overflow-hidden sm:rounded-[28px]">
+
+          {/* SFONDO */}
           <Image
-            src="/student-profile-bg-v2.png"
-            alt="Scheda dello studente"
+            src="/student-diary-bg.png"
+            alt={`Diario di ${fullName}`}
             fill
             priority
+            unoptimized
             sizes="(max-width: 430px) 100vw, 430px"
-            className="object-contain"
+            className="select-none object-fill"
           />
 
+          {/* INDIETRO */}
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => router.push("/studenti")}
             aria-label="Torna a I miei studenti"
-            className="antique-clickable absolute left-[3%] top-[2.2%] z-20 h-[4%] w-[29%] rounded-[10px] bg-transparent"
+            className="antique-clickable absolute left-[1.8%] top-[0.8%] z-40 h-[5.6%] w-[19.5%] rounded-[12px] bg-transparent"
           />
 
+          {/* MENU */}
           <button
             type="button"
-            onClick={toggleEdit}
-            aria-label={isEditing ? "Salva scheda studente" : "Modifica scheda studente"}
-            className="antique-clickable absolute right-[3%] top-[2.2%] z-30 h-[4%] w-[18%] rounded-[10px] bg-transparent"
+            onClick={() => router.push("/menu")}
+            aria-label="Torna al menù"
+            className="antique-clickable absolute right-[1.7%] top-[0.8%] z-40 h-[5.6%] w-[18.8%] rounded-[12px] bg-transparent"
           />
 
-          {isEditing && (
-            <div className="pointer-events-none absolute right-[3.4%] top-[2.38%] z-20 bg-[#f3e6ca]/90 px-2 font-serif text-[clamp(8px,1.7vw,11px)] italic text-[#4b3528]">
-              Salva
-            </div>
-          )}
-
-          {fullName && (
-            <div className="absolute left-[22%] top-[7.0%] w-[56%] overflow-hidden text-center font-serif text-[clamp(10px,2.5vw,16px)] italic text-[#3c2a21]">
+          {/* NOME E COGNOME */}
+          <div className="absolute left-[20%] right-[18%] top-[9.8%] z-30 text-center">
+            <h1 className="font-entry-elegant text-[clamp(25px,6.5vw,36px)] font-medium leading-[0.92] text-[#6f2638]">
               {fullName}
-            </div>
-          )}
+            </h1>
+          </div>
 
-          {isEditing ? (
-            <TransparentInput value={draft.enrollmentDate} onChange={(v) => updateField("enrollmentDate", v)} left="45%" top="10.45%" width="30%" align="center" />
-          ) : (
-            <Field value={saved.enrollmentDate} left="45%" top="10.62%" width="30%" align="center" />
-          )}
-
-          <div className="absolute left-[7%] top-[14.8%] h-[23%] w-[35%] overflow-hidden">
-            {current.avatarUrl && (
-              <Image src={current.avatarUrl} alt={`${current.firstName} ${current.lastName}`} fill className="object-cover opacity-90" />
+          {/* FOTOGRAFIA */}
+          <div className="absolute left-[5.2%] top-[18.5%] z-30 h-[21.6%] w-[28.1%] overflow-hidden">
+            {student.avatarUrl && (
+              <Image
+                src={student.avatarUrl}
+                alt={`Fotografia di ${fullName}`}
+                fill
+                unoptimized
+                className="object-cover opacity-95"
+              />
             )}
           </div>
 
-          {!current.avatarUrl && (
-            <button type="button" aria-label="Aggiungi fotografia" className="antique-clickable absolute left-[14%] top-[24%] z-20 h-[9%] w-[22%] rounded-[12px] bg-transparent" />
+          {/* TESTO NARRATIVO */}
+          <div className="absolute left-[39.5%] top-[22.7%] z-30 h-[24.5%] w-[44.2%] overflow-hidden pr-[1%]">
+            <p className="font-entry-elegant text-[clamp(10px,2.45vw,13.5px)] leading-[1.42] text-[#51372a]">
+              {narrative}
+            </p>
+
+            {books.length > 0 && (
+              <p className="mt-[6%] font-entry-elegant text-[clamp(9px,2.25vw,12.5px)] leading-[1.38] text-[#5b3a2d]">
+                <span className="text-[#6f2638]">
+                  Libri di riferimento:
+                </span>{" "}
+                {formatList(books)}.
+              </p>
+            )}
+          </div>
+
+          {/* NOTE PERSONALI */}
+          {student.personalNotes && (
+            <div className="absolute left-[23.2%] top-[55.3%] z-30 h-[10.4%] w-[66.5%] overflow-hidden px-[1.5%] py-[1%]">
+              <p className="whitespace-pre-wrap font-entry-elegant text-[clamp(9px,2.35vw,12.5px)] leading-[1.38] text-[#5b3a2d]">
+                {student.personalNotes}
+              </p>
+            </div>
           )}
 
-          {isEditing ? (
-            <>
-              <TransparentInput value={draft.firstName} onChange={(v) => updateField("firstName", v)} left="63.8%" top="19.75%" width="18.5%" />
-              <TransparentInput value={draft.lastName} onChange={(v) => updateField("lastName", v)} left="63.8%" top="23.45%" width="18.5%" />
-              <TransparentInput value={draft.birthDate} onChange={(v) => updateField("birthDate", v)} left="63.8%" top="27.12%" width="18.5%" />
-              <TransparentInput value={draft.school} onChange={(v) => updateField("school", v)} left="63.8%" top="30.78%" width="18.5%" small />
-              <TransparentInput value={draft.gradeClass} onChange={(v) => updateField("gradeClass", v)} left="63.8%" top="34.42%" width="18.5%" />
-            </>
-          ) : (
-            <>
-              <Field value={saved.firstName} left="63.8%" top="20.0%" width="18.5%" />
-              <Field value={saved.lastName} left="63.8%" top="23.7%" width="18.5%" />
-              <Field value={saved.birthDate} left="63.8%" top="27.36%" width="18.5%" />
-              <Field value={saved.school} left="63.8%" top="31.02%" width="18.5%" small />
-              <Field value={saved.gradeClass} left="63.8%" top="34.66%" width="18.5%" />
-            </>
-          )}
+          {/* CONTATTI STUDENTE */}
+          <div className="absolute left-[28.5%] top-[74.0%] z-30 w-[27%] text-center">
+            <span className="font-entry-elegant text-[clamp(11px,2.9vw,15px)] text-[#4b3024]">
+              {student.firstName}
+            </span>
+          </div>
 
-          {isEditing ? (
-            <>
-              <TransparentInput value={draft.phone} onChange={(v) => updateField("phone", v)} left="20%" top="46.55%" width="20%" />
-              <TransparentInput value={draft.whatsapp} onChange={(v) => updateField("whatsapp", v)} left="20%" top="49.88%" width="20%" />
-              <TransparentInput value={draft.email} onChange={(v) => updateField("email", v)} left="20%" top="53.28%" width="20%" small />
-              <TransparentInput value={draft.address} onChange={(v) => updateField("address", v)} left="57.5%" top="46.55%" width="31%" />
-              <TransparentInput value={draft.city} onChange={(v) => updateField("city", v)} left="57.5%" top="51.75%" width="27%" />
-            </>
-          ) : (
-            <>
-              <Field value={saved.phone} left="20%" top="46.8%" width="21%" />
-              <Field value={saved.whatsapp} left="20%" top="50.1%" width="21%" />
-              <Field value={saved.email} left="20%" top="53.6%" width="21%" small />
-              <Field value={saved.address} left="57.5%" top="46.8%" width="31%" />
-              <Field value={saved.city} left="57.5%" top="52.0%" width="27%" />
-            </>
-          )}
+          <button
+            type="button"
+            aria-label={`Chiama ${student.firstName}`}
+            disabled={!student.phone.trim()}
+            onClick={() => callPhone(student.phone)}
+            className="antique-clickable absolute left-[61.2%] top-[72.8%] z-40 h-[4.5%] w-[6.9%] rounded-full bg-transparent disabled:pointer-events-none"
+          />
 
-          {!isEditing && current.phone && <a href={`tel:${cleanPhone(current.phone)}`} aria-label="Chiama studente" className="antique-clickable absolute left-[36.6%] top-[45.8%] z-20 h-[3.5%] w-[5.8%] rounded-full" />}
-          {!isEditing && current.whatsapp && <a href={`https://wa.me/${cleanPhone(current.whatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp studente" className="antique-clickable absolute left-[36.6%] top-[49.3%] z-20 h-[3.5%] w-[5.8%] rounded-full" />}
-          {!isEditing && current.email && <a href={`mailto:${current.email}`} aria-label="Email studente" className="antique-clickable absolute left-[36.6%] top-[52.8%] z-20 h-[3.5%] w-[5.8%] rounded-full" />}
+          <button
+            type="button"
+            aria-label={`Apri WhatsApp di ${student.firstName}`}
+            disabled={
+              !(
+                student.whatsapp ||
+                student.phone
+              ).trim()
+            }
+            onClick={() =>
+              openWhatsApp(
+                student.whatsapp ||
+                  student.phone
+              )
+            }
+            className="antique-clickable absolute left-[68.9%] top-[72.8%] z-40 h-[4.5%] w-[6.9%] rounded-full bg-transparent disabled:pointer-events-none"
+          />
 
-          {!isEditing && (current.address || current.city) && (
-            <a href={`https://maps.google.com/?q=${encodeURIComponent(`${current.address} ${current.city}`)}`} target="_blank" rel="noopener noreferrer" aria-label="Apri indirizzo in Maps" className="antique-clickable absolute left-[50%] top-[56.3%] z-20 h-[4%] w-[28%] rounded-[10px]" />
-          )}
+          <button
+            type="button"
+            aria-label={`Invia email a ${student.firstName}`}
+            disabled={!student.email.trim()}
+            onClick={() => sendMail(student.email)}
+            className="antique-clickable absolute left-[76.7%] top-[72.8%] z-40 h-[4.5%] w-[6.9%] rounded-full bg-transparent disabled:pointer-events-none"
+          />
 
-          {isEditing ? (
-            <>
-              <TransparentInput value={draft.primaryParent} onChange={(v) => updateField("primaryParent", v)} left="8%" top="67.35%" width="35%" />
-              <TransparentInput value={draft.primaryParentPhone} onChange={(v) => updateField("primaryParentPhone", v)} left="8%" top="70.15%" width="28%" small />
-              <TransparentInput value={draft.primaryParentEmail} onChange={(v) => updateField("primaryParentEmail", v)} left="17%" top="74.85%" width="25%" small />
-              <TransparentInput value={draft.secondaryParent || ""} onChange={(v) => updateField("secondaryParent", v)} left="8%" top="81.75%" width="35%" />
-              <TransparentInput value={draft.secondaryParentPhone || ""} onChange={(v) => updateField("secondaryParentPhone", v)} left="8%" top="84.55%" width="28%" small />
-            </>
-          ) : (
-            <>
-              <Field value={saved.primaryParent} left="8%" top="67.6%" width="35%" />
-              <Field value={saved.primaryParentPhone} left="8%" top="70.4%" width="28%" small />
-              <Field value={saved.primaryParentEmail} left="17%" top="75.1%" width="25%" small />
-              <Field value={saved.secondaryParent || ""} left="8%" top="82.0%" width="35%" />
-              <Field value={saved.secondaryParentPhone || ""} left="8%" top="84.8%" width="28%" small />
-            </>
-          )}
+          <button
+            type="button"
+            aria-label={`Apri indirizzo di ${student.firstName} sulla mappa`}
+            disabled={
+              !student.address.trim() &&
+              !student.city.trim()
+            }
+            onClick={openMaps}
+            className="antique-clickable absolute left-[84.4%] top-[72.8%] z-40 h-[4.5%] w-[6.9%] rounded-full bg-transparent disabled:pointer-events-none"
+          />
 
-          {!isEditing && current.primaryParentPhone && <a href={`tel:${cleanPhone(current.primaryParentPhone)}`} aria-label="Chiama genitore" className="antique-clickable absolute left-[32%] top-[72.5%] z-20 h-[3.7%] w-[6%] rounded-full" />}
-          {!isEditing && current.primaryParentWhatsapp && <a href={`https://wa.me/${cleanPhone(current.primaryParentWhatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp genitore" className="antique-clickable absolute left-[38.5%] top-[72.5%] z-20 h-[3.7%] w-[6%] rounded-full" />}
-          {!isEditing && current.secondaryParentPhone && <a href={`tel:${cleanPhone(current.secondaryParentPhone)}`} aria-label="Chiama secondo genitore" className="antique-clickable absolute left-[8%] top-[91.2%] z-20 h-[3.7%] w-[6%] rounded-full" />}
-          {!isEditing && current.secondaryParentWhatsapp && <a href={`https://wa.me/${cleanPhone(current.secondaryParentWhatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp secondo genitore" className="antique-clickable absolute left-[15%] top-[91.2%] z-20 h-[3.7%] w-[6%] rounded-full" />}
+          {/* CONTATTI GENITORE */}
+          <div className="absolute left-[28.5%] top-[80.0%] z-30 w-[27%] text-center">
+            <span className="font-entry-elegant text-[clamp(11px,2.9vw,15px)] text-[#4b3024]">
+              {student.primaryParent || "Genitore"}
+            </span>
+          </div>
 
-          {isEditing ? (
-            <>
-              <TransparentInput
-                value={draft.subjects.join(", ")}
-                onChange={(v) => updateField("subjects", v.split(",").map((item) => item.trim()).filter(Boolean))}
-                left="63%"
-                top="68.45%"
-                width="29%"
-              />
-              <TransparentInput value={draft.textbooks.math || ""} onChange={(v) => updateTextbook("math", v)} left="64%" top="81.35%" width="28%" small />
-              <TransparentInput value={draft.textbooks.physics || ""} onChange={(v) => updateTextbook("physics", v)} left="64%" top="84.95%" width="28%" small />
-              <TransparentInput value={draft.textbooks.chemistry || ""} onChange={(v) => updateTextbook("chemistry", v)} left="64%" top="88.55%" width="28%" small />
-            </>
-          ) : (
-            <>
-              <Field value={saved.subjects.join(" · ")} left="63%" top="68.7%" width="29%" />
-              <Field value={saved.textbooks.math || ""} left="64%" top="81.6%" width="28%" small />
-              <Field value={saved.textbooks.physics || ""} left="64%" top="85.2%" width="28%" small />
-              <Field value={saved.textbooks.chemistry || ""} left="64%" top="88.8%" width="28%" small />
-            </>
-          )}
+          <button
+            type="button"
+            aria-label="Chiama il genitore di riferimento"
+            disabled={!student.primaryParentPhone.trim()}
+            onClick={() =>
+              callPhone(
+                student.primaryParentPhone
+              )
+            }
+            className="antique-clickable absolute left-[61.2%] top-[78.8%] z-40 h-[4.5%] w-[6.9%] rounded-full bg-transparent disabled:pointer-events-none"
+          />
 
-          {!isEditing && <Link href="/studenti/libri" aria-label="Vedi dettagli libri" className="antique-clickable absolute left-[52%] top-[92.5%] z-20 h-[4%] w-[30%] rounded-[10px]" />}
+          <button
+            type="button"
+            aria-label="Apri WhatsApp del genitore di riferimento"
+            disabled={
+              !(
+                student.primaryParentWhatsapp ||
+                student.primaryParentPhone
+              ).trim()
+            }
+            onClick={() =>
+              openWhatsApp(
+                student.primaryParentWhatsapp ||
+                  student.primaryParentPhone
+              )
+            }
+            className="antique-clickable absolute left-[68.9%] top-[78.8%] z-40 h-[4.5%] w-[6.9%] rounded-full bg-transparent disabled:pointer-events-none"
+          />
+
+          <button
+            type="button"
+            aria-label="Invia email al genitore di riferimento"
+            disabled={!student.primaryParentEmail.trim()}
+            onClick={() =>
+              sendMail(
+                student.primaryParentEmail
+              )
+            }
+            className="antique-clickable absolute left-[76.7%] top-[78.8%] z-40 h-[4.5%] w-[6.9%] rounded-full bg-transparent disabled:pointer-events-none"
+          />
+
+          {/* FINE */}
+          <button
+            type="button"
+            onClick={() => router.push("/studenti")}
+            aria-label="Fine"
+            className="antique-clickable absolute bottom-[2.0%] right-[5.8%] z-40 h-[6.2%] w-[26.5%] rounded-[16px] bg-transparent"
+          />
+
         </div>
       </div>
     </main>
   );
 }
 
-function Field({ value, left, top, width, small = false, align = "left" }: { value: string; left: string; top: string; width: string; small?: boolean; align?: "left" | "center" }) {
-  if (!value) return null;
-  return (
-    <div className={`absolute overflow-hidden whitespace-nowrap font-serif text-[#3c2a21] ${small ? "text-[clamp(7px,1.5vw,11px)]" : "text-[clamp(8px,1.75vw,12px)]"} ${align === "center" ? "text-center" : "text-left"}`} style={{ left, top, width }}>
-      {value}
-    </div>
-  );
+function buildNarrative(
+  student: StudentRecord
+) {
+  const sentences: string[] = [];
+
+  const firstName =
+    student.firstName ||
+    "Lo studente";
+
+  const age =
+    calculateAge(student.birthDate);
+
+  if (age !== null) {
+    sentences.push(
+      `${firstName} ha ${age} anni.`
+    );
+  }
+
+  if (
+    student.gradeClass &&
+    student.school
+  ) {
+    sentences.push(
+      `Frequenta ${student.gradeClass} presso ${student.school}.`
+    );
+  } else if (student.school) {
+    sentences.push(
+      `Frequenta ${student.school}.`
+    );
+  } else if (student.gradeClass) {
+    sentences.push(
+      `Frequenta ${student.gradeClass}.`
+    );
+  }
+
+  const residence = [
+    student.address,
+    student.city
+      ? `a ${student.city}`
+      : "",
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  if (residence) {
+    sentences.push(
+      `Abita ${residence}.`
+    );
+  }
+
+  if (
+    student.primaryParent &&
+    student.secondaryParent
+  ) {
+    sentences.push(
+      `I suoi riferimenti familiari sono ${student.primaryParent} e ${student.secondaryParent}.`
+    );
+  } else if (
+    student.primaryParent
+  ) {
+    sentences.push(
+      `Il suo genitore di riferimento è ${student.primaryParent}.`
+    );
+  }
+
+  if (
+    student.subjects.length > 0
+  ) {
+    sentences.push(
+      `È seguito in ${formatList(
+        student.subjects
+      )}.`
+    );
+  }
+
+  if (
+    student.enrollmentDate
+  ) {
+    sentences.push(
+      `È mio studente dal ${formatItalianDate(
+        student.enrollmentDate
+      )}.`
+    );
+  }
+
+  if (
+    sentences.length === 0
+  ) {
+    return "Le informazioni dello studente compariranno qui automaticamente.";
+  }
+
+  return sentences.join(" ");
 }
 
-function TransparentInput({ value, onChange, left, top, width, small = false, align = "left" }: { value: string; onChange: (value: string) => void; left: string; top: string; width: string; small?: boolean; align?: "left" | "center" }) {
-  return (
-    <input
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      aria-label="Campo scheda studente"
-      className={`absolute z-30 border-0 bg-transparent p-0 font-serif text-[#3c2a21] outline-none ${small ? "text-[clamp(7px,1.5vw,11px)]" : "text-[clamp(8px,1.75vw,12px)]"} ${align === "center" ? "text-center" : "text-left"}`}
-      style={{ left, top, width }}
-    />
-  );
+function calculateAge(
+  value: string
+) {
+  if (!value) return null;
+
+  let birth: Date;
+
+  const italianMatch =
+    value.match(
+      /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+    );
+
+  if (italianMatch) {
+    const [
+      ,
+      day,
+      month,
+      year,
+    ] = italianMatch;
+
+    birth = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day)
+    );
+  } else {
+    birth = new Date(value);
+  }
+
+  if (
+    Number.isNaN(
+      birth.getTime()
+    )
+  ) {
+    return null;
+  }
+
+  const today =
+    new Date();
+
+  let age =
+    today.getFullYear() -
+    birth.getFullYear();
+
+  const monthDifference =
+    today.getMonth() -
+    birth.getMonth();
+
+  if (
+    monthDifference < 0 ||
+    (
+      monthDifference === 0 &&
+      today.getDate() <
+        birth.getDate()
+    )
+  ) {
+    age--;
+  }
+
+  return age >= 0
+    ? age
+    : null;
+}
+
+function formatItalianDate(
+  value: string
+) {
+  if (!value) return "";
+
+  let date: Date;
+
+  const italianMatch =
+    value.match(
+      /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+    );
+
+  if (italianMatch) {
+    const [
+      ,
+      day,
+      month,
+      year,
+    ] = italianMatch;
+
+    date = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day)
+    );
+  } else {
+    date = new Date(value);
+  }
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat(
+    "it-IT",
+    {
+      month: "long",
+      year: "numeric",
+    }
+  ).format(date);
+}
+
+function formatList(
+  values: string[]
+) {
+  const cleanValues =
+    values.filter(Boolean);
+
+  if (cleanValues.length === 0) {
+    return "";
+  }
+
+  if (cleanValues.length === 1) {
+    return cleanValues[0];
+  }
+
+  if (cleanValues.length === 2) {
+    return `${cleanValues[0]} e ${cleanValues[1]}`;
+  }
+
+  return `${cleanValues
+    .slice(0, -1)
+    .join(", ")} e ${
+    cleanValues[
+      cleanValues.length - 1
+    ]
+  }`;
+}
+
+function cleanPhoneForCall(
+  value: string
+) {
+  return value
+    .trim()
+    .replace(/[^\d+]/g, "");
+}
+
+function cleanPhoneForWhatsApp(
+  value: string
+) {
+  let cleaned =
+    value.replace(/\D/g, "");
+
+  if (
+    cleaned &&
+    !cleaned.startsWith("39")
+  ) {
+    cleaned =
+      `39${cleaned}`;
+  }
+
+  return cleaned;
 }
