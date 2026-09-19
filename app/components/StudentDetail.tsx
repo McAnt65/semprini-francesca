@@ -4,32 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { StudentRecord } from "../data/students";
+import { saveStoredStudent } from "../data/student-storage";
 
-interface StudentData {
-  enrollmentDate: string;
-  avatarUrl?: string;
-  firstName: string;
-  lastName: string;
-  birthDate: string;
-  school: string;
-  gradeClass: string;
-  phone: string;
-  whatsapp: string;
-  email: string;
-  address: string;
-  city: string;
-  primaryParent: string;
-  primaryParentPhone: string;
-  primaryParentWhatsapp: string;
-  primaryParentEmail: string;
-  secondaryParent?: string;
-  secondaryParentPhone?: string;
-  secondaryParentWhatsapp?: string;
-  subjects: string[];
-  textbooks: { math?: string; physics?: string; chemistry?: string };
-}
+type StudentData = StudentRecord;
 
 const defaultStudent: StudentData = {
+  id: "",
   enrollmentDate: "",
   avatarUrl: undefined,
   firstName: "",
@@ -55,6 +36,18 @@ const defaultStudent: StudentData = {
 
 function cleanPhone(phone: string) {
   return phone.replace(/[^\d+]/g, "");
+}
+
+function cleanWhatsApp(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  return digits && !digits.startsWith("39") ? `39${digits}` : digits;
+}
+
+function formatDate(value: string) {
+  if (!value) return "";
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (dateOnly) return `${dateOnly[3]}/${dateOnly[2]}/${dateOnly[1]}`;
+  return value;
 }
 
 export default function StudentDetail({ student = defaultStudent }: { student?: StudentData }) {
@@ -83,6 +76,7 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
   function toggleEdit() {
     if (isEditing) {
       setSaved(draft);
+      saveStoredStudent({ ...draft, updatedAt: new Date().toISOString() });
       setIsEditing(false);
     } else {
       setDraft(saved);
@@ -132,12 +126,12 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
           {isEditing ? (
             <TransparentInput value={draft.enrollmentDate} onChange={(v) => updateField("enrollmentDate", v)} left="45%" top="10.45%" width="30%" align="center" />
           ) : (
-            <Field value={saved.enrollmentDate} left="45%" top="10.62%" width="30%" align="center" />
+            <Field value={formatDate(saved.enrollmentDate)} left="45%" top="10.62%" width="30%" align="center" />
           )}
 
           <div className="absolute left-[7%] top-[14.8%] h-[23%] w-[35%] overflow-hidden">
             {current.avatarUrl && (
-              <Image src={current.avatarUrl} alt={`${current.firstName} ${current.lastName}`} fill className="object-cover opacity-90" />
+              <Image src={current.avatarUrl} alt={`${current.firstName} ${current.lastName}`} fill unoptimized className="object-cover opacity-90" />
             )}
           </div>
 
@@ -157,8 +151,8 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
             <>
               <Field value={saved.firstName} left="63.8%" top="20.0%" width="18.5%" />
               <Field value={saved.lastName} left="63.8%" top="23.7%" width="18.5%" />
-              <Field value={saved.birthDate} left="63.8%" top="27.36%" width="18.5%" />
-              <Field value={saved.school} left="63.8%" top="31.02%" width="18.5%" small />
+              <Field value={formatDate(saved.birthDate)} left="63.8%" top="27.36%" width="18.5%" />
+              <Field value={saved.schoolName || saved.schoolType || saved.school} left="63.8%" top="31.02%" width="18.5%" small />
               <Field value={saved.gradeClass} left="63.8%" top="34.66%" width="18.5%" />
             </>
           )}
@@ -177,12 +171,12 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
               <Field value={saved.whatsapp} left="20%" top="50.1%" width="21%" />
               <Field value={saved.email} left="20%" top="53.6%" width="21%" small />
               <Field value={saved.address} left="57.5%" top="46.8%" width="31%" />
-              <Field value={saved.city} left="57.5%" top="52.0%" width="27%" />
+              <Field value={[saved.postalCode, saved.city, saved.province && `(${saved.province})`].filter(Boolean).join(" ")} left="57.5%" top="52.0%" width="27%" />
             </>
           )}
 
           {!isEditing && current.phone && <a href={`tel:${cleanPhone(current.phone)}`} aria-label="Chiama studente" className="antique-clickable absolute left-[36.6%] top-[45.8%] z-20 h-[3.5%] w-[5.8%] rounded-full" />}
-          {!isEditing && current.whatsapp && <a href={`https://wa.me/${cleanPhone(current.whatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp studente" className="antique-clickable absolute left-[36.6%] top-[49.3%] z-20 h-[3.5%] w-[5.8%] rounded-full" />}
+          {!isEditing && current.whatsapp && <a href={`https://wa.me/${cleanWhatsApp(current.whatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp studente" className="antique-clickable absolute left-[36.6%] top-[49.3%] z-20 h-[3.5%] w-[5.8%] rounded-full" />}
           {!isEditing && current.email && <a href={`mailto:${current.email}`} aria-label="Email studente" className="antique-clickable absolute left-[36.6%] top-[52.8%] z-20 h-[3.5%] w-[5.8%] rounded-full" />}
 
           {!isEditing && (current.address || current.city) && (
@@ -208,9 +202,9 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
           )}
 
           {!isEditing && current.primaryParentPhone && <a href={`tel:${cleanPhone(current.primaryParentPhone)}`} aria-label="Chiama genitore" className="antique-clickable absolute left-[32%] top-[72.5%] z-20 h-[3.7%] w-[6%] rounded-full" />}
-          {!isEditing && current.primaryParentWhatsapp && <a href={`https://wa.me/${cleanPhone(current.primaryParentWhatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp genitore" className="antique-clickable absolute left-[38.5%] top-[72.5%] z-20 h-[3.7%] w-[6%] rounded-full" />}
+          {!isEditing && current.primaryParentWhatsapp && <a href={`https://wa.me/${cleanWhatsApp(current.primaryParentWhatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp genitore" className="antique-clickable absolute left-[38.5%] top-[72.5%] z-20 h-[3.7%] w-[6%] rounded-full" />}
           {!isEditing && current.secondaryParentPhone && <a href={`tel:${cleanPhone(current.secondaryParentPhone)}`} aria-label="Chiama secondo genitore" className="antique-clickable absolute left-[8%] top-[91.2%] z-20 h-[3.7%] w-[6%] rounded-full" />}
-          {!isEditing && current.secondaryParentWhatsapp && <a href={`https://wa.me/${cleanPhone(current.secondaryParentWhatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp secondo genitore" className="antique-clickable absolute left-[15%] top-[91.2%] z-20 h-[3.7%] w-[6%] rounded-full" />}
+          {!isEditing && current.secondaryParentWhatsapp && <a href={`https://wa.me/${cleanWhatsApp(current.secondaryParentWhatsapp)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp secondo genitore" className="antique-clickable absolute left-[15%] top-[91.2%] z-20 h-[3.7%] w-[6%] rounded-full" />}
 
           {isEditing ? (
             <>
@@ -234,10 +228,60 @@ export default function StudentDetail({ student = defaultStudent }: { student?: 
             </>
           )}
 
-          {!isEditing && <Link href="/studenti/libri" aria-label="Vedi dettagli libri" className="antique-clickable absolute left-[52%] top-[92.5%] z-20 h-[4%] w-[30%] rounded-[10px]" />}
+          {!isEditing && <Link href="#dettagli-diario" aria-label="Vedi dettagli libri" className="antique-clickable absolute left-[52%] top-[92.5%] z-20 h-[4%] w-[30%] rounded-[10px]" />}
         </div>
+
+        <DiaryDetails student={current} />
       </div>
     </main>
+  );
+}
+
+function DiaryDetails({ student }: { student: StudentData }) {
+  const books = student.books ?? [];
+  const hasDetails = Boolean(
+    student.schoolType || student.usefulReferences || student.secondaryParentEmail
+    || student.familyNotes || student.personalNotes || books.length
+  );
+
+  if (!hasDetails) return null;
+
+  return (
+    <section id="dettagli-diario" className="mx-4 mb-8 scroll-mt-4 rounded-[26px] border border-[#9b7658]/30 bg-[#f8ecd6] px-7 py-7 text-[#4b3024] shadow-[0_8px_24px_rgba(72,48,30,0.10)]">
+      <h2 className="text-center font-field-label text-xl text-[#6f2638]">Appunti del diario</h2>
+
+      {(student.schoolType || student.schoolName) && (
+        <DetailBlock title="Scuola">
+          {[student.schoolType, student.schoolName, student.gradeClass].filter(Boolean).join(" · ")}
+        </DetailBlock>
+      )}
+
+      {books.length > 0 && (
+        <DetailBlock title="Libri di riferimento">
+          <ul className="space-y-1">
+            {books.map((book, index) => (
+              <li key={`${book.title}-${index}`}>
+                {[book.title, book.publisher].filter(Boolean).join(" — ")}
+              </li>
+            ))}
+          </ul>
+        </DetailBlock>
+      )}
+
+      {student.usefulReferences && <DetailBlock title="Riferimenti utili">{student.usefulReferences}</DetailBlock>}
+      {student.secondaryParentEmail && <DetailBlock title="Email altro genitore">{student.secondaryParentEmail}</DetailBlock>}
+      {student.familyNotes && <DetailBlock title="Note familiari">{student.familyNotes}</DetailBlock>}
+      {student.personalNotes && <DetailBlock title="Note personali">{student.personalNotes}</DetailBlock>}
+    </section>
+  );
+}
+
+function DetailBlock({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-5 border-t border-[#a8886e]/25 pt-4">
+      <h3 className="font-field-label text-sm text-[#6f2638]">{title}</h3>
+      <div className="mt-1 whitespace-pre-wrap font-entry-elegant text-sm leading-relaxed text-[#5b3a2d]">{children}</div>
+    </div>
   );
 }
 

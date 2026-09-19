@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { students, type StudentRecord } from "../data/students";
+import { loadStoredStudents } from "../data/student-storage";
 
 type SubjectFilter = "Tutte" | "Matematica" | "Fisica" | "Chimica";
 type SortMode = "az" | "lesson" | "recent";
@@ -57,13 +58,23 @@ function formatLesson(value?: string) {
 export default function StudentsPage() {
   const router = useRouter();
 
+  const [allStudents, setAllStudents] = useState<StudentRecord[]>(students);
   const [query, setQuery] = useState("");
   const [subject, setSubject] = useState<SubjectFilter>("Tutte");
   const [sortMode, setSortMode] = useState<SortMode>("az");
 
+  useEffect(() => {
+    const storedStudents = loadStoredStudents();
+    const storedIds = new Set(storedStudents.map((student) => student.id));
+    queueMicrotask(() => setAllStudents([
+      ...storedStudents,
+      ...students.filter((student) => !storedIds.has(student.id)),
+    ]));
+  }, []);
+
   const subjectCounts = useMemo(() => {
     const countBySubject = (subjectName: SubjectFilter) =>
-      students.filter((student) =>
+      allStudents.filter((student) =>
         student.subjects
           .map(normalizeSubject)
           .includes(subjectName)
@@ -74,12 +85,12 @@ export default function StudentsPage() {
       Fisica: countBySubject("Fisica"),
       Chimica: countBySubject("Chimica"),
     };
-  }, []);
+  }, [allStudents]);
 
   const visibleStudents = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    const filtered = students.filter((student) => {
+    const filtered = allStudents.filter((student) => {
       const normalizedSubjects =
         student.subjects.map(normalizeSubject);
 
@@ -120,7 +131,7 @@ export default function StudentsPage() {
         }
       );
     });
-  }, [query, subject, sortMode]);
+  }, [allStudents, query, subject, sortMode]);
 
   return (
     <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-sepia">

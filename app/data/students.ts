@@ -6,12 +6,18 @@ export interface StudentRecord {
   lastName: string;
   birthDate: string;
   school: string;
+  schoolType?: string;
+  schoolName?: string;
   gradeClass: string;
+  section?: string;
   phone: string;
   whatsapp: string;
   email: string;
   address: string;
+  postalCode?: string;
   city: string;
+  province?: string;
+  usefulReferences?: string;
   primaryParent: string;
   primaryParentPhone: string;
   primaryParentWhatsapp: string;
@@ -19,13 +25,16 @@ export interface StudentRecord {
   secondaryParent?: string;
   secondaryParentPhone?: string;
   secondaryParentWhatsapp?: string;
+  secondaryParentEmail?: string;
   subjects: string[];
+  books?: Array<{ title: string; publisher: string }>;
   textbooks: {
     math?: string;
     physics?: string;
     chemistry?: string;
   };
   personalNotes?: string;
+  familyNotes?: string;
   nextLesson?: string;
   updatedAt?: string;
 }
