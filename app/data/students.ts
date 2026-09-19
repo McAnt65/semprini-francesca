@@ -39,38 +39,9 @@ export interface StudentRecord {
   updatedAt?: string;
 }
 
-export const students: StudentRecord[] = [
-  {
-    id: "mauro-cantoni",
-    enrollmentDate: "",
-    firstName: "Mauro",
-    lastName: "Cantoni",
-    birthDate: "16/10/1965",
-    school: "Liceo G. Cesare",
-    gradeClass: "3ª I",
-    phone: "",
-    whatsapp: "",
-    email: "",
-    address: "",
-    city: "",
-    primaryParent: "",
-    primaryParentPhone: "",
-    primaryParentWhatsapp: "",
-    primaryParentEmail: "",
-    secondaryParent: "",
-    secondaryParentPhone: "",
-    secondaryParentWhatsapp: "",
-    subjects: [],
-    textbooks: {
-      math: "",
-      physics: "",
-      chemistry: "",
-    },
-    personalNotes: "",
-    nextLesson: "",
-    updatedAt: "2026-09-12T08:00:00+02:00",
-  },
-];
+// Gli studenti mostrati nel registro provengono dall'archivio reale del dispositivo.
+// Il vecchio record dimostrativo "Mauro Cantoni" creava un doppione incompleto.
+export const students: StudentRecord[] = [];
 
 export function getStudentById(id: string) {
   return students.find((student) => student.id === id);

@@ -3,10 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  buildStudentFromSavedDrafts,
-  clearNewStudentDrafts,
   NOTES_DRAFT_KEY,
-  saveStoredStudent,
 } from "../../../data/student-storage";
 
 export default function NewStudentNotesPage() {
@@ -55,23 +52,7 @@ export default function NewStudentNotesPage() {
       return;
     }
 
-    const student = buildStudentFromSavedDrafts();
-
-    if (!student.firstName && !student.lastName) {
-      setMessage("Inserisci almeno il nome dello studente nei dati personali");
-      return;
-    }
-
-    if (!saveStoredStudent(student)) {
-      setMessage("Spazio insufficiente: prova con una fotografia più leggera");
-      return;
-    }
-
-    clearNewStudentDrafts();
-    // Dopo aver liberato lo spazio delle bozze, assicura una copia persistente
-    // anche quando il primo salvataggio era dovuto ripiegare su sessionStorage.
-    saveStoredStudent(student);
-    router.push(`/studenti/${student.id}`);
+    router.push("/studenti/nuovo/diario");
   }
 
   return (
