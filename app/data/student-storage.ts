@@ -4,6 +4,7 @@ export const PERSONAL_DRAFT_KEY = "semprini:new-student:personal-data";
 export const SCHOOL_DRAFT_KEY = "semprini:new-student:school-subjects-books";
 export const HOME_FAMILY_DRAFT_KEY = "semprini:new-student:home-family";
 export const NOTES_DRAFT_KEY = "semprini:new-student:notes";
+export const LEGACY_NOTES_DRAFT_KEY = "semprini:new-student:personal-notes";
 export const STUDENTS_STORAGE_KEY = "semprini:students";
 
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
@@ -158,7 +159,10 @@ export function buildStudentFromSavedDrafts(): StudentRecord {
   const personal = readDraft(PERSONAL_DRAFT_KEY);
   const school = readDraft(SCHOOL_DRAFT_KEY);
   const family = readDraft(HOME_FAMILY_DRAFT_KEY);
-  const notes = readDraft(NOTES_DRAFT_KEY);
+  const currentNotes = readDraft(NOTES_DRAFT_KEY);
+  const notes = Object.keys(currentNotes).length > 0
+    ? currentNotes
+    : readDraft(LEGACY_NOTES_DRAFT_KEY);
   const firstName = text(personal.firstName);
   const lastName = text(personal.lastName);
   const schoolType = text(school.schoolType);
@@ -185,7 +189,14 @@ export function buildStudentFromSavedDrafts(): StudentRecord {
   return {
     id: createStudentId(firstName, lastName),
     enrollmentDate: text(personal.studentSince),
-    avatarUrl: text(personal.photoPreview) || text(personal.originalPhotoPreview) || undefined,
+    avatarUrl: text(personal.watercolorPreview)
+      || text(personal.watercolorPhoto)
+      || text(personal.photoPreview)
+      || text(personal.originalPhotoPreview)
+      || text(personal.photo)
+      || text(personal.photoOriginal)
+      || text(personal.image)
+      || undefined,
     firstName,
     lastName,
     birthDate: text(personal.birthDate),
@@ -226,7 +237,13 @@ export function buildStudentFromSavedDrafts(): StudentRecord {
 
 export function clearNewStudentDrafts() {
   for (const storage of availableStorages()) {
-    for (const key of [PERSONAL_DRAFT_KEY, SCHOOL_DRAFT_KEY, HOME_FAMILY_DRAFT_KEY, NOTES_DRAFT_KEY]) {
+    for (const key of [
+      PERSONAL_DRAFT_KEY,
+      SCHOOL_DRAFT_KEY,
+      HOME_FAMILY_DRAFT_KEY,
+      NOTES_DRAFT_KEY,
+      LEGACY_NOTES_DRAFT_KEY,
+    ]) {
       try {
         storage.removeItem(key);
       } catch {
@@ -235,4 +252,3 @@ export function clearNewStudentDrafts() {
     }
   }
 }
-
