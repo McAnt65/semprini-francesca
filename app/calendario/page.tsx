@@ -184,7 +184,7 @@ export default function CalendarMonthPage() {
 
           <section
             aria-label={`${MONTH_NAMES[visibleMonth.month - 1]} ${visibleMonth.year}`}
-            className="absolute left-[6.65%] top-[33.78%] z-20 grid h-[26.25%] w-[81.4%] grid-cols-7 grid-rows-6"
+            className="absolute left-[6.5%] top-[33.79%] z-20 grid h-[26.27%] w-[81.72%] grid-cols-7 grid-rows-6"
           >
             {days.map((day) => {
               const statuses = occurrencesByDate.get(day.date);
@@ -194,12 +194,12 @@ export default function CalendarMonthPage() {
                 <div
                   key={day.date}
                   aria-current={isToday ? "date" : undefined}
-                  className={`relative flex min-w-0 flex-col items-center pt-[7%] ${
+                  className={`relative min-w-0 ${
                     day.belongsToMonth ? "opacity-100" : "opacity-35"
                   }`}
                 >
                   <span
-                    className={`flex aspect-square w-[34%] items-center justify-center rounded-full font-entry-elegant text-[clamp(10px,2.8vw,14px)] leading-none ${
+                    className={`absolute left-1/2 top-1/2 flex aspect-square w-[34%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full font-entry-elegant text-[clamp(10px,2.8vw,14px)] leading-none ${
                       isToday
                         ? "bg-[#8f263b]/14 font-semibold text-[#781d31] ring-1 ring-[#8f263b]/65"
                         : "text-[#4b3024]"
@@ -210,7 +210,7 @@ export default function CalendarMonthPage() {
 
                   {statuses && statuses.size > 0 && (
                     <span
-                      className="mt-[6%] flex max-w-[82%] flex-wrap justify-center gap-[3px]"
+                      className="absolute left-1/2 top-[70%] flex max-w-[82%] -translate-x-1/2 flex-wrap justify-center gap-[3px]"
                       aria-label={statusLabel(statuses)}
                     >
                       {STATUS_ORDER.filter((status) => statuses.has(status)).map(
