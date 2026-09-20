@@ -177,14 +177,14 @@ export default function CalendarMonthPage() {
 
           <h1
             aria-live="polite"
-            className="pointer-events-none absolute left-[23%] top-[25.25%] z-20 w-[54%] text-center font-entry-elegant text-[clamp(15px,4.4vw,22px)] font-semibold text-[#6f2638]"
+            className="pointer-events-none absolute left-[23%] top-[24.85%] z-20 w-[54%] text-center font-entry-elegant text-[clamp(15px,4.4vw,22px)] font-semibold text-[#6f2638]"
           >
             {MONTH_NAMES[visibleMonth.month - 1]} {visibleMonth.year}
           </h1>
 
           <section
             aria-label={`${MONTH_NAMES[visibleMonth.month - 1]} ${visibleMonth.year}`}
-            className="absolute left-[6.5%] top-[33.79%] z-20 grid h-[26.27%] w-[81.72%] grid-cols-7 grid-rows-6"
+            className="absolute left-[6.5%] top-[33.79%] z-20 grid h-[26.27%] w-[81.72%] grid-cols-7 grid-rows-[repeat(6,minmax(0,1fr))]"
           >
             {days.map((day) => {
               const statuses = occurrencesByDate.get(day.date);
@@ -199,7 +199,7 @@ export default function CalendarMonthPage() {
                   }`}
                 >
                   <span
-                    className={`absolute left-1/2 top-1/2 flex aspect-square w-[34%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full font-entry-elegant text-[clamp(10px,2.8vw,14px)] leading-none ${
+                    className={`absolute left-1/2 top-[52%] flex aspect-square w-[36%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full font-entry-elegant text-[clamp(11px,3.15vw,16px)] leading-none ${
                       isToday
                         ? "bg-[#8f263b]/14 font-semibold text-[#781d31] ring-1 ring-[#8f263b]/65"
                         : "text-[#4b3024]"
