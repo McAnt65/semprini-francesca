@@ -191,15 +191,17 @@ export default function CalendarMonthPage() {
               const isToday = day.date === today;
 
               return (
-                <div
+                <Link
                   key={day.date}
+                  href={`/calendario/giorno?data=${day.date}`}
+                  aria-label={`Apri il giorno ${day.date}`}
                   aria-current={isToday ? "date" : undefined}
                   className={`relative min-w-0 ${
                     day.belongsToMonth ? "opacity-100" : "opacity-35"
                   }`}
                 >
                   <span
-                    className={`absolute left-1/2 top-1/2 flex aspect-square w-[36%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full font-entry-elegant text-[clamp(11px,3.15vw,16px)] leading-none ${
+                    className={`absolute left-1/2 top-[54%] flex aspect-square w-[36%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full font-entry-elegant text-[clamp(12px,3.4vw,17px)] leading-none ${
                       isToday
                         ? "bg-[#8f263b]/14 font-semibold text-[#781d31] ring-1 ring-[#8f263b]/65"
                         : "text-[#4b3024]"
@@ -223,7 +225,7 @@ export default function CalendarMonthPage() {
                       )}
                     </span>
                   )}
-                </div>
+                </Link>
               );
             })}
           </section>
