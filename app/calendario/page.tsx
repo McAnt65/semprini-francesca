@@ -184,7 +184,7 @@ export default function CalendarMonthPage() {
 
           <section
             aria-label={`${MONTH_NAMES[visibleMonth.month - 1]} ${visibleMonth.year}`}
-            className="absolute left-[6.5%] top-[33.79%] z-20 grid h-[26.27%] w-[81.72%] grid-cols-7 grid-rows-[repeat(6,minmax(0,1fr))]"
+            className="absolute left-[6.70%] top-[33.85%] z-20 grid h-[27.09%] w-[81.40%] grid-cols-7 grid-rows-[repeat(6,minmax(0,1fr))]"
           >
             {days.map((day) => {
               const statuses = occurrencesByDate.get(day.date);
@@ -199,7 +199,7 @@ export default function CalendarMonthPage() {
                   }`}
                 >
                   <span
-                    className={`absolute left-1/2 top-[52%] flex aspect-square w-[36%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full font-entry-elegant text-[clamp(11px,3.15vw,16px)] leading-none ${
+                    className={`absolute left-1/2 top-1/2 flex aspect-square w-[36%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full font-entry-elegant text-[clamp(11px,3.15vw,16px)] leading-none ${
                       isToday
                         ? "bg-[#8f263b]/14 font-semibold text-[#781d31] ring-1 ring-[#8f263b]/65"
                         : "text-[#4b3024]"
