@@ -10,8 +10,16 @@ import {
   parseLocalDate,
   startOfLocalWeek,
   toLocalDate,
+  toLocalTime,
 } from "../data/calendario/calendar-dates";
-import { selectOccurrencesInRange } from "../data/calendario/calendar-selectors";
+import {
+  selectDayOccurrences,
+  selectOccurrencesInRange,
+} from "../data/calendario/calendar-selectors";
+import {
+  loadCalendarMonthlyNote,
+  saveCalendarMonthlyNote,
+} from "../data/calendario/calendar-monthly-notes";
 import {
   loadCalendarAppointments,
   loadCalendarSeries,
@@ -19,6 +27,7 @@ import {
 import type {
   CalendarAppointment,
   CalendarSeries,
+  LessonMode,
   LessonStatus,
   LocalDate,
 } from "../data/calendario/calendar-types";
@@ -52,6 +61,12 @@ const STATUS_COLORS: Record<LessonStatus, string> = {
   annullata: "bg-[#ac4a4c]",
 };
 
+const MODE_LABELS: Record<LessonMode, string> = {
+  casa: "Casa",
+  studio: "Studio",
+  online: "Online",
+};
+
 interface VisibleDay {
   date: LocalDate;
   dayNumber: number;
@@ -68,6 +83,7 @@ export default function CalendarMonthPage() {
   }));
   const [appointments, setAppointments] = useState<CalendarAppointment[]>([]);
   const [series, setSeries] = useState<CalendarSeries[]>([]);
+  const [monthlyNote, setMonthlyNote] = useState("");
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -80,6 +96,16 @@ export default function CalendarMonthPage() {
     () => buildVisibleDays(visibleMonth.year, visibleMonth.month),
     [visibleMonth]
   );
+
+  const visibleMonthKey = `${visibleMonth.year}-${visibleMonth.month
+    .toString()
+    .padStart(2, "0")}`;
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      setMonthlyNote(loadCalendarMonthlyNote(visibleMonthKey));
+    });
+  }, [visibleMonthKey]);
 
   const occurrencesByDate = useMemo(() => {
     const firstDay = days[0]?.date;
@@ -102,6 +128,11 @@ export default function CalendarMonthPage() {
 
     return grouped;
   }, [appointments, days, series]);
+
+  const todaySummary = useMemo(
+    () => buildTodaySummary(appointments, series, today, toLocalTime(now)),
+    [appointments, now, series, today]
+  );
 
   function changeMonth(amount: number) {
     setVisibleMonth((current) => {
@@ -230,6 +261,57 @@ export default function CalendarMonthPage() {
             })}
           </section>
 
+          <textarea
+            aria-label={`Appunti di ${MONTH_NAMES[visibleMonth.month - 1]} ${visibleMonth.year}`}
+            value={monthlyNote}
+            maxLength={4_000}
+            onChange={(event) => {
+              const value = event.target.value;
+              setMonthlyNote(value);
+              saveCalendarMonthlyNote(visibleMonthKey, value);
+            }}
+            spellCheck
+            className="absolute left-[8.8%] top-[71.6%] z-20 h-[14.8%] w-[33.2%] resize-none overflow-y-auto border-0 bg-transparent px-[1%] py-[0.5%] font-entry-elegant text-[clamp(10px,2.75vw,14px)] leading-[1.75] text-[#5a3a2a] outline-none placeholder:text-[#765744]/45"
+          />
+
+          <section
+            aria-label="Riepilogo di oggi"
+            className="absolute left-[53.4%] top-[71.7%] z-20 h-[13.7%] w-[30.8%] overflow-y-auto px-[0.8%] py-[0.4%] text-center font-entry-elegant text-[clamp(8px,2.25vw,11px)] leading-[1.38] text-[#563728]"
+          >
+            {todaySummary.lessonCount === 0 ? (
+              <p className="mt-[8%] text-[clamp(9px,2.5vw,12px)] italic leading-[1.5]">
+                Nessuna lezione programmata
+              </p>
+            ) : (
+              <>
+                <p className="font-semibold">
+                  {todaySummary.lessonCount} {todaySummary.lessonCount === 1 ? "lezione" : "lezioni"}
+                  {" · "}{formatDuration(todaySummary.totalMinutes)}
+                </p>
+                <p>{todaySummary.modeSummary}</p>
+                {todaySummary.pendingRequests > 0 && (
+                  <p>Richieste in attesa: {todaySummary.pendingRequests}</p>
+                )}
+              </>
+            )}
+
+            {todaySummary.nextOccurrence && (
+              <div className="mt-[4%] border-t border-[#8a6546]/25 pt-[4%]">
+                <p className="font-semibold text-[#76283a]">
+                  {todaySummary.nextOccurrence.date === today
+                    ? "Prossima lezione"
+                    : `Prossima · ${formatShortDate(todaySummary.nextOccurrence.date)}`}
+                </p>
+                <p>
+                  {todaySummary.nextOccurrence.startTime} · {todaySummary.nextOccurrence.studentNameSnapshot}
+                </p>
+                <p>
+                  {todaySummary.nextOccurrence.subject} · {MODE_LABELS[todaySummary.nextOccurrence.mode]}
+                </p>
+              </div>
+            )}
+          </section>
+
           <nav aria-label="Navigazione principale" className="absolute inset-x-[1.8%] bottom-[1.65%] z-30 h-[9.4%]">
             <Link href="/studenti" aria-label="Studenti" className="antique-clickable absolute inset-y-0 left-0 w-[20%] rounded-[12px] bg-transparent" />
             <Link href="/calendario" aria-label="Calendario" aria-current="page" className="antique-clickable absolute inset-y-0 left-[20%] w-[20%] rounded-[12px] bg-transparent" />
@@ -270,4 +352,81 @@ function statusLabel(statuses: Set<LessonStatus>) {
   return `Appuntamenti: ${STATUS_ORDER.filter((status) => statuses.has(status))
     .map((status) => labels[status])
     .join(", ")}`;
+}
+
+function buildTodaySummary(
+  appointments: CalendarAppointment[],
+  series: CalendarSeries[],
+  today: LocalDate,
+  currentTime: string
+) {
+  const todayOccurrences = selectDayOccurrences(appointments, series, today);
+  const activeToday = todayOccurrences.filter(
+    (occurrence) => occurrence.status !== "annullata"
+  );
+  const modeCounts = new Map<LessonMode, number>();
+
+  for (const occurrence of activeToday) {
+    modeCounts.set(occurrence.mode, (modeCounts.get(occurrence.mode) ?? 0) + 1);
+  }
+
+  const rangeEnd = futureRangeEnd(appointments, series, today);
+  const nextOccurrence = selectOccurrencesInRange(
+    appointments,
+    series,
+    today,
+    rangeEnd
+  ).find(
+    (occurrence) =>
+      occurrence.status !== "annullata" &&
+      (occurrence.date > today || occurrence.startTime >= currentTime)
+  );
+
+  return {
+    lessonCount: activeToday.length,
+    totalMinutes: activeToday.reduce(
+      (total, occurrence) => total + occurrence.durationMinutes,
+      0
+    ),
+    modeSummary: (["casa", "studio", "online"] as LessonMode[])
+      .filter((mode) => modeCounts.has(mode))
+      .map((mode) => `${MODE_LABELS[mode]} ${modeCounts.get(mode)}`)
+      .join(" · "),
+    pendingRequests: todayOccurrences.filter(
+      (occurrence) =>
+        occurrence.status === "richiesta" || occurrence.status === "attesa"
+    ).length,
+    nextOccurrence,
+  };
+}
+
+function futureRangeEnd(
+  appointments: CalendarAppointment[],
+  series: CalendarSeries[],
+  today: LocalDate
+) {
+  const dates = [
+    addDays(today, 366),
+    ...appointments.map((appointment) => appointment.date),
+    ...series.map((item) => item.recurrence.endsOn ?? addDays(today, 366)),
+  ];
+
+  return dates.reduce((latest, date) => date > latest ? date : latest, today);
+}
+
+function formatDuration(totalMinutes: number) {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours === 0) return `${minutes} min`;
+  if (minutes === 0) return `${hours} h`;
+  return `${hours} h ${minutes} min`;
+}
+
+function formatShortDate(date: LocalDate) {
+  const parts = parseLocalDate(date);
+  return parts
+    ? `${parts.day.toString().padStart(2, "0")}/${parts.month
+        .toString()
+        .padStart(2, "0")}`
+    : date;
 }
