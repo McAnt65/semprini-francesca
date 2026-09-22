@@ -197,12 +197,12 @@ function CalendarWeekContent() {
                 href={`/calendario/giorno?data=${date}`}
                 aria-label={`Vista giorno: ${WEEKDAY_NAMES[dayIndex]} ${parts?.day ?? ""}`}
                 aria-current={isToday ? "date" : undefined}
-                className="antique-clickable absolute inset-y-[3%] left-0 z-20 w-[15.1%] rounded-[8px] bg-transparent"
+                className={`antique-clickable absolute inset-y-[3%] left-0 z-20 w-[15.1%] rounded-[8px] ${isToday ? "bg-[#8b2438]/12 ring-1 ring-inset ring-[#8b2438]/35" : "bg-transparent"}`}
               >
                 <span
                   className={`absolute left-[51%] top-[75%] flex h-[clamp(23px,6vw,29px)] min-w-[clamp(23px,6vw,29px)] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-1 font-entry-elegant text-[clamp(14px,3.8vw,18px)] font-semibold leading-none ${
                     isToday
-                      ? "text-[#8b2438]"
+                      ? "text-[#a5142b]"
                       : "text-[#5a3828]"
                   }`}
                 >
