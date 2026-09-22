@@ -15,11 +15,13 @@ import {
 import { selectWeekOccurrences } from "../../data/calendario/calendar-selectors";
 import {
   loadCalendarAppointments,
+  loadCalendarRequests,
   loadCalendarSeries,
 } from "../../data/calendario/calendar-storage";
 import type {
   CalendarAppointment,
   CalendarOccurrence,
+  CalendarRequest,
   CalendarSeries,
   LessonMode,
   LessonStatus,
@@ -67,8 +69,8 @@ const STATUS_COLORS: Record<LessonStatus, string> = {
 
 const MODE_DETAILS: Record<LessonMode, { icon: string; label: string }> = {
   casa: { icon: "⌂", label: "Casa" },
-  studio: { icon: "✎", label: "Studio" },
-  online: { icon: "◉", label: "Online" },
+  studio: { icon: "♟", label: "Studio" },
+  online: { icon: "▣", label: "Online" },
 };
 
 export default function CalendarWeekPage() {
@@ -86,17 +88,21 @@ function CalendarWeekContent() {
   const requestedDate = searchParams.get("data");
   const selectedDate = isLocalDate(requestedDate) ? requestedDate : today;
   const weekStart = startOfLocalWeek(selectedDate);
+  const weekEnd = addDays(weekStart, 6);
   const weekDays = useMemo(
     () => Array.from({ length: 7 }, (_, index) => addDays(weekStart, index)),
     [weekStart]
   );
+
   const [appointments, setAppointments] = useState<CalendarAppointment[]>([]);
   const [series, setSeries] = useState<CalendarSeries[]>([]);
+  const [requests, setRequests] = useState<CalendarRequest[]>([]);
 
   useEffect(() => {
     queueMicrotask(() => {
       setAppointments(loadCalendarAppointments());
       setSeries(loadCalendarSeries());
+      setRequests(loadCalendarRequests());
     });
   }, []);
 
@@ -113,8 +119,24 @@ function CalendarWeekContent() {
       grouped.set(occurrence.date, dayOccurrences);
     }
 
+    for (const dayOccurrences of grouped.values()) {
+      dayOccurrences.sort((a, b) => a.startTime.localeCompare(b.startTime));
+    }
+
     return grouped;
   }, [appointments, selectedDate, series]);
+
+  const latestReceivedRequest = useMemo(
+    () =>
+      [...requests]
+        .filter(
+          (request) =>
+            request.direction === "ricevuta" &&
+            request.status !== "annullata"
+        )
+        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0],
+    [requests]
+  );
 
   function changeWeek(amount: number) {
     router.push(`/calendario/settimana?data=${addDays(weekStart, amount * 7)}`);
@@ -126,51 +148,43 @@ function CalendarWeekContent() {
         type="button"
         onClick={() => router.back()}
         aria-label="Indietro"
-        className="antique-clickable absolute left-[5.7%] top-[0.7%] z-30 h-[4.2%] w-[18.2%] rounded-[12px] bg-transparent"
+        className="antique-clickable absolute left-[5.4%] top-[0.55%] z-30 h-[3.7%] w-[18.2%] rounded-[12px] bg-transparent"
       />
       <Link
         href="/menu"
         aria-label="Torna al menù"
-        className="antique-clickable absolute right-[5.4%] top-[0.7%] z-30 h-[4.2%] w-[18.2%] rounded-[12px] bg-transparent"
+        className="antique-clickable absolute right-[6.2%] top-[0.45%] z-30 h-[3.7%] w-[17%] rounded-[12px] bg-transparent"
       />
 
       <button
         type="button"
         onClick={() => changeWeek(-1)}
         aria-label="Settimana precedente"
-        className="antique-clickable absolute left-[24.6%] top-[4.8%] z-30 h-[5.4%] w-[9.2%] rounded-full bg-transparent"
+        className="antique-clickable absolute left-[24.8%] top-[4.2%] z-30 h-[5.1%] w-[9.2%] rounded-full bg-transparent"
       />
       <button
         type="button"
         onClick={() => changeWeek(1)}
         aria-label="Settimana successiva"
-        className="antique-clickable absolute left-[65.8%] top-[4.8%] z-30 h-[5.4%] w-[9.2%] rounded-full bg-transparent"
+        className="antique-clickable absolute left-[65.3%] top-[4.2%] z-30 h-[5.1%] w-[9.2%] rounded-full bg-transparent"
       />
-
-      <nav aria-label="Viste calendario">
-        <Link
-          href={`/calendario?data=${selectedDate}`}
-          aria-label="Vista mese"
-          className="antique-clickable absolute right-[4.8%] top-[5.6%] z-30 h-[6.4%] w-[11.2%] rounded-[12px] bg-transparent"
-        />
-        <Link
-          href={`/calendario/settimana?data=${selectedDate}`}
-          aria-label="Vista settimana"
-          aria-current="page"
-          className="antique-clickable absolute left-[34.3%] top-[5.3%] z-30 h-[4.6%] w-[31.4%] rounded-[10px] bg-transparent"
-        />
-      </nav>
 
       <h1
         aria-live="polite"
-        className="pointer-events-none absolute left-[29%] top-[5.85%] z-20 w-[42%] whitespace-nowrap text-center font-entry-elegant text-[clamp(9px,2.5vw,12px)] font-semibold text-[#6f2638]"
+        className="pointer-events-none absolute left-[32.2%] top-[5.45%] z-20 w-[35.6%] whitespace-nowrap text-center font-entry-elegant text-[clamp(10px,2.75vw,13px)] font-semibold leading-none text-[#6f2638]"
       >
-        {formatWeekTitle(weekStart, weekDays[6])}
+        {formatWeekTitle(weekStart, weekEnd)}
       </h1>
 
+      <Link
+        href={`/calendario?data=${selectedDate}`}
+        aria-label="Vista mese"
+        className="antique-clickable absolute right-[7.4%] top-[5.5%] z-30 h-[4.7%] w-[10.5%] rounded-[12px] bg-transparent"
+      />
+
       <section
-        aria-label={`Settimana ${formatWeekInterval(weekStart, weekDays[6])}`}
-        className="absolute left-[4.1%] top-[15.55%] z-20 grid h-[62.75%] w-[91.1%] grid-rows-7"
+        aria-label={`Settimana ${formatWeekInterval(weekStart, weekEnd)}`}
+        className="absolute left-[3.5%] top-[12.05%] z-20 grid h-[59.9%] w-[92.3%] grid-rows-[repeat(7,minmax(0,1fr))]"
       >
         {weekDays.map((date, dayIndex) => {
           const parts = parseLocalDate(date);
@@ -183,12 +197,12 @@ function CalendarWeekContent() {
                 href={`/calendario/giorno?data=${date}`}
                 aria-label={`Vista giorno: ${WEEKDAY_NAMES[dayIndex]} ${parts?.day ?? ""}`}
                 aria-current={isToday ? "date" : undefined}
-                className="antique-clickable absolute inset-y-[4%] left-0 w-[16.2%] rounded-[10px] bg-transparent"
+                className="antique-clickable absolute inset-y-[3%] left-0 z-20 w-[15.1%] rounded-[8px] bg-transparent"
               >
                 <span
-                  className={`absolute left-1/2 top-[68%] flex h-[clamp(22px,5.8vw,28px)] min-w-[clamp(22px,5.8vw,28px)] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-1 font-entry-elegant text-[clamp(11px,3.2vw,16px)] font-semibold leading-none ${
+                  className={`absolute left-[51%] top-[70%] flex h-[clamp(23px,6vw,29px)] min-w-[clamp(23px,6vw,29px)] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-1 font-entry-elegant text-[clamp(12px,3.35vw,16px)] font-semibold leading-none ${
                     isToday
-                      ? "text-[#6f2638] ring-2 ring-inset ring-[#6f2638]"
+                      ? "text-[#6f2638] ring-[1.5px] ring-inset ring-[#6f2638]"
                       : "text-[#5a3828]"
                   }`}
                 >
@@ -196,14 +210,8 @@ function CalendarWeekContent() {
                 </span>
               </Link>
 
-              <div className="absolute bottom-[8%] left-[16.8%] top-[9%] w-[81.2%] touch-pan-y overflow-y-auto overscroll-contain pr-[1%] [-webkit-overflow-scrolling:touch]">
-                <div
-                  className={`flex min-h-full flex-col gap-[clamp(2px,0.7vw,4px)] ${
-                    occurrences.length > 2
-                      ? "justify-start py-[1%]"
-                      : "justify-center"
-                  }`}
-                >
+              <div className="absolute bottom-[6%] left-[17.2%] top-[8%] w-[79.4%] touch-pan-y overflow-y-auto overscroll-contain pr-[0.7%] [-webkit-overflow-scrolling:touch]">
+                <div className="flex min-h-full flex-col justify-start gap-[clamp(2px,0.55vw,3px)] py-[1%]">
                   {occurrences.map((occurrence, index) => (
                     <AppointmentWithTravel
                       key={occurrence.occurrenceId}
@@ -218,9 +226,40 @@ function CalendarWeekContent() {
         })}
       </section>
 
+      <section
+        aria-label="Richiesta ricevuta"
+        className="absolute left-[6.8%] top-[76.45%] z-20 h-[10.7%] w-[53.2%] font-entry-elegant text-[#5b3929]"
+      >
+        {latestReceivedRequest ? (
+          <>
+            <p className="absolute left-[2%] top-[28%] w-[87%] truncate text-[clamp(9px,2.4vw,11px)]">
+              {latestReceivedRequest.studentNameSnapshot}
+            </p>
+            <p className="absolute left-[2%] top-[43%] w-[87%] truncate text-[clamp(9px,2.4vw,11px)]">
+              {latestReceivedRequest.subject}
+            </p>
+            <p className="absolute left-[2%] top-[58%] w-[87%] truncate text-[clamp(9px,2.4vw,11px)]">
+              {formatRequestDateTime(latestReceivedRequest)}
+            </p>
+            <p className="absolute left-[2%] top-[73%] w-[87%] truncate text-[clamp(8px,2.2vw,10px)] italic">
+              {latestReceivedRequest.notes || "Richiesta di lezione"}
+            </p>
+          </>
+        ) : (
+          <p className="absolute left-[2%] top-[47%] w-[86%] text-center text-[clamp(9px,2.4vw,11px)] italic text-[#6f5745]">
+            Nessuna richiesta in attesa
+          </p>
+        )}
+        <Link
+          href="/calendario/richieste"
+          aria-label="Vai alle richieste ricevute"
+          className="antique-clickable absolute bottom-[2%] right-[1%] h-[20%] w-[42%] rounded-[8px] bg-transparent"
+        />
+      </section>
+
       <nav
         aria-label="Navigazione principale"
-        className="absolute inset-x-[2%] bottom-[0.8%] z-30 h-[8.6%]"
+        className="absolute inset-x-[1.7%] bottom-[0.6%] z-30 h-[9.5%]"
       >
         <Link href="/studenti" aria-label="Studenti" className="antique-clickable absolute inset-y-0 left-0 w-[20%] bg-transparent" />
         <Link href="/calendario" aria-label="Calendario" className="antique-clickable absolute inset-y-0 left-[20%] w-[20%] bg-transparent" />
@@ -254,38 +293,37 @@ function AppointmentWithTravel({
       <Link
         href={`/calendario/${appointmentId}/modifica`}
         aria-label={`${occurrence.startTime}, ${occurrence.studentNameSnapshot}, ${occurrence.subject}`}
-        className="antique-clickable flex min-h-[clamp(22px,6.2vw,29px)] shrink-0 items-center gap-[2%] rounded-[7px] border border-[#9b7754]/18 bg-[#fff9e9]/28 px-[2%] py-[1%] font-entry-elegant text-[#4e3124] shadow-[0_1px_2px_rgba(77,45,27,0.08)]"
+        className="antique-clickable flex min-h-[clamp(22px,5.6vw,27px)] shrink-0 items-center gap-[1.8%] rounded-[7px] bg-transparent px-[1.8%] py-[0.5%] font-entry-elegant text-[#4e3124]"
       >
-        <span className="shrink-0 text-[clamp(9px,2.6vw,12px)] font-semibold text-[#702c3b]">
+        <span className="shrink-0 text-[clamp(9px,2.55vw,12px)] font-semibold text-[#702c3b]">
           {occurrence.startTime}
         </span>
-        <span className="min-w-0 flex-1 leading-[1.05]">
-          <span className="block truncate text-[clamp(8px,2.35vw,11px)] font-semibold">
-            {occurrence.studentNameSnapshot} · {occurrence.subject}
-          </span>
-          <span className="block truncate text-[clamp(7px,2vw,9.5px)] text-[#694b39]">
-            {formatDuration(occurrence.durationMinutes)} · {STATUS_LABELS[occurrence.status]}
-          </span>
+        <span className="min-w-0 flex-1 truncate text-[clamp(8px,2.35vw,11px)] font-semibold leading-none">
+          {occurrence.studentNameSnapshot}
+        </span>
+        <span className="max-w-[24%] truncate text-[clamp(7px,2.05vw,9.5px)] text-[#694b39]">
+          {occurrence.subject}
+        </span>
+        <span className="shrink-0 text-[clamp(7px,1.95vw,9px)] text-[#694b39]">
+          {formatDuration(occurrence.durationMinutes)}
         </span>
         <span
           aria-label={mode.label}
           title={mode.label}
-          className="flex shrink-0 items-center gap-0.5 text-[clamp(7px,2vw,9.5px)] text-[#674736]"
+          className="shrink-0 text-[clamp(9px,2.45vw,11px)] leading-none text-[#674736]"
         >
-          <span aria-hidden="true" className="text-[clamp(10px,2.8vw,13px)] leading-none">
-            {mode.icon}
-          </span>
-          <span>{mode.label}</span>
+          {mode.icon}
         </span>
         <span
           aria-hidden="true"
-          className={`h-[clamp(5px,1.5vw,7px)] w-[clamp(5px,1.5vw,7px)] shrink-0 rounded-full ${STATUS_COLORS[occurrence.status]}`}
+          title={STATUS_LABELS[occurrence.status]}
+          className={`h-[clamp(5px,1.45vw,7px)] w-[clamp(5px,1.45vw,7px)] shrink-0 rounded-full ${STATUS_COLORS[occurrence.status]}`}
         />
       </Link>
 
       {showTravel && (
-        <div className="flex h-[clamp(7px,1.9vw,9px)] shrink-0 items-center justify-center text-[clamp(6px,1.65vw,8px)] italic leading-none text-[#76543d]/75">
-          <span aria-hidden="true">↝</span>&nbsp;spostamento
+        <div className="flex h-[clamp(6px,1.6vw,8px)] shrink-0 items-center justify-center text-[clamp(6px,1.55vw,7.5px)] italic leading-none text-[#76543d]/75">
+          ↝&nbsp;spostamento
         </div>
       )}
     </>
@@ -296,7 +334,7 @@ function WeekPageFrame({ children }: { children?: ReactNode }) {
   return (
     <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-[#4b3024]">
       <div className="mx-auto w-full max-w-[430px] sm:py-3">
-        <div className="relative aspect-[941/1672] w-full overflow-hidden bg-[#f4e7cf] sm:rounded-[28px]">
+        <div className="relative aspect-[940/1672] w-full overflow-hidden bg-[#f4e7cf] sm:rounded-[28px]">
           <Image
             src="/calendar-week-bg-clean.png"
             alt="Agenda settimanale illustrata"
@@ -349,6 +387,12 @@ function formatDuration(minutes: number) {
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
   if (hours === 0) return `${remainingMinutes} min`;
-  if (remainingMinutes === 0) return `${hours} h`;
-  return `${hours} h ${remainingMinutes} min`;
+  if (remainingMinutes === 0) return `${hours}h`;
+  return `${hours}h${remainingMinutes}`;
+}
+
+function formatRequestDateTime(request: CalendarRequest) {
+  const parts = parseLocalDate(request.proposedDate);
+  if (!parts) return request.proposedStartTime;
+  return `${parts.day} ${MONTH_NAMES[parts.month - 1]} · ${request.proposedStartTime}`;
 }
