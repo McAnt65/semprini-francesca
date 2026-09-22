@@ -229,12 +229,16 @@ export default function CalendarMonthPage() {
                   aria-current={isToday ? "date" : undefined}
                   className={`relative min-w-0 ${
                     day.belongsToMonth ? "opacity-100" : "opacity-35"
+                  } ${
+                    isToday
+                      ? "bg-[#8b2438]/12 ring-1 ring-inset ring-[#8b2438]/35"
+                      : ""
                   }`}
                 >
                   <span
                     className={`absolute left-1/2 top-[54%] flex aspect-square w-[36%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full font-entry-elegant text-[clamp(12px,3.4vw,17px)] leading-none ${
                       isToday
-                        ? "bg-[#8f263b]/14 font-semibold text-[#781d31] ring-1 ring-[#8f263b]/65"
+                        ? "font-semibold text-[#a5142b]"
                         : "text-[#4b3024]"
                     }`}
                   >
