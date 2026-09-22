@@ -19,7 +19,7 @@ export const CALENDAR_REQUESTS_STORAGE_KEY = "semprini:calendar:requests:v1";
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 type StoredRecord = { id: string; updatedAt: string };
 
-const LESSON_MODES: LessonMode[] = ["casa", "studio", "online"];
+const LESSON_MODES: LessonMode[] = ["casa", "domicilio", "online"];
 const LESSON_STATUSES: LessonStatus[] = [
   "confermata",
   "attesa",
@@ -246,7 +246,8 @@ function normalizeLessonSnapshot(
   const studentId = text(record.studentId);
   const studentNameSnapshot = text(record.studentNameSnapshot);
   const subject = text(record.subject);
-  const mode = enumValue(record.mode, LESSON_MODES);
+  const legacyMode = text(record.mode) === "studio" ? "domicilio" : record.mode;
+  const mode = enumValue(legacyMode, LESSON_MODES);
   const status = enumValue(record.status, LESSON_STATUSES);
   const paymentStatus = enumValue(record.paymentStatus, PAYMENT_STATUSES);
 
