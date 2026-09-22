@@ -163,9 +163,9 @@ function CalendarWeekContent() {
 
       <h1
         aria-live="polite"
-        className="pointer-events-none absolute left-[33.3%] top-[5.7%] z-20 w-[33.4%] text-center font-entry-elegant text-[clamp(12px,3.45vw,17px)] font-semibold text-[#6f2638]"
+        className="pointer-events-none absolute left-[29%] top-[5.85%] z-20 w-[42%] whitespace-nowrap text-center font-entry-elegant text-[clamp(9px,2.5vw,12px)] font-semibold text-[#6f2638]"
       >
-        {formatWeekInterval(weekStart, weekDays[6])}
+        {formatWeekTitle(weekStart, weekDays[6])}
       </h1>
 
       <section
@@ -186,9 +186,9 @@ function CalendarWeekContent() {
                 className="antique-clickable absolute inset-y-[4%] left-0 w-[16.2%] rounded-[10px] bg-transparent"
               >
                 <span
-                  className={`absolute left-1/2 top-[68%] flex h-[clamp(18px,5vw,24px)] min-w-[clamp(18px,5vw,24px)] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-1 font-entry-elegant text-[clamp(11px,3.2vw,16px)] font-semibold leading-none ${
+                  className={`absolute left-1/2 top-[68%] flex h-[clamp(22px,5.8vw,28px)] min-w-[clamp(22px,5.8vw,28px)] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-1 font-entry-elegant text-[clamp(11px,3.2vw,16px)] font-semibold leading-none ${
                     isToday
-                      ? "bg-[#8f263b]/14 text-[#781d31] ring-1 ring-[#8f263b]/65"
+                      ? "text-[#6f2638] ring-2 ring-inset ring-[#6f2638]"
                       : "text-[#5a3828]"
                   }`}
                 >
@@ -196,8 +196,14 @@ function CalendarWeekContent() {
                 </span>
               </Link>
 
-              <div className="absolute bottom-[8%] left-[16.8%] top-[9%] w-[81.2%] overflow-y-auto pr-[1%]">
-                <div className="flex min-h-full flex-col justify-center gap-[clamp(2px,0.7vw,4px)]">
+              <div className="absolute bottom-[8%] left-[16.8%] top-[9%] w-[81.2%] touch-pan-y overflow-y-auto overscroll-contain pr-[1%] [-webkit-overflow-scrolling:touch]">
+                <div
+                  className={`flex min-h-full flex-col gap-[clamp(2px,0.7vw,4px)] ${
+                    occurrences.length > 2
+                      ? "justify-start py-[1%]"
+                      : "justify-center"
+                  }`}
+                >
                   {occurrences.map((occurrence, index) => (
                     <AppointmentWithTravel
                       key={occurrence.occurrenceId}
@@ -248,7 +254,7 @@ function AppointmentWithTravel({
       <Link
         href={`/calendario/${appointmentId}/modifica`}
         aria-label={`${occurrence.startTime}, ${occurrence.studentNameSnapshot}, ${occurrence.subject}`}
-        className="antique-clickable flex min-h-[clamp(22px,6.2vw,29px)] items-center gap-[2%] rounded-[7px] border border-[#9b7754]/18 bg-[#fff9e9]/28 px-[2%] py-[1%] font-entry-elegant text-[#4e3124] shadow-[0_1px_2px_rgba(77,45,27,0.08)]"
+        className="antique-clickable flex min-h-[clamp(22px,6.2vw,29px)] shrink-0 items-center gap-[2%] rounded-[7px] border border-[#9b7754]/18 bg-[#fff9e9]/28 px-[2%] py-[1%] font-entry-elegant text-[#4e3124] shadow-[0_1px_2px_rgba(77,45,27,0.08)]"
       >
         <span className="shrink-0 text-[clamp(9px,2.6vw,12px)] font-semibold text-[#702c3b]">
           {occurrence.startTime}
@@ -278,7 +284,7 @@ function AppointmentWithTravel({
       </Link>
 
       {showTravel && (
-        <div className="flex h-[clamp(7px,1.9vw,9px)] items-center justify-center text-[clamp(6px,1.65vw,8px)] italic leading-none text-[#76543d]/75">
+        <div className="flex h-[clamp(7px,1.9vw,9px)] shrink-0 items-center justify-center text-[clamp(6px,1.65vw,8px)] italic leading-none text-[#76543d]/75">
           <span aria-hidden="true">↝</span>&nbsp;spostamento
         </div>
       )}
@@ -321,6 +327,22 @@ function formatWeekInterval(start: LocalDate, end: LocalDate) {
   }
 
   return `${startParts.day} ${MONTH_NAMES[startParts.month - 1]} ${startParts.year}–${endParts.day} ${MONTH_NAMES[endParts.month - 1]} ${endParts.year}`;
+}
+
+function formatWeekTitle(start: LocalDate, end: LocalDate) {
+  const startParts = parseLocalDate(start);
+  const endParts = parseLocalDate(end);
+  if (!startParts || !endParts) return "Settimana";
+
+  if (startParts.year === endParts.year && startParts.month === endParts.month) {
+    return `Settimana dal ${startParts.day} al ${endParts.day} ${MONTH_NAMES[endParts.month - 1]}`;
+  }
+
+  if (startParts.year === endParts.year) {
+    return `Settimana dal ${startParts.day} ${MONTH_NAMES[startParts.month - 1]} al ${endParts.day} ${MONTH_NAMES[endParts.month - 1]}`;
+  }
+
+  return `Settimana dal ${startParts.day} ${MONTH_NAMES[startParts.month - 1]} ${startParts.year} al ${endParts.day} ${MONTH_NAMES[endParts.month - 1]} ${endParts.year}`;
 }
 
 function formatDuration(minutes: number) {
