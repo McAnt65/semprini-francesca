@@ -200,9 +200,9 @@ function CalendarWeekContent() {
                 className="antique-clickable absolute inset-y-[3%] left-0 z-20 w-[15.1%] rounded-[8px] bg-transparent"
               >
                 <span
-                  className={`absolute left-[51%] top-[75%] flex h-[clamp(23px,6vw,29px)] min-w-[clamp(23px,6vw,29px)] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-1 font-entry-elegant text-[clamp(12px,3.35vw,16px)] font-semibold leading-none ${
+                  className={`absolute left-[51%] top-[75%] flex h-[clamp(23px,6vw,29px)] min-w-[clamp(23px,6vw,29px)] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-1 font-entry-elegant text-[clamp(14px,3.8vw,18px)] font-semibold leading-none ${
                     isToday
-                      ? "text-[#6f2638] ring-[1.5px] ring-inset ring-[#6f2638]"
+                      ? "text-[#8b2438]"
                       : "text-[#5a3828]"
                   }`}
                 >
@@ -373,14 +373,14 @@ function formatWeekTitle(start: LocalDate, end: LocalDate) {
   if (!startParts || !endParts) return "Settimana";
 
   if (startParts.year === endParts.year && startParts.month === endParts.month) {
-    return `Settimana dal ${startParts.day} al ${endParts.day} ${MONTH_NAMES[endParts.month - 1]}`;
+    return `Dal ${startParts.day} al ${endParts.day} ${MONTH_NAMES[endParts.month - 1]}`;
   }
 
   if (startParts.year === endParts.year) {
-    return `Settimana dal ${startParts.day} ${MONTH_NAMES[startParts.month - 1]} al ${endParts.day} ${MONTH_NAMES[endParts.month - 1]}`;
+    return `Dal ${startParts.day} ${MONTH_NAMES[startParts.month - 1]} al ${endParts.day} ${MONTH_NAMES[endParts.month - 1]}`;
   }
 
-  return `Settimana dal ${startParts.day} ${MONTH_NAMES[startParts.month - 1]} ${startParts.year} al ${endParts.day} ${MONTH_NAMES[endParts.month - 1]} ${endParts.year}`;
+  return `Dal ${startParts.day} ${MONTH_NAMES[startParts.month - 1]} ${startParts.year} al ${endParts.day} ${MONTH_NAMES[endParts.month - 1]} ${endParts.year}`;
 }
 
 function formatDuration(minutes: number) {
