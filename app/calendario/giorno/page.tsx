@@ -172,7 +172,7 @@ function CalendarDayContent() {
 
       <h1
         aria-live="polite"
-        className="pointer-events-none absolute left-[18.5%] top-[15.6%] z-20 w-[54%] whitespace-nowrap text-center font-entry-elegant text-[clamp(15px,4.15vw,21px)] font-semibold text-[#7a2739]"
+        className="pointer-events-none absolute left-[20%] top-[15.15%] z-20 w-[51%] whitespace-nowrap text-center font-entry-elegant text-[clamp(13px,3.55vw,18px)] font-semibold text-[#7a2739]"
       >
         {formatDayTitle(selectedDate)}
       </h1>
