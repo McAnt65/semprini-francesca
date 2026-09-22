@@ -53,7 +53,7 @@ const WEEKDAY_NAMES = [
 
 const MODE_DETAILS: Record<LessonMode, { icon: string; label: string }> = {
   casa: { icon: "⌂", label: "A casa" },
-  studio: { icon: "♟", label: "In studio" },
+  domicilio: { icon: "⌂", label: "A domicilio" },
   online: { icon: "▣", label: "Online" },
 };
 
