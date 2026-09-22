@@ -69,7 +69,7 @@ const STATUS_COLORS: Record<LessonStatus, string> = {
 
 const MODE_DETAILS: Record<LessonMode, { icon: string; label: string }> = {
   casa: { icon: "⌂", label: "Casa" },
-  studio: { icon: "♟", label: "Studio" },
+  domicilio: { icon: "⌂", label: "A domicilio" },
   online: { icon: "▣", label: "Online" },
 };
 
@@ -286,7 +286,7 @@ function AppointmentWithTravel({
     nextOccurrence &&
     occurrence.status !== "annullata" &&
     nextOccurrence.status !== "annullata" &&
-    (occurrence.mode === "casa" || nextOccurrence.mode === "casa");
+    (occurrence.mode === "domicilio" || nextOccurrence.mode === "domicilio");
 
   return (
     <>
