@@ -63,7 +63,7 @@ const STATUS_COLORS: Record<LessonStatus, string> = {
 
 const MODE_LABELS: Record<LessonMode, string> = {
   casa: "Casa",
-  studio: "Studio",
+  domicilio: "A domicilio",
   online: "Online",
 };
 
@@ -392,7 +392,7 @@ function buildTodaySummary(
       (total, occurrence) => total + occurrence.durationMinutes,
       0
     ),
-    modeSummary: (["casa", "studio", "online"] as LessonMode[])
+    modeSummary: (["casa", "domicilio", "online"] as LessonMode[])
       .filter((mode) => modeCounts.has(mode))
       .map((mode) => `${MODE_LABELS[mode]} ${modeCounts.get(mode)}`)
       .join(" · "),
