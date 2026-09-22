@@ -171,7 +171,7 @@ function CalendarWeekContent() {
 
       <h1
         aria-live="polite"
-        className="pointer-events-none absolute left-[32.2%] top-[5.45%] z-20 w-[35.6%] whitespace-nowrap text-center font-entry-elegant text-[clamp(10px,2.75vw,13px)] font-semibold leading-none text-[#6f2638]"
+        className="pointer-events-none absolute left-[30.5%] top-[5.35%] z-20 w-[39%] whitespace-nowrap text-center font-entry-elegant text-[clamp(9px,2.35vw,11px)] font-semibold leading-none text-[#6f2638]"
       >
         {formatWeekTitle(weekStart, weekEnd)}
       </h1>
@@ -200,7 +200,7 @@ function CalendarWeekContent() {
                 className="antique-clickable absolute inset-y-[3%] left-0 z-20 w-[15.1%] rounded-[8px] bg-transparent"
               >
                 <span
-                  className={`absolute left-[51%] top-[70%] flex h-[clamp(23px,6vw,29px)] min-w-[clamp(23px,6vw,29px)] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-1 font-entry-elegant text-[clamp(12px,3.35vw,16px)] font-semibold leading-none ${
+                  className={`absolute left-[51%] top-[75%] flex h-[clamp(23px,6vw,29px)] min-w-[clamp(23px,6vw,29px)] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-1 font-entry-elegant text-[clamp(12px,3.35vw,16px)] font-semibold leading-none ${
                     isToday
                       ? "text-[#6f2638] ring-[1.5px] ring-inset ring-[#6f2638]"
                       : "text-[#5a3828]"
@@ -246,7 +246,7 @@ function CalendarWeekContent() {
             </p>
           </>
         ) : (
-          <p className="absolute left-[2%] top-[47%] w-[86%] text-center text-[clamp(9px,2.4vw,11px)] italic text-[#6f5745]">
+          <p className="absolute left-[31%] top-[47%] w-[58%] text-center text-[clamp(8px,2.15vw,10px)] italic text-[#6f5745]">
             Nessuna richiesta in attesa
           </p>
         )}
