@@ -44,7 +44,7 @@ export default function TariffarioPage() {
     queueMicrotask(() => setTariffs(loadTariffs()));
   }, []);
 
-  const visibleTariffs = useMemo(() => tariffs.slice(0, 14), [tariffs]);
+  const visibleTariffs = useMemo(() => tariffs.slice(0, 8), [tariffs]);
 
   function persist(next: Tariff[]) {
     setTariffs(next);
@@ -128,11 +128,11 @@ export default function TariffarioPage() {
 
           <section
             aria-label="Le mie tariffe"
-            className="absolute left-[3.6%] top-[26.2%] z-20 h-[55.6%] w-[92.4%]"
+            className="absolute left-[3.6%] top-[29.7%] z-20 h-[39.4%] w-[92.4%]"
           >
             {visibleTariffs.map((tariff, index) => {
               const row = index + 1;
-              const rowTop = row * (100 / 15);
+              const rowTop = row * (100 / 9);
 
               return (
                 <div
@@ -140,10 +140,10 @@ export default function TariffarioPage() {
                   className="absolute left-0 w-full"
                   style={{
                     top: `${rowTop}%`,
-                    height: `${100 / 15}%`,
+                    height: `${100 / 9}%`,
                   }}
                 >
-                  <div className="absolute inset-y-0 left-[0.5%] right-[13.5%] grid grid-cols-[9%_23%_17%_17%_17%_13%] items-center font-entry-elegant text-[#523325]">
+                  <div className="absolute inset-y-0 left-[0.5%] right-[13.5%] grid grid-cols-[9%_22%_16%_19%_16%_14%] items-center font-entry-elegant text-[#523325]">
                     <span className="text-center text-[clamp(10px,2.7vw,13px)] font-semibold text-[#7a2739]">
                       {tariff.code}
                     </span>
@@ -185,17 +185,17 @@ export default function TariffarioPage() {
             <Link
               href="/tariffario/contatori"
               aria-label="Contatori mensili"
-              className="antique-clickable absolute left-[2.2%] top-[82.5%] z-30 h-[6.4%] w-[31.7%] rounded-[12px] bg-transparent"
+              className="antique-clickable absolute left-[2.2%] top-[72.1%] z-30 h-[12.2%] w-[31.7%] rounded-[12px] bg-transparent"
             />
             <Link
               href="/tariffario/studenti"
               aria-label="Tariffe per studente"
-              className="antique-clickable absolute left-[34.1%] top-[82.5%] z-30 h-[6.4%] w-[31.7%] rounded-[12px] bg-transparent"
+              className="antique-clickable absolute left-[34.1%] top-[72.1%] z-30 h-[12.2%] w-[31.7%] rounded-[12px] bg-transparent"
             />
             <Link
               href="/tariffario/pagamenti"
               aria-label="Pagamenti"
-              className="antique-clickable absolute right-[2.2%] top-[82.5%] z-30 h-[6.4%] w-[31.7%] rounded-[12px] bg-transparent"
+              className="antique-clickable absolute right-[2.2%] top-[72.1%] z-30 h-[12.2%] w-[31.7%] rounded-[12px] bg-transparent"
             />
           </nav>
 
