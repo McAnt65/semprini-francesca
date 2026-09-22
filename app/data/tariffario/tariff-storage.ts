@@ -1,4 +1,4 @@
-import type { Tariff, TariffDraft } from "./tariff-types";
+import type { LessonFormat, Tariff, TariffDraft } from "./tariff-types";
 import type { LessonMode } from "../calendario/calendar-types";
 
 export const TARIFF_STORAGE_KEY = "semprini:tariffs:v1";
@@ -6,6 +6,7 @@ export const TARIFF_STORAGE_KEY = "semprini:tariffs:v1";
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
 const MODES: LessonMode[] = ["casa", "domicilio", "online"];
+const FORMATS: LessonFormat[] = ["singola", "gruppo"];
 
 export function loadTariffs(): Tariff[] {
   if (typeof window === "undefined") return [];
@@ -111,6 +112,10 @@ function normalizeTariff(value: unknown): Tariff | null {
   const mode = MODES.includes(legacyMode as LessonMode)
     ? (legacyMode as LessonMode)
     : null;
+  const rawFormat = text(record.format) || "singola";
+  const format = FORMATS.includes(rawFormat as LessonFormat)
+    ? (rawFormat as LessonFormat)
+    : "singola";
   const hourlyRateCents =
     typeof record.hourlyRateCents === "number" &&
     Number.isFinite(record.hourlyRateCents) &&
@@ -126,6 +131,7 @@ function normalizeTariff(value: unknown): Tariff | null {
     subject,
     schoolBand,
     mode,
+    format,
     hourlyRateCents,
     active: record.active !== false,
     createdAt: timestamp(record.createdAt),
