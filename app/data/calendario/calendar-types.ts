@@ -1,7 +1,7 @@
 export type LocalDate = string;
 export type LocalTime = string;
 
-export type LessonMode = "casa" | "studio" | "online";
+export type LessonMode = "casa" | "domicilio" | "online";
 
 export type LessonStatus =
   | "confermata"
