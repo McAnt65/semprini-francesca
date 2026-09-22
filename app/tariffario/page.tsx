@@ -11,7 +11,7 @@ import {
   saveTariffs,
   updateTariff,
 } from "../data/tariffario/tariff-storage";
-import type { Tariff, TariffDraft } from "../data/tariffario/tariff-types";
+import type { LessonFormat, Tariff, TariffDraft } from "../data/tariffario/tariff-types";
 
 const MODE_LABELS: Record<LessonMode, string> = {
   casa: "A casa",
@@ -19,10 +19,16 @@ const MODE_LABELS: Record<LessonMode, string> = {
   online: "Online",
 };
 
+const FORMAT_LABELS: Record<LessonFormat, string> = {
+  singola: "Singola",
+  gruppo: "Di gruppo",
+};
+
 const EMPTY_DRAFT: TariffDraft = {
   subject: "",
   schoolBand: "",
   mode: "casa",
+  format: "singola",
   hourlyRateCents: 0,
   active: true,
 };
@@ -57,6 +63,7 @@ export default function TariffarioPage() {
       subject: tariff.subject,
       schoolBand: tariff.schoolBand,
       mode: tariff.mode,
+      format: tariff.format,
       hourlyRateCents: tariff.hourlyRateCents,
       active: tariff.active,
     });
@@ -136,7 +143,7 @@ export default function TariffarioPage() {
                     height: `${100 / 15}%`,
                   }}
                 >
-                  <div className="absolute inset-y-0 left-[0.5%] right-[13.5%] grid grid-cols-[10%_27%_20%_18%_15%] items-center font-entry-elegant text-[#523325]">
+                  <div className="absolute inset-y-0 left-[0.5%] right-[13.5%] grid grid-cols-[9%_23%_17%_17%_17%_13%] items-center font-entry-elegant text-[#523325]">
                     <span className="text-center text-[clamp(10px,2.7vw,13px)] font-semibold text-[#7a2739]">
                       {tariff.code}
                     </span>
@@ -148,6 +155,9 @@ export default function TariffarioPage() {
                     </span>
                     <span className="truncate px-[4%] text-[clamp(8px,2.2vw,10.5px)]">
                       {MODE_LABELS[tariff.mode]}
+                    </span>
+                    <span className="truncate px-[4%] text-[clamp(8px,2.15vw,10.5px)]">
+                      {FORMAT_LABELS[tariff.format]}
                     </span>
                     <span className="text-center text-[clamp(9px,2.45vw,12px)] font-semibold">
                       {formatEuro(tariff.hourlyRateCents)}/h
@@ -246,6 +256,23 @@ export default function TariffarioPage() {
                       <option value="casa">A casa</option>
                       <option value="domicilio">A domicilio</option>
                       <option value="online">Online</option>
+                    </select>
+                  </label>
+
+                  <label className="block">
+                    <span className="mb-1 block text-sm">Tipo di lezione</span>
+                    <select
+                      value={draft.format}
+                      onChange={(event) =>
+                        setDraft((current) => ({
+                          ...current,
+                          format: event.target.value as LessonFormat,
+                        }))
+                      }
+                      className="w-full rounded-lg border border-[#9b7754]/35 bg-[#fff8e8]/70 px-3 py-2 text-base outline-none"
+                    >
+                      <option value="singola">Singola</option>
+                      <option value="gruppo">Di gruppo</option>
                     </select>
                   </label>
 
