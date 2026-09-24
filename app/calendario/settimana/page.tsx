@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import NewLessonAction from "../../components/NewLessonAction";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
@@ -211,8 +210,8 @@ function CalendarWeekContent() {
                 </span>
               </Link>
 
-              <div className="absolute bottom-[6%] left-[17.2%] top-[8%] w-[79.4%] touch-pan-y overflow-y-auto overscroll-contain pr-[0.7%] [-webkit-overflow-scrolling:touch]">
-                <div className="flex min-h-full flex-col justify-start gap-[clamp(2px,0.55vw,3px)] py-[1%]">
+              <div className="absolute bottom-[5%] left-[17.2%] top-[15%] w-[79.4%] touch-pan-y overflow-y-auto overscroll-contain pr-[0.7%] [-webkit-overflow-scrolling:touch]">
+                <div className="flex min-h-full flex-col justify-start gap-[clamp(2px,0.55vw,3px)]">
                   {occurrences.map((occurrence, index) => (
                     <AppointmentWithTravel
                       key={occurrence.occurrenceId}
@@ -258,6 +257,12 @@ function CalendarWeekContent() {
         />
       </section>
 
+      <Link
+        href={`/calendario/nuova?data=${selectedDate}`}
+        aria-label="Nuova lezione"
+        className="antique-clickable absolute left-[66%] top-[74.1%] z-30 h-[12.5%] w-[21%] bg-transparent"
+      />
+
       <nav
         aria-label="Navigazione principale"
         className="absolute inset-x-[1.7%] bottom-[0.6%] z-30 h-[9.5%]"
@@ -268,7 +273,6 @@ function CalendarWeekContent() {
         <Link href="/libri" aria-label="Libri" className="antique-clickable absolute inset-y-0 left-[60%] w-[20%] bg-transparent" />
         <Link href="/menu" aria-label="Menu" className="antique-clickable absolute inset-y-0 left-[80%] w-[20%] bg-transparent" />
       </nav>
-      <NewLessonAction date={selectedDate} />
     </WeekPageFrame>
   );
 }
@@ -338,7 +342,7 @@ function WeekPageFrame({ children }: { children?: ReactNode }) {
       <div className="mx-auto w-full max-w-[430px] sm:py-3">
         <div className="relative aspect-[940/1672] w-full min-h-dvh sm:min-h-0 overflow-hidden bg-[#f4e7cf] sm:rounded-[28px]">
           <Image
-            src="/calendar-week-bg-clean.png"
+            src="/calendar-week-new-lesson-bg.png"
             alt="Agenda settimanale illustrata"
             fill
             priority
