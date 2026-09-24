@@ -188,7 +188,7 @@ export default function CalendarMonthPage() {
             className="antique-clickable absolute left-[11.5%] top-[17.5%] z-30 h-[5.2%] w-[23.6%] rounded-[12px] bg-transparent"
           />
           <Link
-            href={`/calendario/settimana?data=${selectedDate}`}
+            href={`/calendario/settimana?data=${visibleMonthKey === today.slice(0, 7) ? today : selectedDate}`}
             aria-label="Vista settimana"
             className="antique-clickable absolute left-[37.5%] top-[17.5%] z-30 h-[5.2%] w-[24%] rounded-[12px] bg-transparent"
           />
