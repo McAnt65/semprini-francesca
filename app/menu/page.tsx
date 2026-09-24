@@ -7,14 +7,14 @@ export default function MenuPage() {
   return (
     <main className="min-h-dvh w-full overflow-x-hidden bg-[#f4eddf]">
       <div className="mx-auto w-full max-w-[430px]">
-        <div className="relative aspect-[9/16] w-full">
+        <div className="relative aspect-[9/16] w-full min-h-dvh sm:min-h-0">
           <Image
             src="/menu.png"
             alt="Menu del Registro"
             fill
             priority
             sizes="(max-width: 430px) 100vw, 430px"
-            className="object-contain"
+            className="object-fill"
           />
 
           <Link

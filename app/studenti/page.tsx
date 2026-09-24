@@ -136,12 +136,12 @@ export default function StudentsPage() {
   return (
     <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-sepia">
       <div className="mx-auto w-full max-w-[430px] px-0 sm:py-3">
-        <div className="relative aspect-[977/1610] w-full overflow-hidden bg-[#f4e7cf] shadow-[0_10px_40px_rgba(72,48,30,0.16)] sm:rounded-[28px]">
+        <div className="relative aspect-[977/1610] w-full min-h-dvh sm:min-h-0 overflow-hidden bg-[#f4e7cf] shadow-[0_10px_40px_rgba(72,48,30,0.16)] sm:rounded-[28px]">
 
           <img
             src="/students-register-bg.png?v=20260916-1"
             alt="Registro illustrato degli studenti"
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-fill"
           />
 
           {/* INDIETRO */}

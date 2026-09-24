@@ -85,7 +85,7 @@ export default function StudentDetail({
   return (
     <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-[#4b3024]">
       <div className="mx-auto w-full max-w-[430px] py-0 sm:py-3">
-        <div className="relative aspect-[941/1672] w-full overflow-hidden sm:rounded-[28px]">
+        <div className="relative aspect-[941/1672] w-full min-h-dvh sm:min-h-0 overflow-hidden sm:rounded-[28px]">
 
           {/* SFONDO */}
           <Image

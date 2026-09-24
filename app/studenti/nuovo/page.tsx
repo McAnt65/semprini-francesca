@@ -10,14 +10,14 @@ export default function NewStudentPage() {
   return (
     <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce]">
       <div className="mx-auto w-full max-w-[430px]">
-        <div className="relative aspect-[1024/1792] w-full overflow-hidden bg-[#f4e7cf] sm:rounded-[28px]">
+        <div className="relative aspect-[1024/1792] w-full min-h-dvh sm:min-h-0 overflow-hidden bg-[#f4e7cf] sm:rounded-[28px]">
           <Image
             src="/student-edit-menu.png"
             alt="Completa il profilo dello studente"
             fill
             priority
             sizes="(max-width: 430px) 100vw, 430px"
-            className="object-cover"
+            className="object-fill"
           />
 
           <button

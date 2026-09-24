@@ -14,14 +14,14 @@ export default function StudentEditMenuPage({
   return (
     <main className="min-h-dvh w-full bg-[#f4eddf]">
       <div className="mx-auto w-full max-w-[430px]">
-        <div className="relative aspect-[2/3] w-full">
+        <div className="relative aspect-[2/3] w-full min-h-dvh sm:min-h-0">
           <Image
             src="/student-edit-menu.png"
             alt="Completa il profilo dello studente"
             fill
             priority
             sizes="(max-width: 430px) 100vw, 430px"
-            className="object-contain"
+            className="object-fill"
           />
 
           <Link

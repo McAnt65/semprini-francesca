@@ -124,7 +124,7 @@ export default function NewStudentHomeFamilyPage() {
 
       <div className="mx-auto w-full max-w-[430px] py-0 sm:py-3">
 
-        <div className="relative aspect-[941/1672] w-full overflow-hidden sm:rounded-[28px]">
+        <div className="relative aspect-[941/1672] w-full min-h-dvh sm:min-h-0 overflow-hidden sm:rounded-[28px]">
 
           <Image
             src="/student-home-family-bg.png"

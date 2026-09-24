@@ -84,7 +84,7 @@ export default function NewStudentSchoolSubjectsBooksPage() {
   return (
     <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-[#4b3024]">
       <div className="mx-auto w-full max-w-[430px] py-0 sm:py-3">
-        <div className="relative aspect-[941/1672] w-full overflow-hidden sm:rounded-[28px]">
+        <div className="relative aspect-[941/1672] w-full min-h-dvh sm:min-h-0 overflow-hidden sm:rounded-[28px]">
           <Image src="/student-school-bg-clean.png" alt="Scuola, materie e libri di riferimento" fill unoptimized priority sizes="(max-width: 430px) 100vw, 430px" className="select-none object-fill" />
 
           <button type="button" onClick={goBack} aria-label="Indietro" className="antique-clickable absolute left-[2.5%] top-[0.8%] z-30 h-[4.3%] w-[18%] rounded-[10px] bg-transparent" />

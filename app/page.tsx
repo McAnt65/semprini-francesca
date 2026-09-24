@@ -28,13 +28,13 @@ export default function Home() {
           transizione ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
       >
-        <div className="relative aspect-[9/16] w-[min(100vw,56.25dvh)]">
+        <div className="relative h-full w-full max-w-[430px] sm:aspect-[9/16] sm:h-auto">
           <Image
             src="/Homepage.png"
             alt="Semprini Francesca - Insegnante"
             fill
             priority
-            className="object-contain"
+            className="object-fill"
           />
 
           {/* Area cliccabile invisibile */}
@@ -54,13 +54,13 @@ export default function Home() {
           transizione ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
-        <div className="relative aspect-[9/16] w-[min(100vw,56.25dvh)]">
+        <div className="relative h-full w-full max-w-[430px] sm:aspect-[9/16] sm:h-auto">
           <Image
             src="/menu.png"
             alt="Menu del Registro"
             fill
             priority
-            className="object-contain"
+            className="object-fill"
           />
         </div>
       </div>
