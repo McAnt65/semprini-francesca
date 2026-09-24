@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import NewLessonAction from "../components/NewLessonAction";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -156,7 +155,7 @@ export default function CalendarMonthPage() {
       <div className="mx-auto w-full max-w-[430px] sm:py-3">
         <div className="relative aspect-[941/1672] w-full min-h-dvh sm:min-h-0 overflow-hidden bg-[#f4e7cf] sm:rounded-[28px]">
           <Image
-            src="/calendar-month-bg-clean.png"
+            src="/calendar-month-new-lesson-bg.png"
             alt="Calendario mensile illustrato"
             fill
             priority
@@ -175,6 +174,11 @@ export default function CalendarMonthPage() {
             href="/menu"
             aria-label="Torna al menù"
             className="antique-clickable absolute right-[4.1%] top-[0.7%] z-30 h-[4.4%] w-[19%] rounded-[12px] bg-transparent"
+          />
+          <Link
+            href={`/calendario/nuova?data=${visibleMonthKey === today.slice(0, 7) ? today : selectedDate}`}
+            aria-label="Nuova lezione"
+            className="antique-clickable absolute right-[2.7%] top-[5.3%] z-30 h-[11.7%] w-[26%] bg-transparent"
           />
 
           <Link
@@ -324,7 +328,6 @@ export default function CalendarMonthPage() {
             <Link href="/libri" aria-label="Libri" className="antique-clickable absolute inset-y-0 left-[60%] w-[20%] rounded-[12px] bg-transparent" />
             <Link href="/menu" aria-label="Menu" className="antique-clickable absolute inset-y-0 left-[80%] w-[20%] rounded-[12px] bg-transparent" />
           </nav>
-          <NewLessonAction date={visibleMonthKey === today.slice(0, 7) ? today : selectedDate} />
         </div>
       </div>
     </main>
