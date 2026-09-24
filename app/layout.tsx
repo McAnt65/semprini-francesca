@@ -13,8 +13,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Semprini Francesca - Insegnante",
+  title: "Il Registro di Francesca",
   description: "Insegnare è toccare una vita per sempre",
+  applicationName: "Il Registro di Francesca",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Il Registro",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
