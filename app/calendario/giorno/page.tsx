@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import NewLessonAction from "../../components/NewLessonAction";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
@@ -60,31 +59,27 @@ const MODE_DETAILS: Record<LessonMode, { icon: string; label: string }> = {
 
 const STATUS_DETAILS: Record<
   LessonStatus,
-  { label: string; stripe: string; wash: string; border: string }
+  { label: string; stripe: string; wash: string }
 > = {
   confermata: {
     label: "Confermata",
     stripe: "bg-[#4f7d52]",
-    wash: "bg-[#dfe8d6]/80",
-    border: "border-[#6d8b61]/45",
+    wash: "bg-[#d8e6d0]/50",
   },
   attesa: {
     label: "In attesa",
     stripe: "bg-[#c88d24]",
-    wash: "bg-[#f1e2bd]/82",
-    border: "border-[#bb8b35]/45",
+    wash: "bg-[#f1e2bd]/50",
   },
   richiesta: {
     label: "Richiesta",
     stripe: "bg-[#557e9c]",
-    wash: "bg-[#d9e4e8]/82",
-    border: "border-[#66879b]/45",
+    wash: "bg-[#d9e4e8]/50",
   },
   annullata: {
     label: "Annullata",
     stripe: "bg-[#9e5151]",
-    wash: "bg-[#edd8d6]/78",
-    border: "border-[#9e5f5f]/40",
+    wash: "bg-[#edd8d6]/50",
   },
 };
 
@@ -148,6 +143,11 @@ function CalendarDayContent() {
         aria-label="Torna al menù"
         className="antique-clickable absolute right-[4.3%] top-[0.6%] z-30 h-[4.5%] w-[18.5%] rounded-[12px] bg-transparent"
       />
+      <Link
+        href={`/calendario/nuova?data=${selectedDate}`}
+        aria-label="Nuova lezione"
+        className="antique-clickable absolute right-[4.7%] top-[5.8%] z-30 h-[9.5%] w-[20%] bg-transparent"
+      />
 
       <button
         type="button"
@@ -203,11 +203,11 @@ function CalendarDayContent() {
                 left: `${leftPct}%`,
                 width: `${widthPct}%`,
               }}
-              className={`antique-clickable absolute overflow-hidden rounded-[8px] border ${status.border} ${status.wash} shadow-[0_1px_2px_rgba(86,54,31,0.12)]`}
+              className={`antique-clickable absolute overflow-hidden rounded-[3px] ${status.wash}`}
             >
               <span
                 aria-hidden="true"
-                className={`absolute inset-y-[8%] left-[1%] w-[1.8%] rounded-full ${status.stripe}`}
+                className={`absolute inset-y-[7%] left-[1%] w-[1%] rounded-full opacity-70 ${status.stripe}`}
               />
               <div className="absolute inset-y-[8%] left-[5%] right-[4%] grid min-w-0 grid-cols-[1fr_auto] gap-x-[3%] font-entry-elegant text-[#4d3024]">
                 <div className="min-w-0 self-center">
@@ -278,7 +278,6 @@ function CalendarDayContent() {
           className="antique-clickable absolute inset-y-0 left-[80%] w-[20%] bg-transparent"
         />
       </nav>
-      <NewLessonAction date={selectedDate} />
     </DayPageFrame>
   );
 }
@@ -289,7 +288,7 @@ function DayPageFrame({ children }: { children?: ReactNode }) {
       <div className="mx-auto w-full max-w-[430px] sm:py-3">
         <div className="relative aspect-[940/1672] w-full min-h-dvh sm:min-h-0 overflow-hidden bg-[#f4e7cf] sm:rounded-[28px]">
           <Image
-            src="/calendar-day-bg-clean.png"
+            src="/calendar-day-new-lesson-bg.png"
             alt="Agenda giornaliera illustrata"
             fill
             priority
