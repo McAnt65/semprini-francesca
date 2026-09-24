@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -21,6 +21,14 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Il Registro",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: "#663139",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

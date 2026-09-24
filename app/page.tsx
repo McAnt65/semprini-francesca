@@ -20,7 +20,7 @@ export default function Home() {
   };
 
   return (
-    <main className="relative h-dvh w-full overflow-hidden bg-[#f4eddf]">
+    <main className="relative h-dvh w-full overflow-x-hidden bg-[#f4eddf]">
 
       {/* SCHERMATA HOME */}
       <div
@@ -28,7 +28,7 @@ export default function Home() {
           transizione ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
       >
-        <div className="relative h-dvh aspect-[9/16] max-w-full">
+        <div className="relative aspect-[9/16] w-[min(100vw,56.25dvh)]">
           <Image
             src="/Homepage.png"
             alt="Semprini Francesca - Insegnante"
@@ -43,10 +43,7 @@ export default function Home() {
             onClick={entraNelRegistro}
             aria-label="Entra nel registro"
             className="antique-clickable absolute z-50 left-[8%] top-[76%] h-[18%] w-[84%] rounded-[18px] bg-transparent border-none outline-none"
-            style={{
-              WebkitTapHighlightColor: "transparent",
-              touchAction: "manipulation",
-            }}
+            style={{ WebkitTapHighlightColor: "transparent" }}
           />
         </div>
       </div>
@@ -57,7 +54,7 @@ export default function Home() {
           transizione ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
-        <div className="relative h-dvh aspect-[9/16] max-w-full">
+        <div className="relative aspect-[9/16] w-[min(100vw,56.25dvh)]">
           <Image
             src="/menu.png"
             alt="Menu del Registro"
