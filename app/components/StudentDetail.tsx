@@ -90,7 +90,7 @@ export default function StudentDetail({
 
           {/* SFONDO */}
           <Image
-            src="/student-diary-bg.png"
+            src="/student-diary-new-lesson-bg.png"
             alt={`Diario di ${fullName}`}
             fill
             priority
@@ -124,10 +124,9 @@ export default function StudentDetail({
 
           <Link
             href={`/calendario/nuova?studente=${encodeURIComponent(student.id)}`}
-            className="absolute left-[36%] top-[15.1%] z-40 w-[49%] rounded-full border border-[#9b7663]/60 bg-[#fbf1e1]/90 px-2 py-1 text-center font-entry-elegant text-[clamp(11px,2.8vw,14px)] text-[#6f2638] shadow-sm"
-          >
-            ＋ Nuova lezione
-          </Link>
+            aria-label={`Nuova lezione per ${fullName}`}
+            className="antique-clickable absolute left-[9%] top-[87.3%] z-40 h-[10.5%] w-[23%] bg-transparent"
+          />
 
           {/* FOTOGRAFIA */}
           <div className="absolute left-[5.2%] top-[18.5%] z-30 h-[21.6%] w-[28.1%] overflow-hidden">
