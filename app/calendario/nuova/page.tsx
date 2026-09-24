@@ -109,72 +109,61 @@ function NewLessonForm() {
     router.push(`/calendario/giorno?data=${date}`);
   }
 
-  const field = "w-full rounded-none border-0 border-b border-[#a3836a]/55 bg-transparent px-1 py-2 font-entry-elegant text-[16px] text-[#4b3024] outline-none focus:border-[#792c40]";
-  const label = "block font-field-label text-[14px] text-[#792c40]";
+  const field = "h-full w-full appearance-none border-0 bg-transparent px-1 font-entry-elegant text-[clamp(12px,3.5vw,17px)] text-[#4b3024] outline-none focus-visible:bg-[#fff8e8]/60 focus-visible:ring-1 focus-visible:ring-[#792c40]";
+  const position = (top: string, left = "40%", width = "49%") => ({ top, left, width, height: "4.6%" });
+  const back = date ? `/calendario/giorno?data=${date}` : "/calendario";
 
   return (
-    <main className="min-h-dvh bg-[#e9d8bb] px-3 py-4 text-[#4b3024] sm:py-8">
-      <article className="mx-auto max-w-[430px] rounded-[12px] border border-[#b79673] bg-[linear-gradient(145deg,#fff7e9,#f3e3c8)] px-5 pb-8 pt-5 shadow-[0_8px_28px_rgba(75,48,36,.18)] sm:px-8">
-        <nav className="flex items-center justify-between font-entry-elegant text-[15px] text-[#6f2638]">
-          <Link href={date ? `/calendario/giorno?data=${date}` : "/calendario"} className="py-2">← Calendario</Link>
-          <Link href="/menu" className="py-2">Menu</Link>
-        </nav>
-        <div className="mt-3 text-center">
-          <p className="font-entry-elegant text-[15px] italic text-[#8a6653]">Un nuovo appuntamento da custodire</p>
-          <h1 className="mt-1 font-register text-[clamp(30px,8vw,40px)] italic text-[#6f2638]">Nuova lezione</h1>
-          <div aria-hidden="true" className="mx-auto mt-3 w-28 border-b border-[#a77e66]">♡</div>
-        </div>
+    <main className="min-h-dvh bg-[#f4eddf] text-[#4b3024]">
+      <div className="relative mx-auto aspect-[941/1672] w-full max-w-[430px] min-h-dvh sm:min-h-0">
+        {/* Lo sfondo è una tavola illustrata; tutti i dati restano elementi HTML. */}
+        <img src="/calendar-new-lesson-bg-clean.png" alt="" className="absolute inset-0 h-full w-full" />
+        <h1 className="sr-only">Nuova lezione</h1>
+        <Link href={back} aria-label="Indietro al calendario" className="absolute left-[4%] top-[1%] h-[5%] w-[22%]" />
+        <Link href="/menu" aria-label="Menu" className="absolute right-[4%] top-[1%] h-[5%] w-[22%]" />
 
-        <form onSubmit={save} className="mt-7 space-y-5">
-          <label className={label}>Studente
+        <form onSubmit={save} className="absolute inset-0 pointer-events-none">
+          <label className="pointer-events-auto absolute" style={position("25.1%")}> <span className="sr-only">Studente</span>
             <select required value={studentId} onChange={(event) => selectStudent(event.target.value)} className={field}>
               <option value="">Scegli uno studente</option>
               {students.map((item) => <option value={item.id} key={item.id}>{item.firstName} {item.lastName}</option>)}
             </select>
           </label>
-          {studentsLoaded && students.length === 0 && <p className="font-entry-elegant text-[14px] text-[#694a3b]">Il registro è ancora vuoto. <Link href="/studenti/nuovo" className="underline">Aggiungi prima uno studente</Link>.</p>}
-          <div className="grid grid-cols-2 gap-5">
-            <label className={label}>Data
-              <input required type="date" value={date} onChange={(event) => setDate(event.target.value)} className={field} />
-            </label>
-            <label className={label}>Ora
-              <input required type="time" step="1800" value={time} onChange={(event) => setTime(event.target.value)} className={field} />
-            </label>
-          </div>
-          <label className={label}>Materia
+          <label className="pointer-events-auto absolute" style={position("32.4%")}><span className="sr-only">Data</span>
+            <input required type="date" value={date} onChange={(event) => setDate(event.target.value)} className={field} />
+          </label>
+          <label className="pointer-events-auto absolute" style={position("39.5%")}><span className="sr-only">Ora</span>
+            <input required type="time" step="1800" value={time} onChange={(event) => setTime(event.target.value)} className={field} />
+          </label>
+          <label className="pointer-events-auto absolute" style={position("46.8%")}><span className="sr-only">Materia</span>
             <input required list="lesson-subjects" value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="Matematica, Fisica, Chimica…" className={field} />
             <datalist id="lesson-subjects">{availableSubjects.map((item) => <option key={item} value={item} />)}</datalist>
           </label>
-          <div className="grid grid-cols-2 gap-5">
-            <label className={label}>Durata (minuti)
-              <input required type="number" min="15" max="480" step="15" inputMode="numeric" value={duration} onChange={(event) => setDuration(event.target.value)} className={field} />
-            </label>
-            <label className={label}>Tariffa oraria (€)
-              <input type="text" inputMode="decimal" value={hourlyRate} onChange={(event) => setHourlyRate(event.target.value)} placeholder="Facoltativa" className={field} />
-            </label>
-          </div>
-          <div className="grid grid-cols-2 gap-5">
-            <label className={label}>Modalità
+          <label className="pointer-events-auto absolute" style={position("54.0%", "42%", "47%") }><span className="sr-only">Durata in minuti</span>
+            <select required value={duration} onChange={(event) => setDuration(event.target.value)} className={field}>
+              {[30, 45, 60, 75, 90, 120, 150, 180].map((minutes) => <option key={minutes} value={minutes}>{minutes} minuti</option>)}
+            </select>
+          </label>
+          <label className="pointer-events-auto absolute" style={position("61.1%") }><span className="sr-only">Modalità</span>
               <select value={mode} onChange={(event) => setMode(event.target.value as LessonMode)} className={field}>
                 <option value="casa">Casa / studio</option>
                 <option value="domicilio">A domicilio</option>
                 <option value="online">Online</option>
               </select>
-            </label>
-            <label className={label}>Stato
+          </label>
+          <label className="pointer-events-auto absolute" style={position("68.2%") }><span className="sr-only">Stato della lezione</span>
               <select value={status} onChange={(event) => setStatus(event.target.value as LessonStatus)} className={field}>
                 <option value="confermata">Confermata</option>
                 <option value="attesa">In attesa</option>
               </select>
-            </label>
-          </div>
-          {error && <p role="alert" className="rounded-md bg-[#f3dfd8] px-3 py-2 font-entry-elegant text-[14px] text-[#802b38]">{error}</p>}
-          <div className="flex items-center justify-between gap-4 pt-4 font-entry-elegant text-[17px]">
-            <Link href={date ? `/calendario/giorno?data=${date}` : "/calendario"} className="py-3 text-[#725646]">Annulla</Link>
-            <button disabled={saving || students.length === 0} type="submit" className="min-w-36 rounded-md border border-[#69313c] bg-[#703142] px-6 py-3 text-[#fff6e8] shadow-sm disabled:opacity-50">{saving ? "Salvataggio…" : "Salva lezione"}</button>
-          </div>
+          </label>
+          <label className="pointer-events-auto absolute" style={position("75.6%", "45%", "44%") }><span className="sr-only">Tariffa oraria in euro, facoltativa</span>
+            <input type="text" inputMode="decimal" value={hourlyRate} onChange={(event) => setHourlyRate(event.target.value)} placeholder="Facoltativa (€)" className={field} />
+          </label>
+          {(error || (studentsLoaded && students.length === 0)) && <p role="alert" className="pointer-events-auto absolute left-[12%] top-[82%] w-[76%] rounded bg-[#fff5e5] px-2 py-1 text-center font-entry-elegant text-[clamp(11px,3vw,15px)] text-[#802b38]">{error || <>Il registro è vuoto. <Link href="/studenti/nuovo" className="underline">Aggiungi uno studente</Link>.</>}</p>}
+          <button disabled={saving || students.length === 0} type="submit" aria-label={saving ? "Salvataggio della lezione" : "Salva lezione"} className="pointer-events-auto absolute left-[19%] top-[88%] h-[8.5%] w-[62%] rounded-md bg-transparent disabled:opacity-50"><span className="sr-only">{saving ? "Salvataggio…" : "Salva lezione"}</span></button>
         </form>
-      </article>
+      </div>
     </main>
   );
 }
