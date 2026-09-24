@@ -280,12 +280,12 @@ export default function CalendarMonthPage() {
               saveCalendarMonthlyNote(visibleMonthKey, value);
             }}
             spellCheck
-            className="absolute left-[8.8%] top-[71.6%] z-20 h-[14.8%] w-[33.2%] resize-none overflow-y-auto border-0 bg-transparent px-[1%] py-[0.5%] font-entry-elegant text-[clamp(10px,2.75vw,14px)] leading-[1.75] text-[#5a3a2a] outline-none placeholder:text-[#765744]/45"
+            className="absolute left-[8.8%] top-[71.6%] z-20 h-[14.8%] w-[33.2%] resize-none overflow-y-auto border-0 bg-transparent px-[1%] py-[0.5%] font-entry-elegant text-[clamp(10px,2.75vw,14px)] leading-[1.75] text-[#5a3a2a] outline-none placeholder:text-[#765744]/45 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           />
 
           <section
             aria-label="Riepilogo di oggi"
-            className="absolute left-[53.4%] top-[71.7%] z-20 h-[13.7%] w-[30.8%] overflow-y-auto px-[0.8%] py-[0.4%] text-center font-entry-elegant text-[clamp(8px,2.25vw,11px)] leading-[1.38] text-[#563728]"
+            className="absolute left-[53.4%] top-[71.7%] z-20 h-[13.7%] w-[30.8%] overflow-y-auto px-[0.8%] py-[0.4%] text-center font-entry-elegant text-[clamp(8px,2.25vw,11px)] leading-[1.38] text-[#563728] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {todaySummary.lessonCount === 0 ? (
               <p className="mt-[8%] text-[clamp(9px,2.5vw,12px)] italic leading-[1.5]">
