@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import type { StudentRecord } from "../data/students";
@@ -120,6 +121,13 @@ export default function StudentDetail({
               {fullName}
             </h1>
           </div>
+
+          <Link
+            href={`/calendario/nuova?studente=${encodeURIComponent(student.id)}`}
+            className="absolute left-[36%] top-[15.1%] z-40 w-[49%] rounded-full border border-[#9b7663]/60 bg-[#fbf1e1]/90 px-2 py-1 text-center font-entry-elegant text-[clamp(11px,2.8vw,14px)] text-[#6f2638] shadow-sm"
+          >
+            ＋ Nuova lezione
+          </Link>
 
           {/* FOTOGRAFIA */}
           <div className="absolute left-[5.2%] top-[18.5%] z-30 h-[21.6%] w-[28.1%] overflow-hidden">

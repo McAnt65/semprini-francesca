@@ -5,6 +5,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { students, type StudentRecord } from "../data/students";
 import { loadStoredStudents } from "../data/student-storage";
+import { loadCalendarAppointments, loadCalendarSeries } from "../data/calendario/calendar-storage";
+import { selectOccurrencesInRange } from "../data/calendario/calendar-selectors";
+import { addDays, toLocalDate, toLocalTime } from "../data/calendario/calendar-dates";
 
 type SubjectFilter = "Tutte" | "Matematica" | "Fisica" | "Chimica";
 type SortMode = "az" | "lesson" | "recent";
@@ -66,10 +69,29 @@ export default function StudentsPage() {
   useEffect(() => {
     const storedStudents = loadStoredStudents();
     const storedIds = new Set(storedStudents.map((student) => student.id));
+    const now = new Date();
+    const today = toLocalDate(now);
+    const currentTime = toLocalTime(now);
+    const nextByStudent = new Map<string, string>();
+    const upcoming = selectOccurrencesInRange(
+      loadCalendarAppointments(),
+      loadCalendarSeries(),
+      today,
+      addDays(today, 366)
+    );
+    for (const lesson of upcoming) {
+      if (lesson.status === "annullata" || (lesson.date === today && lesson.startTime < currentTime)) continue;
+      const next = `${lesson.date}T${lesson.startTime}`;
+      const previous = nextByStudent.get(lesson.studentId);
+      if (!previous || next < previous) nextByStudent.set(lesson.studentId, next);
+    }
     queueMicrotask(() => setAllStudents([
       ...storedStudents,
       ...students.filter((student) => !storedIds.has(student.id)),
-    ]));
+    ].map((student) => ({
+      ...student,
+      nextLesson: nextByStudent.get(student.id),
+    }))));
   }, []);
 
   const subjectCounts = useMemo(() => {

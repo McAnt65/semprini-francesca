@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import NewLessonAction from "../../components/NewLessonAction";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
@@ -267,6 +268,7 @@ function CalendarWeekContent() {
         <Link href="/libri" aria-label="Libri" className="antique-clickable absolute inset-y-0 left-[60%] w-[20%] bg-transparent" />
         <Link href="/menu" aria-label="Menu" className="antique-clickable absolute inset-y-0 left-[80%] w-[20%] bg-transparent" />
       </nav>
+      <NewLessonAction date={selectedDate} />
     </WeekPageFrame>
   );
 }
