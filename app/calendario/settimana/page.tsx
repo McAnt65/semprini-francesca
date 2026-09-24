@@ -299,15 +299,15 @@ function AppointmentWithTravel({
       <Link
         href={`/calendario/${appointmentId}/modifica`}
         aria-label={`${occurrence.startTime}, ${occurrence.studentNameSnapshot}, ${occurrence.subject}`}
-        className="antique-clickable flex min-h-[clamp(22px,5.6vw,27px)] shrink-0 items-center gap-[1.8%] rounded-[7px] bg-transparent px-[1.8%] py-[0.5%] font-entry-elegant text-[#4e3124]"
+        className="antique-clickable relative flex min-h-[clamp(22px,5.6vw,27px)] shrink-0 items-center gap-[1.8%] rounded-[7px] bg-transparent pl-[15%] pr-[1.8%] py-[0.5%] font-entry-elegant text-[#4e3124]"
       >
-        <span className="shrink-0 text-[clamp(9px,2.55vw,12px)] font-semibold text-[#702c3b]">
+        <span className="absolute inset-y-0 left-0 flex w-[14%] items-center justify-center text-[clamp(9px,2.55vw,12px)] font-semibold text-[#702c3b]">
           {occurrence.startTime}
         </span>
-        <span className="min-w-0 flex-1 truncate text-[clamp(8px,2.35vw,11px)] font-semibold leading-none">
+        <span className="min-w-0 flex-1 truncate text-[clamp(11px,3.1vw,14px)] font-semibold leading-none">
           {occurrence.studentNameSnapshot}
         </span>
-        <span className="max-w-[24%] truncate text-[clamp(7px,2.05vw,9.5px)] text-[#694b39]">
+        <span className="max-w-[22%] truncate text-[clamp(7px,2.05vw,9.5px)] text-[#694b39]">
           {occurrence.subject}
         </span>
         <span className="shrink-0 text-[clamp(7px,1.95vw,9px)] text-[#694b39]">
