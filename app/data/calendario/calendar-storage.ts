@@ -275,13 +275,14 @@ function loadCollection<T extends StoredRecord>(
   normalize: (value: unknown) => T | null
 ): T[] {
   if (typeof window === "undefined") return [];
-  const byId = new Map<string, T>();
-
+  // La prima copia leggibile è quella autorevole. Un array vuoto rappresenta
+  // anche una cancellazione completa: unirlo a una vecchia copia di fallback
+  // farebbe ricomparire le lezioni eliminate.
   for (const storage of availableStorages()) {
     try {
       const parsed = readJson(storage, key);
       if (!Array.isArray(parsed)) continue;
-
+      const byId = new Map<string, T>();
       for (const value of parsed) {
         const item = normalize(value);
         if (!item) continue;
@@ -290,12 +291,12 @@ function loadCollection<T extends StoredRecord>(
           byId.set(item.id, item);
         }
       }
+      return [...byId.values()];
     } catch {
       // Se uno storage non è disponibile, prova quello successivo.
     }
   }
-
-  return [...byId.values()];
+  return [];
 }
 
 function saveCollection<T>(
