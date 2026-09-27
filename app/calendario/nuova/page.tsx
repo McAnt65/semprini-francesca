@@ -24,6 +24,7 @@ function NewLessonForm() {
   const searchParams = useSearchParams();
   const requestedDate = searchParams.get("data");
   const requestedStudent = searchParams.get("studente");
+  const requestedTime = searchParams.get("ora");
   const [students, setStudents] = useState<StudentRecord[]>([]);
   const [studentsLoaded, setStudentsLoaded] = useState(false);
   const [studentId, setStudentId] = useState("");
@@ -45,11 +46,12 @@ function NewLessonForm() {
       setStudents(available);
       setStudentsLoaded(true);
       setDate(isLocalDate(requestedDate) ? requestedDate : toLocalDate(new Date()));
+      if (isLocalTime(requestedTime)) setTime(requestedTime);
       if (requestedStudent && available.some((item) => item.id === requestedStudent)) {
         setStudentId(requestedStudent);
       }
     });
-  }, [requestedDate, requestedStudent]);
+  }, [requestedDate, requestedStudent, requestedTime]);
 
   const student = students.find((item) => item.id === studentId);
   const availableSubjects = useMemo(
