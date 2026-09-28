@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { students, type StudentRecord } from "../data/students";
 import { loadStoredStudents } from "../data/student-storage";
 import { loadCalendarAppointments, loadCalendarSeries } from "../data/calendario/calendar-storage";
 import { selectOccurrencesInRange } from "../data/calendario/calendar-selectors";
 import { addDays, toLocalDate, toLocalTime } from "../data/calendario/calendar-dates";
+import background from "../assets/students-register-watercolor.webp";
 
 type SubjectFilter = "Tutte" | "Matematica" | "Fisica" | "Chimica";
 type SortMode = "az" | "lesson" | "recent";
@@ -59,8 +60,6 @@ function formatLesson(value?: string) {
 }
 
 export default function StudentsPage() {
-  const router = useRouter();
-
   const [allStudents, setAllStudents] = useState<StudentRecord[]>(students);
   const [query, setQuery] = useState("");
   const [subject, setSubject] = useState<SubjectFilter>("Tutte");
@@ -93,21 +92,6 @@ export default function StudentsPage() {
       nextLesson: nextByStudent.get(student.id),
     }))));
   }, []);
-
-  const subjectCounts = useMemo(() => {
-    const countBySubject = (subjectName: SubjectFilter) =>
-      allStudents.filter((student) =>
-        student.subjects
-          .map(normalizeSubject)
-          .includes(subjectName)
-      ).length;
-
-    return {
-      Matematica: countBySubject("Matematica"),
-      Fisica: countBySubject("Fisica"),
-      Chimica: countBySubject("Chimica"),
-    };
-  }, [allStudents]);
 
   const visibleStudents = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -156,232 +140,66 @@ export default function StudentsPage() {
   }, [allStudents, query, subject, sortMode]);
 
   return (
-    <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-sepia">
-      <div className="mx-auto w-full max-w-[430px] px-0 sm:py-3">
-        <div className="relative aspect-[977/1610] w-full min-h-dvh sm:min-h-0 overflow-hidden bg-[#f4e7cf] shadow-[0_10px_40px_rgba(72,48,30,0.16)] sm:rounded-[28px]">
+    <main className="min-h-dvh w-full bg-[#f6eddb] text-[#4e3426]">
+      <div className="relative mx-auto flex h-dvh min-h-[570px] w-full max-w-[430px] flex-col overflow-hidden bg-[#f8f0e1] sm:h-[min(850px,100dvh)] sm:rounded-[28px] sm:shadow-xl">
+        <Image src={background} alt="" fill priority unoptimized sizes="(max-width: 430px) 100vw, 430px" className="pointer-events-none object-fill" />
 
-          <img
-            src="/students-register-bg.png?v=20260916-1"
-            alt="Registro illustrato degli studenti"
-            className="absolute inset-0 h-full w-full object-fill"
-          />
-
-          {/* INDIETRO */}
-          <button
-            type="button"
-            onClick={() => router.back()}
-            aria-label="Indietro"
-            className="antique-clickable absolute left-[3.2%] top-[1.4%] z-30 h-[5.2%] w-[23%] bg-transparent"
-          />
-
-          {/* MENU */}
-          <Link
-            href="/menu"
-            aria-label="Torna al menù"
-            className="antique-clickable absolute right-[3.2%] top-[1.4%] z-30 h-[5.2%] w-[21%] bg-transparent"
-          />
-
-          {/* CERCA STUDENTE */}
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Cerca studente"
-            aria-label="Cerca uno studente"
-            className="font-entry-elegant absolute left-[6.2%] top-[21.3%] z-30 h-[6.2%] w-[59.5%] border-0 bg-transparent pl-[12%] pr-[3%] pt-[6%] text-[clamp(12px,3.4vw,16px)] text-sepia outline-none placeholder:text-[#8b6f5a]/75 focus:bg-transparent focus:placeholder:text-transparent"
-          />
-
-          {/* NUOVO STUDENTE */}
-          <Link
-            href="/studenti/nuovo"
-            aria-label="Nuovo studente"
-            className="antique-clickable absolute left-[67.5%] top-[21.3%] z-30 h-[6.2%] w-[28.4%] rounded-[16px] bg-transparent"
-          />
-
-          {/* CARD MATEMATICA */}
-          <button
-            type="button"
-            onClick={() =>
-              setSubject(
-                subject === "Matematica"
-                  ? "Tutte"
-                  : "Matematica"
-              )
-            }
-            aria-label="Filtra Matematica"
-            aria-pressed={subject === "Matematica"}
-            className="antique-clickable absolute left-[5.2%] top-[27.1%] z-30 h-[11.9%] w-[29.1%] rounded-[12px] bg-transparent"
-          />
-
-          {/* CARD FISICA */}
-          <button
-            type="button"
-            onClick={() =>
-              setSubject(
-                subject === "Fisica"
-                  ? "Tutte"
-                  : "Fisica"
-              )
-            }
-            aria-label="Filtra Fisica"
-            aria-pressed={subject === "Fisica"}
-            className="antique-clickable absolute left-[35.4%] top-[27.1%] z-30 h-[11.9%] w-[29.1%] rounded-[12px] bg-transparent"
-          />
-
-          {/* CARD CHIMICA */}
-          <button
-            type="button"
-            onClick={() =>
-              setSubject(
-                subject === "Chimica"
-                  ? "Tutte"
-                  : "Chimica"
-              )
-            }
-            aria-label="Filtra Chimica"
-            aria-pressed={subject === "Chimica"}
-            className="antique-clickable absolute right-[5.2%] top-[27.1%] z-30 h-[11.9%] w-[29.1%] rounded-[12px] bg-transparent"
-          />
-
-          {/* CONTATORI STUDENTI */}
-          <div className="pointer-events-none absolute left-[5.2%] top-[39.6%] z-30 w-[29.1%] text-center font-entry-elegant text-[clamp(8px,1.9vw,10px)] text-sepia-soft">
-            Studenti n° {subjectCounts.Matematica}
+        <header className="relative z-10 shrink-0 px-[5%] pt-[2%]">
+          <div className="flex h-12 items-center justify-between font-entry-elegant text-[clamp(16px,4.5vw,21px)]">
+            <Link href="/menu" aria-label="Indietro al menù" className="flex min-h-11 min-w-11 items-center justify-center rounded-lg focus-visible:outline-2 focus-visible:outline-[#754838]">←</Link>
+            <Link href="/menu" className="flex min-h-11 items-center rounded-lg px-2 underline decoration-[#896f50]/50 underline-offset-4">Menù</Link>
           </div>
+          <h1 className="mt-2 text-center font-handwritten text-[clamp(36px,10vw,56px)] leading-[1.08] text-[#683c2b]">I miei studenti</h1>
+          <div className="mx-auto mt-1 w-[40%] border-b border-[#ad9471]/65" />
+        </header>
 
-          <div className="pointer-events-none absolute left-[35.4%] top-[39.6%] z-30 w-[29.1%] text-center font-entry-elegant text-[clamp(8px,1.9vw,10px)] text-sepia-soft">
-            Studenti n° {subjectCounts.Fisica}
-          </div>
-
-          <div className="pointer-events-none absolute right-[5.2%] top-[39.6%] z-30 w-[29.1%] text-center font-entry-elegant text-[clamp(8px,1.9vw,10px)] text-sepia-soft">
-            Studenti n° {subjectCounts.Chimica}
-          </div>
-
-          {/* AREA ELENCO STUDENTI */}
-          <section className="absolute bottom-[15.4%] left-[3.5%] right-[3.5%] top-[39.4%] z-20 overflow-hidden bg-transparent">
-
-            {/* FILTRI */}
-            <div className="relative h-[12.2%] bg-transparent">
-
-              <button
-                type="button"
-                onClick={() => setSubject("Tutte")}
-                aria-label="Mostra tutti gli studenti"
-                aria-pressed={subject === "Tutte"}
-                className="antique-clickable absolute left-[2.5%] top-[35%] h-[38%] w-[18%] rounded-full bg-transparent"
-              />
-
-              <button
-                type="button"
-                onClick={() => setSubject("Matematica")}
-                aria-label="Mostra studenti di Matematica"
-                aria-pressed={subject === "Matematica"}
-                className="antique-clickable absolute left-[21.5%] top-[35%] h-[38%] w-[23%] rounded-full bg-transparent"
-              />
-
-              <button
-                type="button"
-                onClick={() => setSubject("Fisica")}
-                aria-label="Mostra studenti di Fisica"
-                aria-pressed={subject === "Fisica"}
-                className="antique-clickable absolute left-[45.5%] top-[35%] h-[38%] w-[17%] rounded-full bg-transparent"
-              />
-
-              <button
-                type="button"
-                onClick={() => setSubject("Chimica")}
-                aria-label="Mostra studenti di Chimica"
-                aria-pressed={subject === "Chimica"}
-                className="antique-clickable absolute left-[63.5%] top-[35%] h-[38%] w-[20%] rounded-full bg-transparent"
-              />
-
-              {/* ORDINA */}
-              <select
-                value={sortMode}
-                onChange={(event) =>
-                  setSortMode(event.target.value as SortMode)
-                }
-                aria-label="Ordina studenti"
-                className="absolute right-[2%] top-[2%] h-[42%] w-[31%] cursor-pointer opacity-0"
-              >
-                <option value="az">A–Z</option>
-                <option value="lesson">Prossima lezione</option>
-                <option value="recent">Più recenti</option>
-              </select>
-
-            </div>
-
-            {/* LISTA STUDENTI */}
-            <div className="absolute bottom-0 left-0 right-0 top-[26%] overflow-y-auto overscroll-contain px-[2%] [scrollbar-color:#9a7657_transparent] [scrollbar-width:thin]">
-
-              {visibleStudents.map((student) => (
-                <StudentRow
-                  key={student.id}
-                  student={student}
-                />
-              ))}
-
-              {visibleStudents.length === 0 && (
-                <div className="flex min-h-36 items-center justify-center px-6 text-center">
-                  <p className="font-entry-elegant text-sm text-sepia-soft">
-                    Nessuno studente corrisponde alla ricerca.
-                  </p>
-                </div>
-              )}
-
-            </div>
-
-          </section>
-
+        <div className="relative z-10 mt-7 flex shrink-0 gap-2 px-[5%]">
+          <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-xl border border-[#aa8f6d]/65 bg-[#fff9ed]/55 px-3 shadow-[0_1px_3px_#8c6b4920]">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0 text-[#7b603d]"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" strokeWidth="1.7" /><path d="m15.5 15.5 5 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>
+            <span className="sr-only">Cerca uno studente</span>
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cerca studente" className="w-full min-w-0 bg-transparent font-entry-elegant text-[clamp(15px,4vw,18px)] outline-none placeholder:text-[#907b69]" />
+          </label>
+          <Link href="/studenti/nuovo" className="flex h-12 shrink-0 items-center justify-center rounded-xl border border-[#8b9273]/60 bg-[#eaf0df]/70 px-3 font-entry-elegant text-[clamp(16px,4.2vw,20px)] shadow-[0_1px_3px_#8c6b4920]">Nuovo <span aria-hidden="true" className="ml-1 text-2xl">+</span></Link>
         </div>
+
+        <div className="relative z-10 mt-5 flex shrink-0 items-end justify-between gap-2 border-b border-[#a88d69]/60 px-[5%] pb-2 font-entry-elegant">
+          <div aria-label="Filtra per materia" className="flex min-w-0 flex-wrap items-center gap-x-[clamp(8px,2.6vw,15px)] gap-y-1">
+            {(["Tutte", "Matematica", "Fisica", "Chimica"] as SubjectFilter[]).map((filter) => (
+              <button key={filter} type="button" onClick={() => setSubject(filter)} aria-pressed={subject === filter}
+                className={"min-h-9 border-b-2 px-0.5 text-[clamp(12px,3.25vw,16px)] " + (subject === filter ? "border-[#66745b] text-[#593724]" : "border-transparent text-[#6b4e3b]")}>{filter}</button>
+            ))}
+          </div>
+          <label className="flex shrink-0 items-center gap-1 pb-1 text-[clamp(11px,2.8vw,14px)]">
+            <span className="sr-only">Ordina studenti</span>
+            <select value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)} className="max-w-[83px] bg-transparent text-[#68442e] outline-none" aria-label="Ordina studenti">
+              <option value="az">A–Z</option><option value="lesson">Lezione</option><option value="recent">Recenti</option>
+            </select>
+          </label>
+        </div>
+
+        <section aria-label="Elenco degli studenti" className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain px-[5%] pb-16 [scrollbar-color:#ad9471_transparent] [scrollbar-width:thin]">
+          {visibleStudents.map((student) => (
+            <Link key={student.id} href={"/studenti/" + encodeURIComponent(student.id)}
+              aria-label={"Apri il profilo di " + student.firstName + " " + student.lastName}
+              className="grid min-h-[76px] grid-cols-[22px_minmax(0,1.4fr)_minmax(0,.8fr)_minmax(0,.8fr)] items-center gap-2 border-b border-[#a88d69]/55 py-2 font-entry-elegant focus-visible:outline-2 focus-visible:outline-[#754838]">
+              <PenNib />
+              <span className="min-w-0 text-[clamp(16px,4.1vw,21px)] leading-tight text-[#593326]">{student.firstName} {student.lastName}</span>
+              <span className="min-w-0 text-center text-[clamp(11px,2.8vw,14px)] leading-tight text-[#675743]">{student.subjects.map(normalizeSubject).join(" · ") || "—"}</span>
+              <span className="min-w-0 text-right text-[clamp(11px,2.7vw,14px)] leading-tight text-[#593e30]">{formatLesson(student.nextLesson)}</span>
+            </Link>
+          ))}
+          {visibleStudents.length === 0 && (
+            <p className="pt-12 text-center font-entry-elegant text-lg text-[#765d48]">{allStudents.length === 0 ? "Nessuno studente inserito. Inizia con Nuovo +." : "Nessuno studente corrisponde alla ricerca."}</p>
+          )}
+        </section>
       </div>
     </main>
   );
 }
 
-/* =========================================================
-   RIGA STUDENTE
-   NOME - MATERIA - PROSSIMA LEZIONE
-   ========================================================= */
-
-function StudentRow({
-  student,
-}: {
-  student: StudentRecord;
-}) {
-  const subjects =
-    student.subjects.map(normalizeSubject);
-
-  const subjectLabel =
-    subjects.length > 0
-      ? subjects.join(" · ")
-      : "—";
-
-  return (
-    <div className="grid min-h-[58px] grid-cols-[1.45fr_1fr_1.15fr] items-center gap-1 border-b border-[#a8886e]/18 px-3 py-2 text-sepia">
-
-      {/* NOME E COGNOME */}
-      <div className="min-w-0 pl-[24px]">
-        <Link
-          href={`/studenti/${student.id}`}
-          className="block truncate font-entry-elegant text-[clamp(11px,2.9vw,14px)] font-medium text-[#4b3024] underline decoration-[#7a5842]/40 decoration-1 underline-offset-[3px]"
-        >
-          {student.firstName} {student.lastName}
-        </Link>
-      </div>
-
-      {/* MATERIA */}
-      <div className="min-w-0 text-center">
-        <div className="truncate font-entry-elegant text-[clamp(9px,2.3vw,11px)] font-medium text-[#5a4030]">
-          {subjectLabel}
-        </div>
-      </div>
-
-      {/* PROSSIMA LEZIONE */}
-      <div className="min-w-0 text-center">
-        <div className="font-entry-elegant text-[clamp(9px,2.2vw,10.5px)] font-medium leading-tight text-[#5a4030]">
-          {formatLesson(student.nextLesson)}
-        </div>
-      </div>
-
-    </div>
-  );
+function PenNib() {
+  return <svg aria-hidden="true" viewBox="0 0 32 44" fill="none" className="h-7 w-5 shrink-0 text-[#907550]">
+    <path d="M16 2 4 25l12 17 12-17L16 2Z" stroke="currentColor" strokeWidth="1.25" />
+    <path d="M16 13v28M12 24a4 4 0 1 0 8 0 4 4 0 0 0-8 0Z" stroke="currentColor" strokeWidth="1.2" />
+  </svg>;
 }
