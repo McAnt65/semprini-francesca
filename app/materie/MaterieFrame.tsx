@@ -17,7 +17,7 @@ export default function MaterieFrame({ image, alt, children, back = "/menu" }: {
     ["/menu", "Menu"],
   ];
   return <main className="min-h-screen bg-[#faf4e9] px-0 py-0 sm:py-4">
-    <div className="relative mx-auto aspect-[941/1672] w-full max-w-[430px] overflow-hidden font-serif text-[#3e342e] shadow-sm">
+    <div className="relative mx-auto aspect-[941/1672] min-h-dvh w-full max-w-[430px] overflow-hidden font-serif text-[#3e342e] shadow-sm sm:min-h-0">
       <Image src={image} alt={alt} fill sizes="(max-width: 430px) 100vw, 430px" priority unoptimized className="select-none object-fill" />
       <Hotspot href={back} label="Indietro" x={5} y={1} w={22} h={5} />
       <Hotspot href="/menu" label="Menu" x={74} y={1} w={22} h={5} />
