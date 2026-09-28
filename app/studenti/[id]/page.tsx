@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
-import StudentDetail from "../../components/StudentDetail";
+import StudentCard from "../../components/StudentCard";
 import { getStudentById, type StudentRecord } from "../../data/students";
 import { getStoredStudentById } from "../../data/student-storage";
 
@@ -33,5 +33,5 @@ export default function StudentProfilePage({
     );
   }
 
-  return <StudentDetail student={student} />;
+  return <StudentCard student={student} />;
 }
