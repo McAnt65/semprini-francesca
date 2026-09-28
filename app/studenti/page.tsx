@@ -144,40 +144,44 @@ export default function StudentsPage() {
       <div className="relative mx-auto flex h-dvh min-h-[570px] w-full max-w-[430px] flex-col overflow-hidden bg-[#f8f0e1] sm:h-[min(850px,100dvh)] sm:rounded-[28px] sm:shadow-xl">
         <Image src={background} alt="" fill priority unoptimized sizes="(max-width: 430px) 100vw, 430px" className="pointer-events-none object-fill" />
 
-        <header className="relative z-10 shrink-0 px-[5%] pt-[2%]">
-          <div className="flex h-12 items-center justify-between font-entry-elegant text-[clamp(16px,4.5vw,21px)]">
-            <Link href="/menu" aria-label="Indietro al menù" className="flex min-h-11 min-w-11 items-center justify-center rounded-lg focus-visible:outline-2 focus-visible:outline-[#754838]">←</Link>
-            <Link href="/menu" className="flex min-h-11 items-center rounded-lg px-2 underline decoration-[#896f50]/50 underline-offset-4">Menù</Link>
+        <header className="relative z-10 shrink-0 px-[5%] pt-[1%]">
+          <div className="flex h-12 items-center justify-between font-entry-elegant text-[clamp(15px,4vw,19px)]">
+            <Link href="/menu" aria-label="Indietro al menù" className="flex min-h-11 items-center gap-1 rounded-lg px-1 focus-visible:outline-2 focus-visible:outline-[#754838]">
+              <span aria-hidden="true" className="text-2xl leading-none">‹</span> Indietro
+            </Link>
+            <Link href="/menu" className="flex min-h-11 items-center gap-1 rounded-lg px-1 focus-visible:outline-2 focus-visible:outline-[#754838]">
+              <span aria-hidden="true" className="text-lg leading-none">☰</span> Menù
+            </Link>
           </div>
-          <h1 className="mt-2 text-center font-handwritten text-[clamp(36px,10vw,56px)] leading-[1.08] text-[#683c2b]">I miei studenti</h1>
-          <div className="mx-auto mt-1 w-[40%] border-b border-[#ad9471]/65" />
+          <h1 className="mt-3 text-center font-handwritten text-[clamp(33px,9vw,49px)] leading-[1.15] text-[#692f35] drop-shadow-[0_1px_#fff9ea]">I miei studenti</h1>
+          <div className="mx-auto mt-1 w-[47%] border-b border-[#ad9471]/65" />
         </header>
 
-        <div className="relative z-10 mt-7 flex shrink-0 gap-2 px-[5%]">
-          <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-xl border border-[#aa8f6d]/65 bg-[#fff9ed]/55 px-3 shadow-[0_1px_3px_#8c6b4920]">
+        <div className="relative z-10 mt-5 flex shrink-0 gap-2 px-[5%]">
+          <label className="flex h-[50px] min-w-0 flex-1 items-center gap-2 rounded-xl border border-[#aa8f6d]/75 bg-[radial-gradient(ellipse_at_25%_50%,#f0dec8ab,#fff8eac0_72%)] px-3 shadow-[inset_0_0_7px_#aa8f6d30,0_2px_4px_#8c6b4920]">
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0 text-[#7b603d]"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" strokeWidth="1.7" /><path d="m15.5 15.5 5 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>
             <span className="sr-only">Cerca uno studente</span>
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cerca studente" className="w-full min-w-0 bg-transparent font-entry-elegant text-[clamp(15px,4vw,18px)] outline-none placeholder:text-[#907b69]" />
           </label>
-          <Link href="/studenti/nuovo" className="flex h-12 shrink-0 items-center justify-center rounded-xl border border-[#8b9273]/60 bg-[#eaf0df]/70 px-3 font-entry-elegant text-[clamp(16px,4.2vw,20px)] shadow-[0_1px_3px_#8c6b4920]">Nuovo <span aria-hidden="true" className="ml-1 text-2xl">+</span></Link>
+          <Link href="/studenti/nuovo" className="flex h-[50px] shrink-0 items-center justify-center rounded-xl border border-[#8b9273]/75 bg-[radial-gradient(ellipse_at_40%_45%,#e4ead4e8,#f6f0dec9)] px-3 font-entry-elegant text-[clamp(16px,4.2vw,20px)] shadow-[inset_0_0_7px_#92a17a42,0_2px_4px_#8c6b4920]">Nuovo <span aria-hidden="true" className="ml-1 text-2xl">+</span></Link>
         </div>
 
-        <div className="relative z-10 mt-5 flex shrink-0 items-end justify-between gap-2 border-b border-[#a88d69]/60 px-[5%] pb-2 font-entry-elegant">
-          <div aria-label="Filtra per materia" className="flex min-w-0 flex-wrap items-center gap-x-[clamp(8px,2.6vw,15px)] gap-y-1">
+        <div className="relative z-10 mt-4 shrink-0 px-[5%] font-entry-elegant">
+          <div aria-label="Filtra per materia" className="grid grid-cols-4 gap-1.5">
             {(["Tutte", "Matematica", "Fisica", "Chimica"] as SubjectFilter[]).map((filter) => (
               <button key={filter} type="button" onClick={() => setSubject(filter)} aria-pressed={subject === filter}
-                className={"min-h-9 border-b-2 px-0.5 text-[clamp(12px,3.25vw,16px)] " + (subject === filter ? "border-[#66745b] text-[#593724]" : "border-transparent text-[#6b4e3b]")}>{filter}</button>
+                className={"min-h-10 rounded-full border px-1 text-[clamp(11px,3vw,14px)] shadow-[inset_0_0_5px_#a98c6130] " + (subject === filter ? "border-[#889073] bg-[#dfe7d3c9] text-[#49372c]" : "border-[#ae9471]/45 bg-[#f6e8d9a8] text-[#6b4e3b]")}>{filter}</button>
             ))}
           </div>
-          <label className="flex shrink-0 items-center gap-1 pb-1 text-[clamp(11px,2.8vw,14px)]">
-            <span className="sr-only">Ordina studenti</span>
-            <select value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)} className="max-w-[83px] bg-transparent text-[#68442e] outline-none" aria-label="Ordina studenti">
+          <label className="mt-2 flex min-h-9 items-center justify-end gap-1 border-b border-[#a88d69]/60 pr-1 text-[clamp(12px,3vw,14px)]">
+            Ordina:
+            <select value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)} className="max-w-[100px] bg-transparent text-[#68442e] outline-none" aria-label="Ordina studenti">
               <option value="az">A–Z</option><option value="lesson">Lezione</option><option value="recent">Recenti</option>
             </select>
           </label>
         </div>
 
-        <section aria-label="Elenco degli studenti" className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain px-[5%] pb-16 [scrollbar-color:#ad9471_transparent] [scrollbar-width:thin]">
+        <section aria-label="Elenco degli studenti" tabIndex={0} className="relative z-10 mx-[5%] mb-[14dvh] mt-2 min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-xl border border-[#ad9471]/45 bg-[#fff9eb]/30 px-2 shadow-[inset_0_0_12px_#bc9e7533] [scrollbar-color:#ad9471_transparent] [scrollbar-width:thin]">
           {visibleStudents.map((student) => (
             <Link key={student.id} href={"/studenti/" + encodeURIComponent(student.id)}
               aria-label={"Apri il profilo di " + student.firstName + " " + student.lastName}
