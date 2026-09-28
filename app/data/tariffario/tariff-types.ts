@@ -17,5 +17,5 @@ export interface Tariff {
 
 export type TariffDraft = Pick<
   Tariff,
-  "subject" | "schoolBand" | "mode" | "format" | "hourlyRateCents" | "active"
+  "code" | "subject" | "schoolBand" | "mode" | "format" | "hourlyRateCents" | "active"
 >;

@@ -1,342 +1,45 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { createTariff, isTariffCodeAvailable, loadTariffs, nextTariffCode, saveTariffs, updateTariff } from "../data/tariffario/tariff-storage";
+import type { Tariff, TariffDraft, LessonFormat } from "../data/tariffario/tariff-types";
 import type { LessonMode } from "../data/calendario/calendar-types";
-import {
-  createTariff,
-  loadTariffs,
-  saveTariffs,
-  updateTariff,
-} from "../data/tariffario/tariff-storage";
-import type { LessonFormat, Tariff, TariffDraft } from "../data/tariffario/tariff-types";
-
-const MODE_LABELS: Record<LessonMode, string> = {
-  casa: "A casa",
-  domicilio: "A domicilio",
-  online: "Online",
-};
-
-const FORMAT_LABELS: Record<LessonFormat, string> = {
-  singola: "Singola",
-  gruppo: "Di gruppo",
-};
-
-const EMPTY_DRAFT: TariffDraft = {
-  subject: "",
-  schoolBand: "",
-  mode: "casa",
-  format: "singola",
-  hourlyRateCents: 0,
-  active: true,
-};
-
-export default function TariffarioPage() {
-  const router = useRouter();
-  const [tariffs, setTariffs] = useState<Tariff[]>([]);
-  const [editing, setEditing] = useState<Tariff | null>(null);
-  const [draft, setDraft] = useState<TariffDraft>(EMPTY_DRAFT);
-  const [editorOpen, setEditorOpen] = useState(false);
-
-  useEffect(() => {
-    queueMicrotask(() => setTariffs(loadTariffs()));
-  }, []);
-
-  const visibleTariffs = useMemo(() => tariffs.slice(0, 8), [tariffs]);
-
-  function persist(next: Tariff[]) {
-    setTariffs(next);
-    saveTariffs(next);
-  }
-
-  function openNew() {
-    setEditing(null);
-    setDraft(EMPTY_DRAFT);
-    setEditorOpen(true);
-  }
-
-  function openEdit(tariff: Tariff) {
-    setEditing(tariff);
-    setDraft({
-      subject: tariff.subject,
-      schoolBand: tariff.schoolBand,
-      mode: tariff.mode,
-      format: tariff.format,
-      hourlyRateCents: tariff.hourlyRateCents,
-      active: tariff.active,
-    });
-    setEditorOpen(true);
-  }
-
-  function submitTariff() {
-    if (!draft.subject.trim() || !draft.schoolBand.trim() || draft.hourlyRateCents <= 0) {
-      return;
-    }
-
-    if (editing) {
-      persist(
-        tariffs.map((tariff) =>
-          tariff.id === editing.id ? updateTariff(tariff, draft) : tariff
-        )
-      );
-    } else {
-      persist([...tariffs, createTariff(draft, tariffs)]);
-    }
-
-    setEditorOpen(false);
-  }
-
-  function removeTariff(tariff: Tariff) {
-    if (!window.confirm(`Eliminare la tariffa ${tariff.code}?`)) return;
-    persist(tariffs.filter((item) => item.id !== tariff.id));
-  }
-
-  return (
-    <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-[#4b3024]">
-      <div className="mx-auto w-full max-w-[430px] sm:py-3">
-        <div className="relative aspect-[941/1672] w-full min-h-dvh sm:min-h-0 overflow-hidden bg-[#f4e7cf] sm:rounded-[28px]">
-          <Image
-            src="/tariffario-bg-clean.png"
-            alt="Tariffario illustrato"
-            fill
-            priority
-            unoptimized
-            sizes="(max-width: 430px) 100vw, 430px"
-            className="pointer-events-none select-none object-fill"
-          />
-
-          <button
-            type="button"
-            onClick={() => router.back()}
-            aria-label="Indietro"
-            className="antique-clickable absolute left-[4.8%] top-[0.7%] z-30 h-[4.3%] w-[20%] rounded-[12px] bg-transparent"
-          />
-          <Link
-            href="/menu"
-            aria-label="Torna al menù"
-            className="antique-clickable absolute right-[4.5%] top-[0.7%] z-30 h-[4.3%] w-[18.5%] rounded-[12px] bg-transparent"
-          />
-
-          <button
-            type="button"
-            onClick={openNew}
-            aria-label="Nuova tariffa"
-            className="antique-clickable absolute right-[6%] top-[21.4%] z-30 h-[4.6%] w-[32%] rounded-[12px] bg-transparent"
-          />
-
-          <section
-            aria-label="Le mie tariffe"
-            className="absolute left-[3.6%] top-[29.7%] z-20 h-[39.4%] w-[92.4%]"
-          >
-            {visibleTariffs.map((tariff, index) => {
-              const row = index + 1;
-              const rowTop = row * (100 / 9);
-
-              return (
-                <div
-                  key={tariff.id}
-                  className="absolute left-0 w-full"
-                  style={{
-                    top: `${rowTop}%`,
-                    height: `${100 / 9}%`,
-                  }}
-                >
-                  <div className="absolute inset-y-0 left-[0.5%] right-[13.5%] grid grid-cols-[9%_22%_16%_19%_16%_14%] items-center font-entry-elegant text-[#523325]">
-                    <span className="text-center text-[clamp(10px,2.7vw,13px)] font-semibold text-[#7a2739]">
-                      {tariff.code}
-                    </span>
-                    <span className="truncate px-[3%] text-[clamp(9px,2.45vw,12px)]">
-                      {tariff.subject}
-                    </span>
-                    <span className="truncate px-[4%] text-[clamp(8px,2.25vw,11px)]">
-                      {tariff.schoolBand}
-                    </span>
-                    <span className="truncate px-[4%] text-[clamp(8px,2.2vw,10.5px)]">
-                      {MODE_LABELS[tariff.mode]}
-                    </span>
-                    <span className="truncate px-[4%] text-[clamp(8px,2.15vw,10.5px)]">
-                      {FORMAT_LABELS[tariff.format]}
-                    </span>
-                    <span className="text-center text-[clamp(9px,2.45vw,12px)] font-semibold">
-                      {formatEuro(tariff.hourlyRateCents)}/h
-                    </span>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => openEdit(tariff)}
-                    aria-label={`Modifica ${tariff.code}`}
-                    className="antique-clickable absolute inset-y-[8%] right-[7.1%] w-[6%] rounded-[8px] bg-transparent"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeTariff(tariff)}
-                    aria-label={`Elimina ${tariff.code}`}
-                    className="antique-clickable absolute inset-y-[8%] right-[0.5%] w-[6%] rounded-[8px] bg-transparent"
-                  />
-                </div>
-              );
-            })}
-          </section>
-
-          <nav aria-label="Sezioni tariffario">
-            <Link
-              href="/tariffario/contatori"
-              aria-label="Contatori mensili"
-              className="antique-clickable absolute left-[2.2%] top-[72.1%] z-30 h-[12.2%] w-[31.7%] rounded-[12px] bg-transparent"
-            />
-            <Link
-              href="/tariffario/studenti"
-              aria-label="Tariffe per studente"
-              className="antique-clickable absolute left-[34.1%] top-[72.1%] z-30 h-[12.2%] w-[31.7%] rounded-[12px] bg-transparent"
-            />
-            <Link
-              href="/tariffario/pagamenti"
-              aria-label="Pagamenti"
-              className="antique-clickable absolute right-[2.2%] top-[72.1%] z-30 h-[12.2%] w-[31.7%] rounded-[12px] bg-transparent"
-            />
-          </nav>
-
-          <nav
-            aria-label="Navigazione principale"
-            className="absolute inset-x-[1.8%] bottom-[0.55%] z-30 h-[9.1%]"
-          >
-            <Link href="/studenti" aria-label="Studenti" className="antique-clickable absolute inset-y-0 left-0 w-[20%] bg-transparent" />
-            <Link href="/calendario" aria-label="Calendario" className="antique-clickable absolute inset-y-0 left-[20%] w-[20%] bg-transparent" />
-            <Link href="/tariffario" aria-label="Tariffe" aria-current="page" className="antique-clickable absolute inset-y-0 left-[40%] w-[20%] bg-transparent" />
-            <Link href="/libri" aria-label="Libri" className="antique-clickable absolute inset-y-0 left-[60%] w-[20%] bg-transparent" />
-            <Link href="/menu" aria-label="Menu" className="antique-clickable absolute inset-y-0 left-[80%] w-[20%] bg-transparent" />
-          </nav>
-
-          {editorOpen && (
-            <div className="absolute inset-0 z-40 flex items-center justify-center bg-[#4c3324]/25 px-[7%]">
-              <div className="w-full rounded-[18px] border border-[#8b6648]/35 bg-[#f4e4c8]/95 p-[6%] shadow-xl backdrop-blur-[1px]">
-                <h2 className="mb-4 text-center font-entry-elegant text-xl font-semibold text-[#7a2739]">
-                  {editing ? `Modifica ${editing.code}` : "Nuova tariffa"}
-                </h2>
-
-                <div className="space-y-3 font-entry-elegant">
-                  <label className="block">
-                    <span className="mb-1 block text-sm">Materia</span>
-                    <input
-                      value={draft.subject}
-                      onChange={(event) =>
-                        setDraft((current) => ({ ...current, subject: event.target.value }))
-                      }
-                      className="w-full rounded-lg border border-[#9b7754]/35 bg-[#fff8e8]/70 px-3 py-2 text-base outline-none"
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className="mb-1 block text-sm">Fascia scolastica</span>
-                    <input
-                      value={draft.schoolBand}
-                      placeholder="es. Biennio, Triennio, 3° anno..."
-                      onChange={(event) =>
-                        setDraft((current) => ({ ...current, schoolBand: event.target.value }))
-                      }
-                      className="w-full rounded-lg border border-[#9b7754]/35 bg-[#fff8e8]/70 px-3 py-2 text-base outline-none"
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className="mb-1 block text-sm">Modalità</span>
-                    <select
-                      value={draft.mode}
-                      onChange={(event) =>
-                        setDraft((current) => ({
-                          ...current,
-                          mode: event.target.value as LessonMode,
-                        }))
-                      }
-                      className="w-full rounded-lg border border-[#9b7754]/35 bg-[#fff8e8]/70 px-3 py-2 text-base outline-none"
-                    >
-                      <option value="casa">A casa</option>
-                      <option value="domicilio">A domicilio</option>
-                      <option value="online">Online</option>
-                    </select>
-                  </label>
-
-                  <label className="block">
-                    <span className="mb-1 block text-sm">Tipo di lezione</span>
-                    <select
-                      value={draft.format}
-                      onChange={(event) =>
-                        setDraft((current) => ({
-                          ...current,
-                          format: event.target.value as LessonFormat,
-                        }))
-                      }
-                      className="w-full rounded-lg border border-[#9b7754]/35 bg-[#fff8e8]/70 px-3 py-2 text-base outline-none"
-                    >
-                      <option value="singola">Singola</option>
-                      <option value="gruppo">Di gruppo</option>
-                    </select>
-                  </label>
-
-                  <label className="block">
-                    <span className="mb-1 block text-sm">Tariffa oraria (€)</span>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.50"
-                      value={draft.hourlyRateCents ? draft.hourlyRateCents / 100 : ""}
-                      onChange={(event) =>
-                        setDraft((current) => ({
-                          ...current,
-                          hourlyRateCents: Math.max(
-                            0,
-                            Math.round(Number(event.target.value || 0) * 100)
-                          ),
-                        }))
-                      }
-                      className="w-full rounded-lg border border-[#9b7754]/35 bg-[#fff8e8]/70 px-3 py-2 text-base outline-none"
-                    />
-                  </label>
-
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={draft.active}
-                      onChange={(event) =>
-                        setDraft((current) => ({ ...current, active: event.target.checked }))
-                      }
-                    />
-                    Tariffa attiva
-                  </label>
-                </div>
-
-                <div className="mt-5 flex justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setEditorOpen(false)}
-                    className="rounded-lg border border-[#8b6648]/35 px-4 py-2 font-entry-elegant"
-                  >
-                    Annulla
-                  </button>
-                  <button
-                    type="button"
-                    onClick={submitTariff}
-                    className="rounded-lg bg-[#7a2739] px-4 py-2 font-entry-elegant text-[#fff7e8]"
-                  >
-                    Salva
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </main>
-  );
-}
-
-function formatEuro(cents: number) {
-  return new Intl.NumberFormat("it-IT", {
-    style: "currency",
-    currency: "EUR",
-    minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
-  }).format(cents / 100);
+const money=(c:number)=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR"}).format(c/100);
+const modes:Record<LessonMode,string>={casa:"Casa / studio",domicilio:"A domicilio",online:"Online"};
+export default function TariffsPage(){
+ const router=useRouter(); const [tariffs,setTariffs]=useState<Tariff[]>([]),[draft,setDraft]=useState<TariffDraft|null>(null),[editing,setEditing]=useState<string|null>(null),[error,setError]=useState("");
+ useEffect(()=>{queueMicrotask(()=>setTariffs(loadTariffs()));},[]);
+ function open(item?:Tariff){setEditing(item?.id??null);setDraft(item?{code:item.code,subject:item.subject,schoolBand:item.schoolBand,mode:item.mode,format:item.format,hourlyRateCents:item.hourlyRateCents,active:item.active}:{code:nextTariffCode(tariffs),subject:"",schoolBand:"",mode:"casa",format:"singola",hourlyRateCents:0,active:true});setError("");}
+ function save(){if(!draft)return;const code=draft.code.trim().toUpperCase();if(!isTariffCodeAvailable(code,tariffs,editing??undefined)){setError("Scegli una sigla univoca di 1–12 lettere, numeri, _ o -.");return;}
+  if(!draft.subject.trim()||!draft.schoolBand.trim()||draft.hourlyRateCents<=0){setError("Compila materia, fascia e importo.");return;}
+  const clean={...draft,code,subject:draft.subject.trim(),schoolBand:draft.schoolBand.trim()};const next=editing?tariffs.map(t=>t.id===editing?updateTariff(t,clean):t):[...tariffs,createTariff(clean)];
+  if(!saveTariffs(next)){setError("Salvataggio non riuscito sul dispositivo.");return;}setTariffs(loadTariffs());setDraft(null);
+ }
+ const field="h-full w-full appearance-none border-0 bg-transparent px-2 font-entry-elegant text-[clamp(12px,3.5vw,17px)] text-[#493025] outline-none focus-visible:ring-1 focus-visible:ring-[#813247]";
+ return <main className="min-h-dvh overflow-x-hidden bg-[#efe3ce]"><div className="mx-auto w-full max-w-[430px] sm:py-3"><div className="relative aspect-[941/1672] min-h-dvh w-full overflow-hidden sm:min-h-0 sm:rounded-[28px]">
+ <Image src="/tariffe-watercolor.png" alt="" fill priority unoptimized sizes="(max-width: 430px) 100vw, 430px" className="pointer-events-none object-fill"/>
+ <button aria-label="Indietro" onClick={()=>router.back()} className="absolute left-[3%] top-[1%] h-[8%] w-[24%]"/><Link href="/menu" aria-label="Menu" className="absolute right-[3%] top-[1%] h-[9%] w-[17%]"/>
+ <Link href="/tariffario/pagamenti" aria-label="Pagamenti" className="absolute left-[50%] top-[22.7%] h-[4.7%] w-[45%]"/>
+ <button aria-label="Aggiungi tariffa" onClick={()=>open()} className="absolute left-[31%] top-[28%] h-[5.6%] w-[38%]"/>
+ <section aria-label="Tariffe base" className="absolute left-[5%] top-[34.8%] h-[39.1%] w-[90%] overflow-y-auto px-[2%] py-[2%] font-entry-elegant [scrollbar-width:thin]">
+ {tariffs.length===0?<p className="mt-8 text-center italic text-[#745541]">Aggiungi la prima tariffa</p>:tariffs.map(t=><div key={t.id} className={`mb-2 flex items-center gap-2 border-b border-[#a98c6b]/35 py-2 text-[#4d3327] ${t.active?"":"opacity-55"}`}>
+ <button onClick={()=>open(t)} className="min-w-0 flex-1 text-left"><span className="block truncate text-[clamp(13px,3.6vw,17px)]"><strong className="mr-2 text-[#843247]">{t.code}</strong>{t.subject} · {t.schoolBand}</span><span className="block truncate text-[clamp(11px,3vw,14px)]">{modes[t.mode]} · {t.format==="gruppo"?"Gruppo":"Singola"} · {money(t.hourlyRateCents)}/h{!t.active?" · Non attiva":""}</span></button>
+ <button onClick={()=>open(t)} aria-label={`Modifica ${t.code}`} className="p-2 text-[#813247]">✎</button></div>)}
+ </section>
+ <nav aria-label="Navigazione principale" className="absolute inset-x-[2%] bottom-[1%] h-[10%]">{[["/studenti","Studenti"],["/calendario","Calendario"],["/calendario/nuova","Lezione"],["/materie","Materie"],["/menu","Menu"]].map(([href,label],i)=><Link key={label} href={href} aria-label={label} className="absolute inset-y-0 w-[20%]" style={{left:`${i*20}%`}}/>)}</nav>
+ {draft&&<div role="dialog" aria-modal="true" aria-label={editing?"Modifica tariffa":"Aggiungi tariffa"} className="absolute inset-0 z-40 overflow-hidden">
+ <Image src="/tariff-editor-clean.png" alt="" fill unoptimized sizes="(max-width: 430px) 100vw, 430px" className="pointer-events-none object-fill"/>
+ <button aria-label="Chiudi" onClick={()=>setDraft(null)} className="absolute left-[3%] top-[1%] h-[8%] w-[26%]"/><Link href="/menu" aria-label="Menu" className="absolute right-[3%] top-[1%] h-[9%] w-[17%]"/>
+ {[["Sigla","code","29.8%"],["Materia","subject","35.2%"],["Fascia scolastica","schoolBand","40.5%"]].map(([label,key,top])=><label key={key} className="absolute left-[41%] h-[4%] w-[49%]" style={{top}}><span className="sr-only">{label}</span><input value={String(draft[key as "code"|"subject"|"schoolBand"])} onChange={e=>setDraft({...draft,[key]:e.target.value})} className={field}/></label>)}
+ <label className="absolute left-[41%] top-[45.9%] h-[4%] w-[49%]"><span className="sr-only">Modalità</span><select value={draft.mode} onChange={e=>setDraft({...draft,mode:e.target.value as LessonMode})} className={field}><option value="casa">Casa / studio</option><option value="domicilio">A domicilio</option><option value="online">Online</option></select></label>
+ <label className="absolute left-[41%] top-[51.3%] h-[4%] w-[49%]"><span className="sr-only">Tipo di lezione</span><select value={draft.format} onChange={e=>setDraft({...draft,format:e.target.value as LessonFormat})} className={field}><option value="singola">Singola</option><option value="gruppo">Gruppo</option></select></label>
+ <label className="absolute left-[41%] top-[56.7%] h-[4%] w-[49%]"><span className="sr-only">Prezzo orario in euro</span><input type="number" inputMode="decimal" min="0.01" step="0.01" value={draft.hourlyRateCents?draft.hourlyRateCents/100:""} onChange={e=>setDraft({...draft,hourlyRateCents:Math.round(Number(e.target.value)*100)})} className={field}/></label>
+ <label className="absolute left-[40%] top-[62%] h-[4.5%] w-[15%] cursor-pointer"><span className="sr-only">Tariffa attiva</span><input type="checkbox" checked={draft.active} onChange={e=>setDraft({...draft,active:e.target.checked})} className="absolute inset-0 h-full w-full cursor-pointer opacity-0"/><span aria-hidden="true" className={`pointer-events-none absolute top-[12%] h-[76%] w-[45%] rounded-full border border-[#b68550] bg-[#fff5e2]/90 shadow-sm transition-[left] ${draft.active?"left-[49%]":"left-[2%]"}`}/></label>
+ {error&&<p role="alert" className="absolute left-[12%] top-[67%] w-[76%] bg-[#fff5e5]/95 text-center font-entry-elegant text-[clamp(11px,3vw,15px)] text-[#a62b42]">{error}</p>}
+ <button onClick={()=>setDraft(null)} aria-label="Annulla" className="absolute left-[8%] top-[70.5%] h-[6%] w-[37%]"/><button onClick={save} aria-label="Salva tariffa" className="absolute left-[51%] top-[70.5%] h-[6%] w-[40%]"/>
+ <nav aria-label="Navigazione principale" className="absolute inset-x-[2%] bottom-[1%] h-[10%]">{[["/studenti","Studenti"],["/calendario","Calendario"],["/calendario/nuova","Lezione"],["/materie","Materie"],["/menu","Menu"]].map(([href,label],i)=><Link key={label} href={href} aria-label={label} className="absolute inset-y-0 w-[20%]" style={{left:`${i*20}%`}}/>)}</nav>
+ </div>}
+ </div></div></main>;
 }

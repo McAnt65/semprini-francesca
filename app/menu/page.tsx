@@ -9,10 +9,11 @@ export default function MenuPage() {
       <div className="mx-auto w-full max-w-[430px]">
         <div className="relative aspect-[9/16] w-full min-h-dvh sm:min-h-0">
           <Image
-            src="/menu.png"
+            src="/menu.png?v=20260928"
             alt="Menu del Registro"
             fill
             priority
+            unoptimized
             sizes="(max-width: 430px) 100vw, 430px"
             className="object-fill"
           />
@@ -60,13 +61,13 @@ export default function MenuPage() {
           />
 
           <Link
-            href="/domicilio"
-            aria-label="Lezioni a domicilio"
+            href="/lezioni"
+            aria-label="Lezione"
             className="antique-clickable absolute left-[37.2%] top-[59.4%] h-[18.5%] w-[25.5%] rounded-xl bg-transparent"
           />
 
           <Link
-            href="/tariffe"
+            href="/tariffario"
             aria-label="Tariffe e pagamenti"
             className="antique-clickable absolute left-[66.5%] top-[59.4%] h-[18.5%] w-[25.5%] rounded-xl bg-transparent"
           />

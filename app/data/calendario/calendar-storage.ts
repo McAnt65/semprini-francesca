@@ -266,6 +266,9 @@ function normalizeLessonSnapshot(
     notes: text(record.notes),
     hourlyRateCents: cents(record.hourlyRateCents),
     lessonAmountCents: cents(record.lessonAmountCents),
+    tariffId: text(record.tariffId) || undefined,
+    tariffCode: text(record.tariffCode) || undefined,
+    paidAmountCents: typeof record.paidAmountCents === "number" ? cents(record.paidAmountCents) : record.paymentStatus === "pagata" ? cents(record.lessonAmountCents) : 0,
     paymentStatus,
   };
 }

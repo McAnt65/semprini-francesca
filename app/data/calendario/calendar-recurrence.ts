@@ -85,6 +85,7 @@ export function createSingleOccurrenceException(
       | "hourlyRateCents"
       | "lessonAmountCents"
       | "paymentStatus"
+      | "paidAmountCents"
       | "source"
     >
   >,
@@ -108,6 +109,9 @@ export function createSingleOccurrenceException(
     notes: series.notes,
     hourlyRateCents: series.hourlyRateCents,
     lessonAmountCents: series.lessonAmountCents,
+    tariffId: series.tariffId,
+    tariffCode: series.tariffCode,
+    paidAmountCents: series.paidAmountCents,
     paymentStatus: series.paymentStatus,
     source: series.source,
     ...changes,
@@ -252,6 +256,9 @@ function seriesToOccurrence(
     notes: series.notes,
     hourlyRateCents: series.hourlyRateCents,
     lessonAmountCents: series.lessonAmountCents,
+    tariffId: series.tariffId,
+    tariffCode: series.tariffCode,
+    paidAmountCents: series.paidAmountCents,
     paymentStatus: series.paymentStatus,
     source: series.source,
     isRecurring: true,
@@ -279,6 +286,9 @@ function appointmentToOccurrence(
     notes: appointment.notes,
     hourlyRateCents: appointment.hourlyRateCents,
     lessonAmountCents: appointment.lessonAmountCents,
+    tariffId: appointment.tariffId,
+    tariffCode: appointment.tariffCode,
+    paidAmountCents: appointment.paidAmountCents,
     paymentStatus: appointment.paymentStatus,
     source: appointment.source,
     isRecurring: Boolean(appointment.seriesId),

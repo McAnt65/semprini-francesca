@@ -6,7 +6,7 @@ import { isLocalDate, isLocalTime, toLocalDate } from "../../../data/calendario/
 import { selectDayOccurrences } from "../../../data/calendario/calendar-selectors";
 import { createSingleOccurrenceException } from "../../../data/calendario/calendar-recurrence";
 import { loadCalendarAppointments, loadCalendarSeries, upsertCalendarAppointment } from "../../../data/calendario/calendar-storage";
-import type { CalendarAppointment, LessonMode, LessonStatus, PaymentStatus } from "../../../data/calendario/calendar-types";
+import type { CalendarAppointment, LessonMode, LessonStatus } from "../../../data/calendario/calendar-types";
 export default function EditPage(){return <Suspense fallback={<main className="min-h-dvh bg-[#efe3ce]"/>}><Edit/></Suspense>;}
 function Edit(){
  const params=useParams(),search=useSearchParams(),router=useRouter();const id=decodeURIComponent(String(params.id));
@@ -36,9 +36,10 @@ function Edit(){
  <label className="block">Data<input type="date" required value={item.date} onChange={e=>setItem({...item,date:e.target.value})} className={field}/></label>
  <label className="block">Ora<input type="time" required step="1800" value={item.startTime} onChange={e=>setItem({...item,startTime:e.target.value})} className={field}/></label>
  <label className="block">Durata in minuti<input type="number" min="15" max="480" step="15" value={item.durationMinutes} onChange={e=>setItem({...item,durationMinutes:Number(e.target.value)})} className={field}/></label>
+ <label className="block">Tariffa oraria (€)<input type="number" min="0" step="0.01" value={item.hourlyRateCents/100} onChange={e=>setItem({...item,hourlyRateCents:Math.round(Number(e.target.value)*100)})} className={field}/></label>
  <label className="block">Modalità<select value={item.mode} onChange={e=>setItem({...item,mode:e.target.value as LessonMode})} className={field}><option value="casa">Casa</option><option value="domicilio">A domicilio</option><option value="online">Online</option></select></label>
  <label className="block">Stato<select value={item.status} onChange={e=>setItem({...item,status:e.target.value as LessonStatus})} className={field}><option value="confermata">Confermata</option><option value="attesa">In attesa</option><option value="richiesta">Richiesta</option><option value="annullata">Annullata</option></select></label>
- <label className="block">Pagamento<select value={item.paymentStatus} onChange={e=>setItem({...item,paymentStatus:e.target.value as PaymentStatus})} className={field}><option value="non_pagata">Non pagata</option><option value="pagata">Pagata</option><option value="parziale">Parziale</option><option value="non_dovuta">Non dovuta</option></select></label>
+ <Link href="/tariffario/pagamenti" className="block text-[#813247] underline">Registra il pagamento in Tariffe → Pagamenti</Link>
  <button type="submit" className="w-full rounded-full bg-[#813247] px-4 py-3 text-[#fff8ed]">Salva modifiche</button>
  </form>}
  </div></main>;

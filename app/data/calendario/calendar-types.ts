@@ -23,6 +23,9 @@ export type AppointmentSource =
 export type RequestDirection = "ricevuta" | "inviata";
 
 export interface LessonSnapshot {
+  tariffId?: string;
+  tariffCode?: string;
+  paidAmountCents?: number;
   studentId: string;
   studentNameSnapshot: string;
   subject: string;

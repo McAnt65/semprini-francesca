@@ -65,15 +65,20 @@ export function saveTariffs(tariffs: Tariff[]): boolean {
   return false;
 }
 
-export function createTariff(draft: TariffDraft, current: Tariff[]): Tariff {
+export function createTariff(draft: TariffDraft): Tariff {
   const now = new Date().toISOString();
   return {
     id: crypto.randomUUID(),
-    code: nextTariffCode(current),
     ...draft,
     createdAt: now,
     updatedAt: now,
   };
+}
+
+export function isTariffCodeAvailable(code: string, tariffs: Tariff[], exceptId?: string) {
+  const normalized = code.trim().toLocaleUpperCase("it-IT");
+  return /^[A-Z0-9][A-Z0-9_-]{0,11}$/.test(normalized) &&
+    !tariffs.some((item) => item.id !== exceptId && item.code.toLocaleUpperCase("it-IT") === normalized);
 }
 
 export function updateTariff(

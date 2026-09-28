@@ -56,10 +56,11 @@ export default function Home() {
       >
         <div className="relative h-full w-full max-w-[430px] sm:aspect-[9/16] sm:h-auto">
           <Image
-            src="/menu.png"
+            src="/menu.png?v=20260928"
             alt="Menu del Registro"
             fill
             priority
+            unoptimized
             className="object-fill"
           />
         </div>
