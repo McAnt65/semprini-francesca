@@ -7,6 +7,7 @@ export type LessonStatus =
   | "confermata"
   | "attesa"
   | "richiesta"
+  | "svolta"
   | "annullata";
 
 export type PaymentStatus =

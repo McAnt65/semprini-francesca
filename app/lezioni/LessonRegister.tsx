@@ -25,12 +25,12 @@ export default function LessonRegister({ view }: { view: View }) {
   const to = formatLocalDate({ year: period.year, month: period.month, day: new Date(Date.UTC(period.year, period.month, 0)).getUTCDate() });
   const lessons = useMemo(() => selectOccurrencesInRange(appointments, series, from, to)
     .filter(item => item.status !== "annullata" && (view === "upcoming"
-      ? item.date > today || (item.date === today && item.startTime >= currentTime)
-      : item.date < today || (item.date === today && item.startTime < currentTime)))
+      ? item.status !== "svolta"
+      : item.status === "svolta"))
     .sort((a, b) => view === "upcoming"
       ? a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime)
       : b.date.localeCompare(a.date) || b.startTime.localeCompare(a.startTime)),
-  [appointments, series, from, to, view, today, currentTime]);
+  [appointments, series, from, to, view]);
 
   function shift(delta: number) {
     const next = new Date(Date.UTC(period.year, period.month - 1 + delta, 1));
@@ -55,12 +55,12 @@ export default function LessonRegister({ view }: { view: View }) {
             {view === "upcoming" ? <>
               <span className="block truncate text-[clamp(14px,4.2vw,20px)] italic text-[#4d3027]">{longDate(item.date, true)}</span>
               <span className="block truncate text-[clamp(13px,3.8vw,18px)]"><strong className="font-normal text-[#813247]">{item.startTime}</strong> · {item.studentNameSnapshot}</span>
-              <span className="block truncate text-[clamp(11px,3.3vw,16px)] italic">{item.subject} · {item.durationMinutes} min</span>
+              <span className="block truncate text-[clamp(11px,3.3vw,16px)] italic">{item.subject} · {item.durationMinutes} min{item.date < today || (item.date === today && item.startTime < currentTime) ? " · Da registrare" : ""}</span>
             </> : <>
               <span className="block truncate text-[clamp(12px,3.5vw,17px)]"><span className="text-[#813247]">{longDate(item.date)}</span> · {item.studentNameSnapshot}</span>
               <span className="block truncate text-[clamp(14px,4.2vw,20px)] italic">{item.subject}</span>
               <span className="block truncate text-[clamp(11px,3.2vw,15px)] italic">{item.topic || "Argomento da annotare"}</span>
-              <span className="block text-[clamp(10px,2.9vw,14px)]">{item.durationMinutes} min · {item.status === "attesa" ? "In attesa" : "Confermata"}</span>
+              <span className="block text-[clamp(10px,2.9vw,14px)]">{item.durationMinutes} min · Svolta</span>
             </>}
           </span>
         </Link>)}

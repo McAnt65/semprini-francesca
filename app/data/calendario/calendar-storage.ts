@@ -24,6 +24,7 @@ const LESSON_STATUSES: LessonStatus[] = [
   "confermata",
   "attesa",
   "richiesta",
+  "svolta",
   "annullata",
 ];
 const PAYMENT_STATUSES: PaymentStatus[] = [

@@ -38,7 +38,9 @@ function Edit(){
  <label className="block">Durata in minuti<input type="number" min="15" max="480" step="15" value={item.durationMinutes} onChange={e=>setItem({...item,durationMinutes:Number(e.target.value)})} className={field}/></label>
  <label className="block">Tariffa oraria (€)<input type="number" min="0" step="0.01" value={item.hourlyRateCents/100} onChange={e=>setItem({...item,hourlyRateCents:Math.round(Number(e.target.value)*100)})} className={field}/></label>
  <label className="block">Modalità<select value={item.mode} onChange={e=>setItem({...item,mode:e.target.value as LessonMode})} className={field}><option value="casa">Casa</option><option value="domicilio">A domicilio</option><option value="online">Online</option></select></label>
- <label className="block">Stato<select value={item.status} onChange={e=>setItem({...item,status:e.target.value as LessonStatus})} className={field}><option value="confermata">Confermata</option><option value="attesa">In attesa</option><option value="richiesta">Richiesta</option><option value="annullata">Annullata</option></select></label>
+ <label className="block">Stato<select value={item.status} onChange={e=>setItem({...item,status:e.target.value as LessonStatus})} className={field}><option value="confermata">Confermata</option><option value="attesa">In attesa</option><option value="richiesta">Richiesta</option><option value="svolta">Svolta</option><option value="annullata">Annullata</option></select></label>
+ <label className="block">Argomento svolto<input type="text" value={item.topic} onChange={e=>setItem({...item,topic:e.target.value})} className={field}/></label>
+ <label className="block">Appunti sulla lezione<textarea value={item.notes} onChange={e=>setItem({...item,notes:e.target.value})} rows={5} className={field}/></label>
  <Link href="/tariffario/pagamenti" className="block text-[#813247] underline">Registra il pagamento in Tariffe → Pagamenti</Link>
  <button type="submit" className="w-full rounded-full bg-[#813247] px-4 py-3 text-[#fff8ed]">Salva modifiche</button>
  </form>}

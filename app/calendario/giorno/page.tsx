@@ -10,7 +10,7 @@ import type { CalendarAppointment, CalendarOccurrence, CalendarSeries, LessonMod
 const months=["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
 const weekdays=["Domenica","Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato"];
 const modes:Record<LessonMode,string>={casa:"Casa",domicilio:"A domicilio",online:"Online"};
-const colors:Record<string,string>={confermata:"#e2ecdd",attesa:"#f4e7c9",richiesta:"#dce9ed",annullata:"#f0dedd"};
+const colors:Record<string,string>={confermata:"#e2ecdd",attesa:"#f4e7c9",richiesta:"#dce9ed",svolta:"#e8e2d0",annullata:"#f0dedd"};
 const HALF_HOUR=56, FIRST=480;
 export default function DayPage(){return <Suspense fallback={<main className="min-h-dvh bg-[#efe3ce]"/>}><Day/></Suspense>;}
 function Day(){
