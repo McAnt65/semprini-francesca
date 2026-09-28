@@ -157,6 +157,14 @@ export default function StudentDetail({
             )}
           </div>
 
+          <Link
+            href={`/studenti/${encodeURIComponent(student.id)}/lezioni`}
+            aria-label={`Apri lezioni svolte e appunti di ${fullName}`}
+            className="antique-clickable absolute left-[39.5%] top-[48%] z-40 flex h-[4.2%] w-[44.2%] items-center justify-center rounded-full bg-[#fff8eb]/75 px-2 text-center font-entry-elegant text-[clamp(10px,2.8vw,14px)] text-[#6f2638] shadow-sm"
+          >
+            Lezioni svolte e appunti →
+          </Link>
+
           {/* NOTE PERSONALI */}
           {student.personalNotes && (
             <div className="absolute left-[23.2%] top-[55.3%] z-30 flex h-[10.4%] w-[66.5%] items-center justify-center overflow-hidden px-[1.5%] py-[1%] text-center">

@@ -11,7 +11,7 @@ import type { CalendarAppointment, CalendarOccurrence, CalendarSeries } from "..
 type View = "upcoming" | "diary";
 const longDate = (value: string, weekday = false) => new Intl.DateTimeFormat("it-IT", { ...(weekday ? { weekday: "long" as const } : {}), day: "numeric", month: "long" }).format(new Date(`${value}T12:00:00`));
 
-export default function LessonRegister({ view }: { view: View }) {
+export default function LessonRegister({ view, studentId, backHref = "/lezioni" }: { view: View; studentId?: string; backHref?: string }) {
   const [period, setPeriod] = useState(() => { const now = new Date(); return { year: now.getFullYear(), month: now.getMonth() + 1 }; });
   const [appointments, setAppointments] = useState<CalendarAppointment[]>([]);
   const [series, setSeries] = useState<CalendarSeries[]>([]);
@@ -24,13 +24,13 @@ export default function LessonRegister({ view }: { view: View }) {
   const from = formatLocalDate({ year: period.year, month: period.month, day: 1 });
   const to = formatLocalDate({ year: period.year, month: period.month, day: new Date(Date.UTC(period.year, period.month, 0)).getUTCDate() });
   const lessons = useMemo(() => selectOccurrencesInRange(appointments, series, from, to)
-    .filter(item => item.status !== "annullata" && (view === "upcoming"
+    .filter(item => (!studentId || item.studentId === studentId) && item.status !== "annullata" && (view === "upcoming"
       ? item.status !== "svolta"
       : item.status === "svolta"))
     .sort((a, b) => view === "upcoming"
       ? a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime)
       : b.date.localeCompare(a.date) || b.startTime.localeCompare(a.startTime)),
-  [appointments, series, from, to, view]);
+  [appointments, series, from, to, view, studentId]);
 
   function shift(delta: number) {
     const next = new Date(Date.UTC(period.year, period.month - 1 + delta, 1));
@@ -43,7 +43,7 @@ export default function LessonRegister({ view }: { view: View }) {
     <div className="relative mx-auto aspect-[941/1672] min-h-dvh w-full max-w-[430px] overflow-hidden sm:min-h-0">
       <Image src={view === "upcoming" ? "/lessons-upcoming-clean.png" : "/lessons-diary-clean.png"} alt="" fill priority unoptimized sizes="(max-width: 430px) 100vw, 430px" className="pointer-events-none object-fill" />
       <h1 className="sr-only">{title}</h1>
-      <Link href="/lezioni" aria-label="Indietro a Lezioni" className="absolute left-[3%] top-[1%] h-[6%] w-[28%]" />
+      <Link href={backHref} aria-label={studentId ? "Indietro al profilo dello studente" : "Indietro a Lezioni"} className="absolute left-[3%] top-[1%] h-[6%] w-[28%]" />
       <Link href="/menu" aria-label="Menu" className="absolute right-[3%] top-[1%] h-[6%] w-[26%]" />
       <button type="button" onClick={() => shift(-1)} aria-label="Mese precedente" className="absolute left-[23%] top-[19.2%] h-[6%] w-[10%]" />
       <button type="button" onClick={() => shift(1)} aria-label="Mese successivo" className="absolute right-[23%] top-[19.2%] h-[6%] w-[10%]" />
@@ -60,6 +60,7 @@ export default function LessonRegister({ view }: { view: View }) {
               <span className="block truncate text-[clamp(12px,3.5vw,17px)]"><span className="text-[#813247]">{longDate(item.date)}</span> · {item.studentNameSnapshot}</span>
               <span className="block truncate text-[clamp(14px,4.2vw,20px)] italic">{item.subject}</span>
               <span className="block truncate text-[clamp(11px,3.2vw,15px)] italic">{item.topic || "Argomento da annotare"}</span>
+              {item.notes && <span className="block truncate text-[clamp(10px,2.9vw,14px)] italic">{item.notes}</span>}
               <span className="block text-[clamp(10px,2.9vw,14px)]">{item.durationMinutes} min · Svolta</span>
             </>}
           </span>
