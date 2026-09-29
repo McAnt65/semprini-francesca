@@ -68,7 +68,7 @@ export default function TodayPage() {
             <Link href="/menu" className="rounded-lg px-2 py-2 text-[#702f3e]">☰ Menù</Link>
           </div>
           <p className="mt-2 text-center font-entry-elegant text-xs tracking-[.12em] text-[#8a6546]">IL DIARIO DI FRANCESCA</p>
-          <h1 className="mt-2 text-center font-entry-elegant text-[clamp(37px,10vw,50px)] leading-[1.15] text-[#6f2638]">Oggi</h1>
+          <h1 className="mt-2 text-center font-handwritten text-[clamp(43px,12vw,58px)] leading-tight text-[#71313b]">Oggi</h1>
           <p className="text-center font-entry-elegant text-[clamp(16px,4.4vw,20px)] capitalize">{today ? dateTitle(today) : "Il diario della giornata"}</p>
           <div className="mt-2 h-px bg-[#9d7855]/55" />
         </header>
@@ -109,7 +109,7 @@ export default function TodayPage() {
         </section>
 
         <section aria-labelledby="tomorrow-lessons" className="mt-8 border-t border-[#a88965]/50 pt-5">
-          <h2 id="tomorrow-lessons" className="font-entry-elegant text-3xl text-[#6f2638]">Domani</h2>
+          <h2 id="tomorrow-lessons" className="font-handwritten text-3xl text-[#71313b]">Domani</h2>
           <p className="font-entry-elegant text-sm capitalize text-[#82674e]">{tomorrow ? dateTitle(tomorrow) : ""}</p>
           {tomorrow && tomorrowLessons.length === 0 && <p className="mt-3 font-entry-elegant text-base">Nessuna lezione prevista per domani.</p>}
           <ul className="mt-3 space-y-2 font-entry-elegant">
