@@ -113,7 +113,9 @@ export function loadStoredStudents(): StudentRecord[] {
       if (!Array.isArray(stored)) continue;
       for (const value of stored) {
         const student = normalizeStoredStudent(value);
-        if (student && !byId.has(student.id)) byId.set(student.id, student);
+        if (!student) continue;
+        const previous = byId.get(student.id);
+        if (!previous || student.updatedAt > previous.updatedAt) byId.set(student.id, student);
       }
     } catch {
       // L'altro storage può ancora contenere una copia valida.
