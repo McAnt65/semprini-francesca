@@ -4,6 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import background from "../assets/today-diary-watercolor.webp";
+import todayTitle from "../assets/today-title.webp";
+import lessonsTitle from "../assets/today-lessons-title.webp";
+import tomorrowTitle from "../assets/tomorrow-title.webp";
+import studentsIcon from "../assets/today-icon-students.webp";
+import lessonsIcon from "../assets/today-icon-lessons.webp";
+import paymentsIcon from "../assets/today-icon-payments.webp";
+import subjectsIcon from "../assets/today-icon-subjects.webp";
+import calendarIcon from "../assets/today-icon-calendar.webp";
 import { addDays, toLocalDate } from "../data/calendario/calendar-dates";
 import { selectOccurrencesInRange } from "../data/calendario/calendar-selectors";
 import { loadCalendarAppointments, loadCalendarSeries } from "../data/calendario/calendar-storage";
@@ -19,16 +27,7 @@ const menu = [
   { href: "/calendario", label: "Calendario", icon: "calendar" },
 ];
 
-function DiaryIcon({ name }: { name: string }) {
-  const common = { fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
-  return <svg aria-hidden="true" viewBox="0 0 48 42" className="h-7 w-8 text-[#856347]" {...common}>
-    {name === "students" && <><circle cx="24" cy="12" r="5" /><path d="M14 34c0-8 4-12 10-12s10 4 10 12M10 18a4 4 0 1 1 3-7M7 32c0-6 2-10 7-11M38 18a4 4 0 1 0-3-7M41 32c0-6-2-10-7-11" /></>}
-    {name === "lessons" && <><path d="M24 36c-6-4-12-4-19-3V8c7-1 13-1 19 3 6-4 12-4 19-3v25c-7-1-13-1-19 3ZM24 11v25M9 15c4-.5 8 0 11 2M28 17c3-2 7-2.5 11-2M9 22c4-.5 8 0 11 2M28 24c3-2 7-2.5 11-2" /></>}
-    {name === "payments" && <><ellipse cx="18" cy="11" rx="10" ry="4" /><path d="M8 11v10c0 2 4 4 10 4 2 0 4-.2 6-1M8 16c3 3 11 4 16 2M24 20v11c0 3 4 5 10 5s10-2 10-5V20" /><ellipse cx="34" cy="20" rx="10" ry="4" /><path d="M24 25c4 3 16 3 20 0" /></>}
-    {name === "subjects" && <><path d="m4 18 20-10 20 10-20 10L4 18ZM13 24v9c8 5 14 5 22 0v-9M43 19v13" /><circle cx="43" cy="34" r="2" /></>}
-    {name === "calendar" && <><rect x="6" y="9" width="36" height="29" rx="2" /><path d="M6 18h36M15 5v8M33 5v8M14 25h5M25 25h5M14 32h5M25 32h5" /></>}
-  </svg>;
-}
+const icons = { students: studentsIcon, lessons: lessonsIcon, payments: paymentsIcon, subjects: subjectsIcon, calendar: calendarIcon };
 
 function dateTitle(date: string) {
   return new Intl.DateTimeFormat("it-IT", { weekday: "long", day: "numeric", month: "long" }).format(new Date(date + "T12:00:00"));
@@ -79,7 +78,8 @@ export default function TodayPage() {
             <Link href="/menu" className="rounded-lg px-2 py-2 text-[#702f3e]">☰ Menù</Link>
           </div>
           <p className="mt-2 text-center font-entry-elegant text-xs tracking-[.12em] text-[#8a6546]">IL DIARIO DI FRANCESCA</p>
-          <h1 className="mt-2 text-center font-handwritten text-[clamp(43px,12vw,58px)] leading-tight text-[#71313b]">Oggi</h1>
+          <h1 className="sr-only">Oggi</h1>
+          <Image src={todayTitle} alt="" priority unoptimized className="mx-auto mt-1 h-auto w-[clamp(155px,42vw,190px)]" />
           <p className="text-center font-entry-elegant text-[clamp(16px,4.4vw,20px)] capitalize">{today ? dateTitle(today) : "Il diario della giornata"}</p>
           <div className="mx-auto mt-3 flex w-[75%] items-center gap-2 text-[#9b7359]" aria-hidden="true"><span className="h-px flex-1 bg-current/65" /><span className="text-xs">✦</span><span className="h-px flex-1 bg-current/65" /></div>
         </header>
@@ -87,7 +87,7 @@ export default function TodayPage() {
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-5 [scrollbar-color:#ad9471_transparent] [scrollbar-width:thin]" aria-label="Diario di oggi e domani" tabIndex={0}>
         <section aria-labelledby="today-lessons" className="mt-5">
           <div className="flex items-center justify-between gap-2">
-            <h2 id="today-lessons" className="font-entry-elegant text-[clamp(22px,6vw,27px)] text-[#71313b]">Le lezioni di oggi</h2>
+            <h2 id="today-lessons" className="min-w-0"><span className="sr-only">Le lezioni di oggi</span><Image src={lessonsTitle} alt="" unoptimized className="h-auto w-[clamp(205px,57vw,250px)]" /></h2>
             <Link href={today ? "/calendario/giorno?data=" + today : "/calendario/giorno"} className="font-entry-elegant text-sm underline underline-offset-4">Apri agenda</Link>
           </div>
           {today && todayLessons.length === 0 && <p className="py-8 font-entry-elegant text-lg text-[#765b46]">Oggi non ci sono lezioni in programma.</p>}
@@ -119,7 +119,7 @@ export default function TodayPage() {
         </section>
 
         <section aria-labelledby="tomorrow-lessons" className="mt-8 border-t border-[#a88965]/50 pt-5">
-          <h2 id="tomorrow-lessons" className="font-handwritten text-[clamp(30px,8vw,38px)] text-[#71313b]">Domani</h2>
+          <h2 id="tomorrow-lessons"><span className="sr-only">Domani</span><Image src={tomorrowTitle} alt="" unoptimized className="h-auto w-[clamp(140px,42vw,185px)]" /></h2>
           <p className="font-entry-elegant text-sm capitalize text-[#82674e]">{tomorrow ? dateTitle(tomorrow) : ""}</p>
           {tomorrow && tomorrowLessons.length === 0 && <p className="mt-3 font-entry-elegant text-base">Nessuna lezione prevista per domani.</p>}
           <ul className="mt-3 space-y-2 font-entry-elegant">
@@ -131,12 +131,12 @@ export default function TodayPage() {
           {tomorrow && <Link href={"/calendario/giorno?data=" + tomorrow} className="mt-3 inline-block text-sm text-[#71313b] underline underline-offset-4">Agenda di domani</Link>}
         </section>
 
-        </div>
-        <nav aria-label="Sezioni principali" className="shrink-0 border-t border-[#a88965]/60 bg-[#fbf1de]/95 py-1.5">
-          <div className="grid grid-cols-5 divide-x divide-[#ac9272]/45">
-            {menu.map((item) => <Link key={item.href} href={item.href} className="flex min-h-[67px] flex-col items-center justify-center gap-0.5 px-0.5 text-center font-entry-elegant text-[clamp(9px,2.5vw,12px)] leading-tight text-[#623b2e] focus-visible:outline-2 focus-visible:outline-[#71313b]"><DiaryIcon name={item.icon} />{item.label}</Link>)}
+        <nav aria-label="Sezioni principali" className="mt-8 pb-3">
+          <div className="grid grid-cols-5 gap-1">
+            {menu.map((item) => <Link key={item.href} href={item.href} className="flex min-h-[82px] flex-col items-center justify-center gap-1 px-0.5 text-center font-entry-elegant text-[clamp(11px,3vw,15px)] leading-tight text-[#623b2e] focus-visible:outline-2 focus-visible:outline-[#71313b]"><Image src={icons[item.icon as keyof typeof icons]} alt="" unoptimized className="h-10 w-11 object-contain" />{item.label}</Link>)}
           </div>
         </nav>
+        </div>
       </div>
     </div>
   </main>;
