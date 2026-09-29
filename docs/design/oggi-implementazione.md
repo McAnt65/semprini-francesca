@@ -26,7 +26,7 @@ I nomi, gli orari e gli indirizzi nell'immagine sono esempi. La pagina di produz
 
 ## Stato e lavoro visivo restante
 
-La route `app/oggi/page.tsx`, la navigazione da copertina, i dati del calendario, il foglio scorrevole e il tempo di spostamento facoltativo sono già nel codice. L'anteprima non è una cattura dell'app: la pagina attuale usa ancora voci con bordo e riquadri e pulsanti di navigazione testuali. Per raggiungere il riferimento bisogna rifinire tipografia, interlinea, separatori manoscritti, illustrazioni delle cinque icone e resa dei collegamenti su telefono.
+La route `app/oggi/page.tsx`, la navigazione da copertina, i dati del calendario, il foglio scorrevole e il tempo di spostamento facoltativo sono già nel codice. Le lezioni sono ora rese come righe del diario e la barra inferiore ha cinque simboli SVG separati dai testi. L'anteprima non è una cattura dell'app: gli SVG hanno un tratto semplice e devono ancora essere confrontati con le illustrazioni ad acquerello; restano da rifinire tipografia, interlinea, separatori e resa dei collegamenti sul telefono.
 
 ## Verifica prima della chiusura
 
