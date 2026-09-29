@@ -95,7 +95,7 @@ export default function StudentJourney({ student }: { student: StudentRecord }) 
       </section>
 
       <nav aria-label="Azioni studente" className="absolute inset-x-[2%] bottom-[1%] h-[8%]">
-        <Link href={`/calendario/nuova?studente=${encodeURIComponent(student.id)}`} aria-label={`Nuova lezione per ${name}`} className="absolute inset-y-0 left-0 w-[33.3%]" />
+        <Link href={`/calendario/nuova?studente=${encodeURIComponent(student.id)}&origine=profilo`} aria-label={`Nuova lezione per ${name}`} className="absolute inset-y-0 left-0 w-[33.3%]" />
         <Link href={`/studenti/${encodeURIComponent(student.id)}/lezioni`} aria-label={`Diario completo di ${name}`} className="absolute inset-y-0 left-[33.3%] w-[33.4%]" />
         <Link href={`/studenti/${encodeURIComponent(student.id)}/modifica`} aria-label={`Modifica ${name}`} className="absolute inset-y-0 right-0 w-[33.3%]" />
       </nav>

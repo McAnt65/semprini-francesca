@@ -111,11 +111,11 @@ export default function TodayPage() {
                   {lesson.travelMinutes ? " · Spostamento previsto " + lesson.travelMinutes + " min" : ""}
                 </p>}
                 {lesson.mode === "online" && <p className="font-entry-elegant text-sm text-[#6e5844]">Online</p>}
-                <Link href={"/calendario/" + encodeURIComponent(lesson.appointmentId ?? lesson.occurrenceId) + "/modifica?data=" + lesson.date} className="mt-2 inline-block font-entry-elegant text-sm text-[#71313b] underline underline-offset-4">Apri la lezione</Link>
+                <Link href={"/calendario/" + encodeURIComponent(lesson.appointmentId ?? lesson.occurrenceId) + "/modifica?data=" + lesson.date + "&origine=oggi"} className="mt-2 inline-block font-entry-elegant text-sm text-[#71313b] underline underline-offset-4">Apri la lezione</Link>
               </article>;
             })}
           </div>
-          <Link href={today ? "/calendario/nuova?data=" + today : "/calendario/nuova"} className="mt-4 inline-block rounded-full border border-[#98745c]/50 bg-[#f8ecda]/70 px-4 py-2 font-entry-elegant text-sm text-[#71313b]">+ Nuova lezione</Link>
+          <Link href={today ? "/calendario/nuova?data=" + today + "&origine=oggi" : "/calendario/nuova?origine=oggi"} className="mt-4 inline-block rounded-full border border-[#98745c]/50 bg-[#f8ecda]/70 px-4 py-2 font-entry-elegant text-sm text-[#71313b]">+ Nuova lezione</Link>
         </section>
 
         <section aria-labelledby="tomorrow-lessons" className="mt-8 border-t border-[#a88965]/50 pt-5">

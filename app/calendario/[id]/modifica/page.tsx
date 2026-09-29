@@ -11,6 +11,7 @@ export default function EditPage(){return <Suspense fallback={<main className="m
 function Edit(){
  const params=useParams(),search=useSearchParams(),router=useRouter();const id=decodeURIComponent(String(params.id));
  const requested=search.get("data"), date=isLocalDate(requested)?requested:toLocalDate(new Date());
+ const back=search.get("origine")==="oggi"?"/oggi":`/calendario/giorno?data=${date}`;
  const [item,setItem]=useState<CalendarAppointment|null>(null),[error,setError]=useState("");
  useEffect(()=>{queueMicrotask(()=>{
   const appointments=loadCalendarAppointments(),series=loadCalendarSeries();
@@ -26,11 +27,11 @@ function Edit(){
   if(item.travelMinutes!==undefined&&(!Number.isInteger(item.travelMinutes)||item.travelMinutes<1||item.travelMinutes>480)){setError("La durata dello spostamento deve essere tra 1 e 480 minuti.");return;}
   const next={...item,lessonAmountCents:Math.round(item.hourlyRateCents*item.durationMinutes/60),updatedAt:new Date().toISOString()};
   if(!upsertCalendarAppointment(next)){setError("Salvataggio non riuscito.");return;}
-  router.push(`/calendario/giorno?data=${next.date}`);
+  router.push(search.get("origine")==="oggi"?"/oggi":`/calendario/giorno?data=${next.date}`);
  }
  const field="w-full rounded-md border border-[#a88c70]/45 bg-[#fff9ed]/65 px-3 py-2 font-entry-elegant text-[#4b3024]";
  return <main className="min-h-dvh bg-[#efe3ce] px-4 py-8 text-[#4b3024]"><div className="mx-auto max-w-[430px] rounded-xl border border-[#b89b7a]/50 bg-[#f8edda] p-6 font-entry-elegant shadow-sm">
- <Link href={`/calendario/giorno?data=${date}`} className="text-[#792d40]">← Indietro al giorno</Link><h1 className="my-5 text-center text-3xl text-[#792d40]">Modifica lezione</h1>
+ <Link href={back} className="text-[#792d40]">← Indietro</Link><h1 className="my-5 text-center text-3xl text-[#792d40]">Modifica lezione</h1>
  {error&&<p role="alert" className="mb-4 text-[#a2273c]">{error}</p>}
  {item&&<form onSubmit={save} className="space-y-4">
  <p className="text-xl">{item.studentNameSnapshot} · {item.subject}</p>

@@ -27,6 +27,7 @@ function NewLessonForm() {
   const searchParams = useSearchParams();
   const requestedDate = searchParams.get("data");
   const requestedStudent = searchParams.get("studente");
+  const origin = searchParams.get("origine");
   const requestedTime = searchParams.get("ora");
   const [students, setStudents] = useState<StudentRecord[]>([]);
   const [studentsLoaded, setStudentsLoaded] = useState(false);
@@ -128,12 +129,16 @@ function NewLessonForm() {
       setError("Non è stato possibile salvare la lezione sul telefono. Riprova.");
       return;
     }
-    router.push(`/calendario/giorno?data=${date}`);
+    router.push(origin === "profilo"
+      ? `/studenti/${encodeURIComponent(selected.id)}`
+      : origin === "oggi" ? "/oggi" : `/calendario/giorno?data=${date}`);
   }
 
   const field = "h-full w-full appearance-none border-0 bg-transparent px-1 font-entry-elegant text-[clamp(12px,3.5vw,17px)] text-[#4b3024] outline-none focus-visible:bg-[#fff8e8]/60 focus-visible:ring-1 focus-visible:ring-[#792c40]";
   const position = (top: string, left = "41%", width = "48%") => ({ top, left, width, height: "4.3%" });
-  const back = date ? `/calendario/giorno?data=${date}` : "/lezioni";
+  const back = origin === "profilo" && requestedStudent
+    ? `/studenti/${encodeURIComponent(requestedStudent)}`
+    : origin === "oggi" ? "/oggi" : date ? `/calendario/giorno?data=${date}` : "/lezioni";
 
   return (
     <main className="min-h-dvh bg-[#f4eddf] text-[#4b3024]">
@@ -141,7 +146,7 @@ function NewLessonForm() {
         {/* Lo sfondo è una tavola illustrata; tutti i dati restano elementi HTML. */}
         <Image src="/new-lesson-tariff-clean.png" alt="" fill priority unoptimized sizes="(max-width: 430px) 100vw, 430px" className="pointer-events-none object-fill" />
         <h1 className="sr-only">Nuova lezione</h1>
-        <Link href={back} aria-label="Indietro al calendario" className="absolute left-[4%] top-[1%] h-[5%] w-[22%]" />
+        <Link href={back} aria-label="Indietro" className="absolute left-[4%] top-[1%] h-[5%] w-[22%]" />
         <Link href="/menu" aria-label="Menu" className="absolute right-[4%] top-[1%] h-[5%] w-[22%]" />
 
         <form onSubmit={save} className="absolute inset-0 pointer-events-none">
