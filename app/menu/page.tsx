@@ -17,6 +17,7 @@ export default function MenuPage() {
             sizes="(max-width: 430px) 100vw, 430px"
             className="object-fill"
           />
+          <Link href="/oggi" aria-label="Torna a Oggi" className="absolute left-[3%] top-[1%] z-20 flex h-[8%] w-[20%] items-start pt-2 font-entry-elegant text-[clamp(13px,3.4vw,16px)] text-[#60412f]">‹ Oggi</Link>
 
           <Link
             href="/studenti"

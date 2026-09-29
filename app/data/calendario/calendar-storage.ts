@@ -261,6 +261,7 @@ function normalizeLessonSnapshot(
     studentNameSnapshot,
     subject,
     durationMinutes: positiveInteger(record.durationMinutes, 1, 24 * 60),
+    travelMinutes: typeof record.travelMinutes === "number" && Number.isInteger(record.travelMinutes) && record.travelMinutes > 0 && record.travelMinutes <= 480 ? record.travelMinutes : undefined,
     mode,
     status,
     topic: text(record.topic),

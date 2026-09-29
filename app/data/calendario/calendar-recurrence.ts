@@ -78,6 +78,7 @@ export function createSingleOccurrenceException(
       | "date"
       | "startTime"
       | "durationMinutes"
+      | "travelMinutes"
       | "mode"
       | "status"
       | "topic"
@@ -103,6 +104,7 @@ export function createSingleOccurrenceException(
     date: occurrenceDate,
     startTime: series.startTime,
     durationMinutes: series.durationMinutes,
+    travelMinutes: series.travelMinutes,
     mode: series.mode,
     status: series.status,
     topic: series.topic,
@@ -250,6 +252,7 @@ function seriesToOccurrence(
     date,
     startTime: series.startTime,
     durationMinutes: series.durationMinutes,
+    travelMinutes: series.travelMinutes,
     mode: series.mode,
     status: series.status,
     topic: series.topic,
@@ -280,6 +283,7 @@ function appointmentToOccurrence(
     date: appointment.date,
     startTime: appointment.startTime,
     durationMinutes: appointment.durationMinutes,
+    travelMinutes: appointment.travelMinutes,
     mode: appointment.mode,
     status: appointment.status,
     topic: appointment.topic,

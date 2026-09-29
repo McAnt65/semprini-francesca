@@ -23,6 +23,7 @@ function Edit(){
  });},[id,date]);
  function save(event:FormEvent){event.preventDefault();if(!item)return;
   if(!isLocalDate(item.date)||!isLocalTime(item.startTime)||item.durationMinutes<15){setError("Controlla data, ora e durata.");return;}
+  if(item.travelMinutes!==undefined&&(!Number.isInteger(item.travelMinutes)||item.travelMinutes<1||item.travelMinutes>480)){setError("La durata dello spostamento deve essere tra 1 e 480 minuti.");return;}
   const next={...item,lessonAmountCents:Math.round(item.hourlyRateCents*item.durationMinutes/60),updatedAt:new Date().toISOString()};
   if(!upsertCalendarAppointment(next)){setError("Salvataggio non riuscito.");return;}
   router.push(`/calendario/giorno?data=${next.date}`);
@@ -38,6 +39,7 @@ function Edit(){
  <label className="block">Durata in minuti<input type="number" min="15" max="480" step="15" value={item.durationMinutes} onChange={e=>setItem({...item,durationMinutes:Number(e.target.value)})} className={field}/></label>
  <label className="block">Tariffa oraria (€)<input type="number" min="0" step="0.01" value={item.hourlyRateCents/100} onChange={e=>setItem({...item,hourlyRateCents:Math.round(Number(e.target.value)*100)})} className={field}/></label>
  <label className="block">Modalità<select value={item.mode} onChange={e=>setItem({...item,mode:e.target.value as LessonMode})} className={field}><option value="casa">Casa</option><option value="domicilio">A domicilio</option><option value="online">Online</option></select></label>
+ {item.mode==="domicilio"&&<label className="block">Durata prevista dello spostamento (minuti, facoltativa)<input type="number" min="1" max="480" step="1" value={item.travelMinutes??""} onChange={e=>setItem({...item,travelMinutes:e.target.value?Number(e.target.value):undefined})} className={field}/></label>}
  <label className="block">Stato<select value={item.status} onChange={e=>setItem({...item,status:e.target.value as LessonStatus})} className={field}><option value="confermata">Confermata</option><option value="attesa">In attesa</option><option value="richiesta">Richiesta</option><option value="svolta">Svolta</option><option value="annullata">Annullata</option></select></label>
  <label className="block">Argomento svolto<input type="text" value={item.topic} onChange={e=>setItem({...item,topic:e.target.value})} className={field}/></label>
  <label className="block">Appunti sulla lezione<textarea value={item.notes} onChange={e=>setItem({...item,notes:e.target.value})} rows={5} className={field}/></label>

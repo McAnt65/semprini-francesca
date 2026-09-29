@@ -31,6 +31,7 @@ export interface LessonSnapshot {
   studentNameSnapshot: string;
   subject: string;
   durationMinutes: number;
+  travelMinutes?: number;
   mode: LessonMode;
   status: LessonStatus;
   topic: string;
@@ -106,5 +107,6 @@ export type SeriesLessonPatch = Partial<
     | "paymentStatus"
     | "source"
     | "recurrence"
+    | "travelMinutes"
   >
 >;

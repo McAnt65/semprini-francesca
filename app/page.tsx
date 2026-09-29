@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import todayBackground from "./assets/today-diary-watercolor.webp";
 
 export default function Home() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function Home() {
 
     // Durata ridotta a 700ms per una sfumatura fluida e reattiva
     setTimeout(() => {
-      router.push("/menu");
+      router.push("/oggi");
     }, 700);
   };
 
@@ -48,7 +49,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* OVERLAY MENU IN DISSOLVENZA */}
+      {/* ANTEPRIMA DEL DIARIO IN DISSOLVENZA */}
       <div
         className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ease-in-out ${
           transizione ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -56,13 +57,14 @@ export default function Home() {
       >
         <div className="relative h-full w-full max-w-[430px] sm:aspect-[9/16] sm:h-auto">
           <Image
-            src="/menu.png?v=20260928"
-            alt="Menu del Registro"
+            src={todayBackground}
+            alt=""
             fill
             priority
             unoptimized
             className="object-fill"
           />
+          <span className="absolute left-[10%] top-[13%] font-handwritten text-5xl text-[#71313b]">Oggi</span>
         </div>
       </div>
 
