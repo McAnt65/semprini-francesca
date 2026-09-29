@@ -9,6 +9,7 @@ import { loadCalendarAppointments, loadCalendarSeries } from "../data/calendario
 import { selectOccurrencesInRange } from "../data/calendario/calendar-selectors";
 import { addDays, toLocalDate, toLocalTime } from "../data/calendario/calendar-dates";
 import background from "../assets/students-register-watercolor.webp";
+import studentTitle from "../assets/students-title-watercolor.webp";
 
 type SubjectFilter = "Tutte" | "Matematica" | "Fisica" | "Chimica";
 type SortMode = "az" | "lesson" | "recent";
@@ -153,7 +154,8 @@ export default function StudentsPage() {
               <span aria-hidden="true" className="text-lg leading-none">☰</span> Menù
             </Link>
           </div>
-          <h1 className="mt-3 text-center font-handwritten text-[clamp(33px,9vw,49px)] leading-[1.15] text-[#692f35] drop-shadow-[0_1px_#fff9ea]">I miei studenti</h1>
+          <h1 className="sr-only">I miei studenti</h1>
+          <Image src={studentTitle} alt="" priority unoptimized className="mx-auto mt-3 h-auto w-[95%]" />
           <div className="mx-auto mt-1 w-[47%] border-b border-[#ad9471]/65" />
         </header>
 
