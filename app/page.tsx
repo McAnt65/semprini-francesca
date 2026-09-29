@@ -64,7 +64,7 @@ export default function Home() {
             unoptimized
             className="object-fill"
           />
-          <span className="absolute left-[10%] top-[13%] font-handwritten text-5xl text-[#71313b]">Oggi</span>
+          <span className="absolute left-[10%] top-[13%] font-entry-elegant text-5xl text-[#6f2638]">Oggi</span>
         </div>
       </div>
 
