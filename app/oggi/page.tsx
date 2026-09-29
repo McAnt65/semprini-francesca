@@ -72,22 +72,22 @@ export default function TodayPage() {
     <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-[#fbf1de] shadow-[0_8px_35px_#53331b30]">
       <Image src={background} alt="" fill priority unoptimized sizes="(max-width: 430px) 100vw, 430px" className="pointer-events-none object-fill" />
       <div className="relative z-10 flex min-h-0 flex-1 flex-col px-[8%]">
-        <header className="shrink-0 pt-3">
-          <div className="flex min-h-11 items-center justify-between font-entry-elegant text-base">
+        <header className="shrink-0 pt-2">
+          <p className="text-center font-entry-elegant text-xs tracking-[.12em] text-[#8a6546]">Il diario di Francesca</p>
+          <div className="flex min-h-9 items-center justify-between font-entry-elegant text-base">
             <Link href="/" aria-label="Torna alla copertina" className="rounded-lg px-1 py-2">‹ Copertina</Link>
             <Link href="/menu" className="rounded-lg px-2 py-2 text-[#702f3e]">☰ Menù</Link>
           </div>
-          <p className="mt-2 text-center font-entry-elegant text-xs tracking-[.12em] text-[#8a6546]">IL DIARIO DI FRANCESCA</p>
           <h1 className="sr-only">Oggi</h1>
-          <Image src={todayTitle} alt="" priority unoptimized className="mx-auto mt-1 h-auto w-[clamp(155px,42vw,190px)]" />
+          <Image src={todayTitle} alt="" priority unoptimized className="mx-auto -mt-2 h-auto w-[clamp(155px,42vw,190px)]" />
           <p className="text-center font-entry-elegant text-[clamp(16px,4.4vw,20px)] capitalize">{today ? dateTitle(today) : "Il diario della giornata"}</p>
           <div className="mx-auto mt-3 flex w-[75%] items-center gap-2 text-[#9b7359]" aria-hidden="true"><span className="h-px flex-1 bg-current/65" /><span className="text-xs">✦</span><span className="h-px flex-1 bg-current/65" /></div>
         </header>
 
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-5 [scrollbar-color:#ad9471_transparent] [scrollbar-width:thin]" aria-label="Diario di oggi e domani" tabIndex={0}>
+        <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain pb-5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" aria-label="Diario di oggi e domani" tabIndex={0}>
         <section aria-labelledby="today-lessons" className="mt-5">
           <div className="flex items-center justify-between gap-2">
-            <h2 id="today-lessons" className="min-w-0"><span className="sr-only">Le lezioni di oggi</span><Image src={lessonsTitle} alt="" unoptimized className="h-auto w-[clamp(205px,57vw,250px)]" /></h2>
+            <h2 id="today-lessons" className="min-w-0"><span className="sr-only">Le lezioni di oggi</span><Image src={lessonsTitle} alt="" unoptimized className="h-[64px] w-auto max-w-full object-contain object-left" /></h2>
             <Link href={today ? "/calendario/giorno?data=" + today : "/calendario/giorno"} className="font-entry-elegant text-sm underline underline-offset-4">Apri agenda</Link>
           </div>
           {today && todayLessons.length === 0 && <p className="py-8 font-entry-elegant text-lg text-[#765b46]">Oggi non ci sono lezioni in programma.</p>}
@@ -119,7 +119,7 @@ export default function TodayPage() {
         </section>
 
         <section aria-labelledby="tomorrow-lessons" className="mt-8 border-t border-[#a88965]/50 pt-5">
-          <h2 id="tomorrow-lessons"><span className="sr-only">Domani</span><Image src={tomorrowTitle} alt="" unoptimized className="h-auto w-[clamp(140px,42vw,185px)]" /></h2>
+          <h2 id="tomorrow-lessons"><span className="sr-only">Domani</span><Image src={tomorrowTitle} alt="" unoptimized className="h-[58px] w-auto max-w-full object-contain object-left" /></h2>
           <p className="font-entry-elegant text-sm capitalize text-[#82674e]">{tomorrow ? dateTitle(tomorrow) : ""}</p>
           {tomorrow && tomorrowLessons.length === 0 && <p className="mt-3 font-entry-elegant text-base">Nessuna lezione prevista per domani.</p>}
           <ul className="mt-3 space-y-2 font-entry-elegant">
@@ -131,12 +131,13 @@ export default function TodayPage() {
           {tomorrow && <Link href={"/calendario/giorno?data=" + tomorrow} className="mt-3 inline-block text-sm text-[#71313b] underline underline-offset-4">Agenda di domani</Link>}
         </section>
 
-        <nav aria-label="Sezioni principali" className="mt-8 pb-3">
+        </div>
+
+        <nav aria-label="Sezioni principali" className="shrink-0 pt-2 pb-[max(8px,env(safe-area-inset-bottom))]">
           <div className="grid grid-cols-5 gap-1">
             {menu.map((item) => <Link key={item.href} href={item.href} className="flex min-h-[82px] flex-col items-center justify-center gap-1 px-0.5 text-center font-entry-elegant text-[clamp(11px,3vw,15px)] leading-tight text-[#623b2e] focus-visible:outline-2 focus-visible:outline-[#71313b]"><Image src={icons[item.icon as keyof typeof icons]} alt="" unoptimized className="h-10 w-11 object-contain" />{item.label}</Link>)}
           </div>
         </nav>
-        </div>
       </div>
     </div>
   </main>;
