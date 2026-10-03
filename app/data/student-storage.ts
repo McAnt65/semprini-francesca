@@ -64,6 +64,7 @@ function normalizeStoredStudent(value: unknown): StudentRecord | null {
 
   return {
     id: text(student.id),
+    status: text(student.status) === "archived" ? "archived" : "active",
     enrollmentDate: text(student.enrollmentDate),
     avatarUrl: text(student.avatarUrl) || undefined,
     firstName: text(student.firstName),
@@ -99,6 +100,9 @@ function normalizeStoredStudent(value: unknown): StudentRecord | null {
     },
     familyNotes: text(student.familyNotes),
     personalNotes: text(student.personalNotes),
+    lessonMode: ["casa", "domicilio", "online"].includes(text(student.lessonMode)) ? text(student.lessonMode) as StudentRecord["lessonMode"] : undefined,
+    lessonDurationMinutes: numberValue(student.lessonDurationMinutes),
+    lessonRateCents: numberValue(student.lessonRateCents),
     nextLesson: text(student.nextLesson),
     updatedAt: text(student.updatedAt),
   };
@@ -131,7 +135,12 @@ export function getStoredStudentById(id: string) {
 
 export function saveStoredStudent(student: StudentRecord) {
   const current = loadStoredStudents();
-  const next = [student, ...current.filter((item) => item.id !== student.id)];
+  const normalized = {
+    ...student,
+    status: student.status ?? "active",
+    updatedAt: new Date().toISOString(),
+  };
+  const next = [normalized, ...current.filter((item) => item.id !== student.id)];
   const serialized = JSON.stringify(next);
 
   for (const storage of availableStorages()) {
@@ -144,6 +153,18 @@ export function saveStoredStudent(student: StudentRecord) {
   }
 
   return false;
+}
+
+export function archiveStoredStudent(id: string) {
+  const student = getStoredStudentById(id);
+  if (!student) return false;
+  return saveStoredStudent({ ...student, status: "archived" });
+}
+
+export function restoreStoredStudent(id: string) {
+  const student = getStoredStudentById(id);
+  if (!student) return false;
+  return saveStoredStudent({ ...student, status: "active" });
 }
 
 function createStudentId(firstName: string, lastName: string) {
@@ -190,6 +211,7 @@ export function buildStudentFromSavedDrafts(): StudentRecord {
 
   return {
     id: createStudentId(firstName, lastName),
+    status: "active",
     enrollmentDate: text(personal.studentSince),
     avatarUrl: text(personal.watercolorPreview)
       || text(personal.watercolorPhoto)
@@ -232,9 +254,17 @@ export function buildStudentFromSavedDrafts(): StudentRecord {
     },
     familyNotes: text(family.familyNotes),
     personalNotes: text(notes.personalNotes),
+    lessonMode: undefined,
+    lessonDurationMinutes: undefined,
+    lessonRateCents: undefined,
     nextLesson: "",
     updatedAt: new Date().toISOString(),
   };
+}
+
+function numberValue(value: unknown) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return undefined;
+  return Math.round(value);
 }
 
 export function clearNewStudentDrafts() {

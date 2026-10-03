@@ -1,45 +1,5 @@
-"use client";
-
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import StudentForm from "../StudentForm";
 
 export default function NewStudentPage() {
-  const router = useRouter();
-
-  return (
-    <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce]">
-      <div className="mx-auto w-full max-w-[430px]">
-        <div className="relative aspect-[1024/1792] w-full min-h-dvh sm:min-h-0 overflow-hidden bg-[#f4e7cf] sm:rounded-[28px]">
-          <Image
-            src="/student-edit-menu.png"
-            alt="Completa il profilo dello studente"
-            fill
-            priority
-            sizes="(max-width: 430px) 100vw, 430px"
-            className="object-fill"
-          />
-
-          <button
-            type="button"
-            onClick={() => router.back()}
-            aria-label="Indietro"
-            className="antique-clickable absolute left-[3%] top-[1.5%] z-30 h-[5%] w-[24%] rounded-[12px] bg-transparent"
-          />
-
-          <Link
-            href="/menu"
-            aria-label="Torna al menù"
-            className="antique-clickable absolute right-[3%] top-[1.5%] z-30 h-[5%] w-[21%] rounded-[12px] bg-transparent"
-          />
-
-          <Link
-            href="/studenti/nuovo/dati-personali"
-            aria-label="Fotografia e dati personali"
-            className="antique-clickable absolute left-[4.5%] right-[4.5%] top-[23.5%] z-30 h-[14%] rounded-[18px] bg-transparent"
-          />
-        </div>
-      </div>
-    </main>
-  );
+  return <StudentForm />;
 }
