@@ -9,19 +9,43 @@ export default function StudentSurface({
   children,
   current = "list",
   className = "",
+  showTopHotspots = true,
 }: {
   artwork: StaticImageData;
   children: ReactNode;
   current?: StudentsNavKey;
   className?: string;
+  showTopHotspots?: boolean;
 }) {
   return (
     <main className={styles.page}>
       <div className={`${styles.surface} ${className}`}>
-        <Image src={artwork} alt="" fill priority sizes="(max-width: 430px) 100vw, 430px" className={styles.artwork} />
-        <Link href="/studenti/nuovo" aria-label="Nuovo studente" className={styles.newStudent} />
-        <Link href="/menu" aria-label="Menu" className={styles.menu} />
+        <Image
+          src={artwork}
+          alt=""
+          fill
+          priority
+          sizes="(max-width: 430px) 100vw, 430px"
+          className={styles.artwork}
+        />
+
+        {showTopHotspots && (
+          <>
+            <Link
+              href="/studenti/nuovo"
+              aria-label="Nuovo studente"
+              className={styles.newStudent}
+            />
+            <Link
+              href="/menu"
+              aria-label="Menu"
+              className={styles.menu}
+            />
+          </>
+        )}
+
         {children}
+
         <StudentsNavigation current={current} />
       </div>
     </main>
