@@ -1,7 +1,7 @@
 import { loadCalendarAppointments, loadCalendarSeries } from "../data/calendario/calendar-storage";
 import { selectOccurrencesInRange } from "../data/calendario/calendar-selectors";
-import { addDays, toLocalDate, toLocalTime } from "../data/calendario/calendar-dates";
-import type { CalendarOccurrence, LessonMode } from "../data/calendario/calendar-types";
+import { addDays, daysBetween, toLocalDate, toLocalTime } from "../data/calendario/calendar-dates";
+import type { CalendarAppointment, CalendarOccurrence, CalendarSeries, LessonMode } from "../data/calendario/calendar-types";
 import type { StudentRecord } from "../data/students";
 
 export function fullName(student: StudentRecord) {
@@ -67,6 +67,61 @@ export function loadStudentLessonSummary() {
   }
 
   return { byStudent, nextByStudent, lastByStudent };
+}
+
+export function loadStudentArchiveOverview(
+  studentId: string,
+  now = new Date(),
+  source: { appointments: CalendarAppointment[]; series: CalendarSeries[] } = {
+    appointments: loadCalendarAppointments(),
+    series: loadCalendarSeries(),
+  },
+) {
+  const appointments = source.appointments.filter((lesson) => lesson.studentId === studentId);
+  const series = source.series.filter((lesson) => lesson.studentId === studentId);
+  const today = toLocalDate(now);
+  const currentTime = toLocalTime(now);
+  const dates = [...appointments.map((lesson) => lesson.date), ...series.map((lesson) => lesson.startsOn)];
+  const from = dates.sort()[0] ?? today;
+  const to = [addDays(today, 366), ...dates].sort().at(-1) ?? today;
+  const lessons = selectOccurrencesInRange(appointments, series, from, to);
+  const completed = lessons
+    .filter((lesson) => lesson.status === "svolta" && (lesson.date < today || (lesson.date === today && lesson.startTime <= currentTime)))
+    .at(-1);
+  const hasFuture = lessons.some((lesson) =>
+    lesson.status !== "annullata" &&
+    lesson.status !== "svolta" &&
+    (lesson.date > today || (lesson.date === today && lesson.startTime > currentTime))
+  );
+  const inactiveDays = completed ? daysBetween(completed.date, today) : null;
+  return { lessons, suggestArchiving: inactiveDays !== null && inactiveDays >= 90 && !hasFuture };
+}
+
+export type StudentPaymentStatus = "Saldato" | "Da saldare" | "Parzialmente saldato" | "Nessun pagamento registrato";
+
+export function summarizeStudentPayments(lessons: CalendarOccurrence[]) {
+  const billable = lessons.filter((lesson) =>
+    lesson.status !== "annullata" &&
+    lesson.lessonAmountCents > 0 &&
+    (lesson.paymentStatus === "non_pagata" ||
+      lesson.paymentStatus === "pagata" ||
+      lesson.paymentStatus === "parziale" ||
+      lesson.paymentStatus === "non_dovuta")
+  );
+  const due = billable.reduce((total, lesson) =>
+    total + (lesson.paymentStatus === "non_dovuta" ? 0 : lesson.lessonAmountCents), 0);
+  const paid = billable.reduce((total, lesson) =>
+    total + (lesson.paymentStatus === "non_dovuta"
+      ? 0
+      : Math.min(lesson.lessonAmountCents, lesson.paidAmountCents ?? (lesson.paymentStatus === "pagata" ? lesson.lessonAmountCents : 0))), 0);
+  const status: StudentPaymentStatus = due <= 0
+    ? "Nessun pagamento registrato"
+    : paid >= due
+      ? "Saldato"
+      : paid > 0
+        ? "Parzialmente saldato"
+        : "Da saldare";
+  return { status, hasOutstanding: due > paid };
 }
 
 export function euroFromCents(value?: number) {

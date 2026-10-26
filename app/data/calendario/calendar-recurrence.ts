@@ -82,6 +82,8 @@ export function createSingleOccurrenceException(
       | "mode"
       | "status"
       | "topic"
+      | "topicKind"
+      | "coveredTopic"
       | "notes"
       | "hourlyRateCents"
       | "lessonAmountCents"
@@ -108,6 +110,8 @@ export function createSingleOccurrenceException(
     mode: series.mode,
     status: series.status,
     topic: series.topic,
+    topicKind: series.topicKind,
+    coveredTopic: series.coveredTopic,
     notes: series.notes,
     hourlyRateCents: series.hourlyRateCents,
     lessonAmountCents: series.lessonAmountCents,
@@ -256,6 +260,8 @@ function seriesToOccurrence(
     mode: series.mode,
     status: series.status,
     topic: series.topic,
+    topicKind: series.topicKind,
+    coveredTopic: series.coveredTopic,
     notes: series.notes,
     hourlyRateCents: series.hourlyRateCents,
     lessonAmountCents: series.lessonAmountCents,
@@ -287,6 +293,8 @@ function appointmentToOccurrence(
     mode: appointment.mode,
     status: appointment.status,
     topic: appointment.topic,
+    topicKind: appointment.topicKind,
+    coveredTopic: appointment.coveredTopic,
     notes: appointment.notes,
     hourlyRateCents: appointment.hourlyRateCents,
     lessonAmountCents: appointment.lessonAmountCents,
@@ -294,6 +302,8 @@ function appointmentToOccurrence(
     tariffCode: appointment.tariffCode,
     paidAmountCents: appointment.paidAmountCents,
     paymentStatus: appointment.paymentStatus,
+    historicalPaidAmountCents: appointment.historicalPaidAmountCents,
+    paymentMovements: appointment.paymentMovements,
     source: appointment.source,
     isRecurring: Boolean(appointment.seriesId),
     isException: Boolean(appointment.seriesId && appointment.originalOccurrenceDate),

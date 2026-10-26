@@ -1,0 +1,39 @@
+.page {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: #f3e4ce;
+}
+
+.sheet {
+  position: relative;
+  width: min(100%, 560px, calc(100dvh * 941 / 1672));
+  aspect-ratio: 941 / 1672;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.artwork {
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.hotspot {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 3%;
+  background: transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hotspot:focus-visible {
+  outline: 3px solid #741d32;
+  outline-offset: -5px;
+  background: rgb(116 29 50 / 9%);
+}

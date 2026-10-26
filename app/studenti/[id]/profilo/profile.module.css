@@ -1,0 +1,206 @@
+.page {
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background: #f4eddf;
+}
+
+.stage {
+  position: relative;
+  width: min(100%, 430px);
+  min-height: 100dvh;
+  margin-inline: auto;
+  overflow: hidden;
+  isolation: isolate;
+  aspect-ratio: 2 / 3;
+  color: #4b3024;
+}
+
+.background {
+  z-index: -1;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+}
+
+.todayLink,
+.menuLink {
+  position: absolute;
+  z-index: 3;
+  top: 1.5%;
+  height: 7%;
+  border-radius: 12px;
+}
+
+.todayLink {
+  left: 3%;
+  width: 21%;
+}
+
+.menuLink {
+  right: 3%;
+  width: 21%;
+}
+
+.todayLink:focus-visible,
+.menuLink:focus-visible {
+  outline: 2px solid #71815d;
+  outline-offset: -3px;
+}
+
+.title {
+  position: absolute;
+  top: 12.4%;
+  left: 10%;
+  z-index: 1;
+  width: 80%;
+  margin: 0;
+  color: #3f6549;
+  font-family: var(--font-register-script, "Segoe Script", "Lucida Handwriting", cursive);
+  font-size: clamp(38px, 11vw, 54px);
+  font-weight: 500;
+  line-height: 1.15;
+  text-align: center;
+  text-shadow: 0 1px 0 rgb(251 244 231 / 30%);
+}
+
+.tabs {
+  position: absolute;
+  top: 28.1%;
+  left: 4%;
+  z-index: 2;
+  display: grid;
+  width: 92%;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: center;
+  text-align: center;
+}
+
+.tab {
+  display: flex;
+  min-width: 0;
+  min-height: 54px;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 3px 8px;
+  color: #6f2638;
+  font-family: var(--font-entry-elegant, Baskerville, Georgia, serif);
+  font-size: clamp(11px, 3.15vw, 15px);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.05;
+  text-decoration: none;
+}
+
+.currentTab {
+  position: relative;
+  color: #456747;
+}
+
+.currentTab::after {
+  position: absolute;
+  right: 18%;
+  bottom: 3px;
+  left: 18%;
+  height: 1px;
+  background: #557957;
+  content: "";
+}
+
+.narrative {
+  position: absolute;
+  top: 36%;
+  right: 10%;
+  bottom: 13%;
+  left: 10%;
+  z-index: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px 3px 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  outline: none;
+}
+
+.narrative::-webkit-scrollbar {
+  display: none;
+}
+
+.narrative:focus-visible {
+  outline: 1px dashed rgb(111 38 56 / 35%);
+  outline-offset: 2px;
+}
+
+.prose {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(10px, 3.5vw, 18px);
+  padding-block: 6px 18px;
+  color: #4b3024;
+  font-family: var(--font-entry-elegant, Baskerville, Georgia, serif);
+  font-size: clamp(17px, 4.6vw, 21px);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  line-height: 1.42;
+  text-align: center;
+}
+
+.prose p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.value {
+  color: #762b3b;
+}
+
+.studentNote {
+  max-width: 100%;
+  white-space: pre-wrap;
+}
+
+.loading,
+.notFound {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  background: #f4eddf;
+}
+
+.notFound {
+  padding: 24px;
+  text-align: center;
+}
+
+.notFound section {
+  color: #4b3024;
+  font-family: var(--font-entry-elegant, Baskerville, Georgia, serif);
+}
+
+.notFound h1 {
+  margin: 0 0 18px;
+  color: #6f2638;
+  font-size: 22px;
+}
+
+.notFound a {
+  color: #4b3024;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-height: 700px) {
+  .title {
+    top: 11.5%;
+    font-size: clamp(34px, 10vw, 46px);
+  }
+
+  .tabs {
+    top: 27%;
+  }
+
+  .narrative {
+    top: 35%;
+  }
+}

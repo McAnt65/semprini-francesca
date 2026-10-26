@@ -1,4 +1,5 @@
 import { isLocalDate, isLocalTime } from "./calendar-dates";
+import { writeAndVerify, type SaveResult } from "../save-result";
 import type {
   AppointmentSource,
   CalendarAppointment,
@@ -8,6 +9,7 @@ import type {
   LessonSnapshot,
   LessonStatus,
   PaymentStatus,
+  PaymentMovement,
   RequestDirection,
 } from "./calendar-types";
 
@@ -50,7 +52,11 @@ export function loadCalendarAppointments(): CalendarAppointment[] {
 export function saveCalendarAppointments(
   appointments: CalendarAppointment[]
 ): boolean {
-  return saveCollection(
+  return saveCalendarAppointmentsResult(appointments).status !== "failed";
+}
+
+export function saveCalendarAppointmentsResult(appointments: CalendarAppointment[]): SaveResult {
+  return saveCollectionResult(
     CALENDAR_APPOINTMENTS_STORAGE_KEY,
     appointments,
     normalizeCalendarAppointment
@@ -60,11 +66,33 @@ export function saveCalendarAppointments(
 export function upsertCalendarAppointment(
   appointment: CalendarAppointment
 ): boolean {
+  return upsertCalendarAppointmentResult(appointment).status !== "failed";
+}
+
+export function upsertCalendarAppointmentResult(appointment: CalendarAppointment): SaveResult {
   const normalized = normalizeCalendarAppointment(appointment);
-  if (!normalized) return false;
+  if (!normalized) return { status: "failed" };
   const current = loadCalendarAppointments();
-  return saveCalendarAppointments([
-    normalized,
+  const previous = current.find((item) => item.id === normalized.id);
+  // Older editors may still write only the aggregate payment. Once dated
+  // movements exist, reject such a write instead of desynchronizing history.
+  if (previous?.paymentMovements?.length && (
+    normalized.paidAmountCents !== previous.paidAmountCents ||
+    normalized.historicalPaidAmountCents !== previous.historicalPaidAmountCents ||
+    JSON.stringify(normalized.paymentMovements) !== JSON.stringify(previous.paymentMovements)
+  )) return { status: "failed" };
+  // A price edit can change the residual without changing the recorded payments.
+  // Reconcile the aggregate status even when the existing editor does not yet use
+  // the payment engine directly.
+  const revised = previous && normalized.lessonAmountCents !== previous.lessonAmountCents &&
+    normalized.paymentStatus !== "non_dovuta"
+    ? { ...normalized, paymentStatus: (
+      normalized.lessonAmountCents > 0 && (normalized.paidAmountCents ?? 0) >= normalized.lessonAmountCents
+        ? "pagata" : (normalized.paidAmountCents ?? 0) > 0 ? "parziale" : "non_pagata"
+    ) as PaymentStatus }
+    : normalized;
+  return saveCalendarAppointmentsResult([
+    revised,
     ...current.filter((item) => item.id !== normalized.id),
   ]);
 }
@@ -82,7 +110,11 @@ export function loadCalendarSeries(): CalendarSeries[] {
 }
 
 export function saveCalendarSeries(series: CalendarSeries[]): boolean {
-  return saveCollection(
+  return saveCalendarSeriesResult(series).status !== "failed";
+}
+
+export function saveCalendarSeriesResult(series: CalendarSeries[]): SaveResult {
+  return saveCollectionResult(
     CALENDAR_SERIES_STORAGE_KEY,
     series,
     normalizeCalendarSeries
@@ -90,10 +122,14 @@ export function saveCalendarSeries(series: CalendarSeries[]): boolean {
 }
 
 export function upsertCalendarSeries(series: CalendarSeries): boolean {
+  return upsertCalendarSeriesResult(series).status !== "failed";
+}
+
+export function upsertCalendarSeriesResult(series: CalendarSeries): SaveResult {
   const normalized = normalizeCalendarSeries(series);
-  if (!normalized) return false;
+  if (!normalized) return { status: "failed" };
   const current = loadCalendarSeries();
-  return saveCalendarSeries([
+  return saveCalendarSeriesResult([
     normalized,
     ...current.filter((item) => item.id !== normalized.id),
   ]);
@@ -165,6 +201,10 @@ export function normalizeCalendarAppointment(
     originalOccurrenceDate: hasValidExceptionLink
       ? originalOccurrenceDate
       : undefined,
+    // Keep an existing ledger intact, including malformed values. Payment operations
+    // validate it before writing; a generic lesson edit must not erase its history.
+    historicalPaidAmountCents: record.historicalPaidAmountCents as number | undefined,
+    paymentMovements: record.paymentMovements as PaymentMovement[] | undefined,
     createdAt: timestamp(record.createdAt),
     updatedAt: timestamp(record.updatedAt),
   };
@@ -265,6 +305,8 @@ function normalizeLessonSnapshot(
     mode,
     status,
     topic: text(record.topic),
+    topicKind: record.topicKind === "planned" ? "planned" : undefined,
+    coveredTopic: typeof record.coveredTopic === "string" ? record.coveredTopic.trim() : undefined,
     notes: text(record.notes),
     hourlyRateCents: cents(record.hourlyRateCents),
     lessonAmountCents: cents(record.lessonAmountCents),
@@ -308,7 +350,11 @@ function saveCollection<T>(
   values: T[],
   normalize: (value: unknown) => T | null
 ): boolean {
-  if (typeof window === "undefined") return false;
+  return saveCollectionResult(key, values, normalize).status !== "failed";
+}
+
+function saveCollectionResult<T>(key: string, values: T[], normalize: (value: unknown) => T | null): SaveResult {
+  if (typeof window === "undefined") return { status: "failed" };
   const normalized = values
     .map((value) => normalize(value))
     .filter((value): value is T => value !== null);
@@ -316,22 +362,21 @@ function saveCollection<T>(
   const storages = availableStorages();
 
   for (let index = 0; index < storages.length; index += 1) {
-    try {
-      storages[index].setItem(key, serialized);
-      if (index === 0 && storages[1]) {
+    if (writeAndVerify(storages[index], key, serialized)) {
+      let persistent = false;
+      try { persistent = storages[index] === window.localStorage; } catch { /* Storage denied. */ }
+      if (persistent && storages[1]) {
         try {
           storages[1].removeItem(key);
         } catch {
           // Una vecchia copia di fallback non impedisce il salvataggio principale.
         }
       }
-      return true;
-    } catch {
-      // localStorage può essere bloccato o pieno: prova sessionStorage.
+      return { status: persistent ? "saved" : "temporary" };
     }
   }
 
-  return false;
+  return { status: "failed" };
 }
 
 function availableStorages(): StorageLike[] {

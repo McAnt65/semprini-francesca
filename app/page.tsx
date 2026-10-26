@@ -1,24 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 import todayBackground from "./assets/today-diary-watercolor.webp";
 
 export default function Home() {
-  const router = useRouter();
   const [transizione, setTransizione] = useState(false);
-
-  const entraNelRegistro = () => {
-    if (transizione) return;
-
-    setTransizione(true);
-
-    // Durata ridotta a 700ms per una sfumatura fluida e reattiva
-    setTimeout(() => {
-      router.push("/oggi");
-    }, 700);
-  };
 
   return (
     <main className="relative h-dvh w-full overflow-x-hidden bg-[#f4eddf]">
@@ -39,11 +27,11 @@ export default function Home() {
           />
 
           {/* Area cliccabile invisibile */}
-          <button
-            type="button"
-            onClick={entraNelRegistro}
+          <Link
+            href="/benvenuto"
+            onClick={() => setTransizione(true)}
             aria-label="Entra nel registro"
-            className="antique-clickable absolute z-50 left-[8%] top-[76%] h-[18%] w-[84%] rounded-[18px] bg-transparent border-none outline-none"
+            className="antique-clickable absolute z-50 left-[13%] top-[81%] h-[14.5%] w-[73%] rounded-[18px] bg-transparent border-none outline-none"
             style={{ WebkitTapHighlightColor: "transparent" }}
           />
         </div>

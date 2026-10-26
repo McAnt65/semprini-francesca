@@ -1,0 +1,40 @@
+@font-face {
+  font-family: "Berenis ADF Pro Previsioni";
+  src: url("/fonts/berenis-adf/BerenisADFPro-Italic.otf") format("opentype");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+.page { display: grid; place-items: center; width: 100%; min-height: 100dvh; overflow: hidden; background: #f3e4ce; color: #493025; }
+.sheet { position: relative; container-type: inline-size; width: min(100%, 560px, calc(100dvh * 941 / 1672)); aspect-ratio: 941 / 1672; font: italic 400 16px/1.45 "Berenis ADF Pro Previsioni", Georgia, serif; }
+.artwork { object-fit: contain; pointer-events: none; user-select: none; }
+.topLinks { top: 33.5%; }
+.workspace { position: absolute; z-index: 1; top: calc(33.5% + 44px); right: 8%; bottom: 16%; left: 8%; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.workspace::-webkit-scrollbar { display: none; }
+.windowControl { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; min-height: 44px; }
+.windowControl button { min-height: 44px; border: 0; background: transparent; color: #741d32; font: 32px/1 Georgia, serif; cursor: pointer; }
+.windowControl button:disabled { opacity: .38; cursor: default; }
+.windowControl p { margin: 0; color: #9b2747; font-size: clamp(18px, 4.6cqw, 21px); text-align: center; text-transform: capitalize; }
+.explanation { margin: 0 0 10px; color: #5d4232; font-size: 14px; text-align: center; }
+.month { padding: 12px 0 16px; border-top: 1px solid rgb(182 154 123 / 58%); }
+.monthHeading { display: grid; grid-template-columns: minmax(0, 1fr) auto 20px; align-items: center; gap: 4px; width: 100%; min-height: 44px; padding: 0; border: 0; background: transparent; color: #741d32; font: inherit; text-align: left; cursor: pointer; }
+.monthHeading strong { font-size: clamp(20px, 5cqw, 23px); font-weight: 400; text-transform: capitalize; }
+.monthHeading span:nth-child(2) { color: #493025; font-size: 15px; white-space: nowrap; }
+.monthHeading span:last-child { text-align: right; }
+.amounts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin: 8px 0 0; }
+.amounts div { min-width: 0; }
+.amounts dt { color: #493025; font-size: 15px; }
+.amounts dd { margin: 4px 0 0; color: #9b2747; font-size: clamp(18px, 4.6cqw, 20px); overflow-wrap: anywhere; }
+.amounts div:nth-child(2) dd { color: #42634e; }
+.details { margin: 12px 0 0; padding: 6px 0 0; border-top: 1px solid rgb(182 154 123 / 40%); }
+.empty { margin: 6px 0; color: #5d4232; font-size: 14px; }
+.student { padding: 13px 0; border-bottom: 1px solid rgb(182 154 123 / 35%); }
+.student:last-child { border-bottom: 0; }
+.student h2 { margin: 0; color: #9b2747; font-size: 17px; font-weight: 400; overflow-wrap: anywhere; }
+.student p { margin: 4px 0 8px; color: #493025; font-size: 15px; }
+.student .amounts dd { font-size: 18px; }
+.page a:focus-visible, .page button:focus-visible { outline: 2px solid #741d32; outline-offset: 2px; }
+.page a:hover, .page button:hover:not(:disabled) { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 380px) { .workspace { right: 6%; left: 6%; } .amounts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (max-width: 300px) { .topLinks { grid-template-columns: repeat(2, minmax(0, 1fr)); } .topLinks a:nth-child(2) { grid-column: 1 / -1; grid-row: 2; } .topLinks a:nth-child(3) { grid-column: 2; grid-row: 1; } .workspace { top: calc(33.5% + 88px); } }

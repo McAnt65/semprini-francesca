@@ -1,3 +1,22 @@
+export interface StudentFamilyContact {
+  id: string;
+  firstName: string;
+  lastName: string;
+  relationship?: string;
+  phone?: string;
+  whatsapp?: string;
+  email?: string;
+}
+
+export interface StudentTeacher {
+  id: string;
+  firstName: string;
+  lastName: string;
+  subject: string;
+  phone?: string;
+  email?: string;
+}
+
 export interface StudentRecord {
   id: string;
   status?: "active" | "archived";
@@ -36,6 +55,27 @@ export interface StudentRecord {
   };
   personalNotes?: string;
   familyNotes?: string;
+  householdMembers?: string;
+  familyContacts?: StudentFamilyContact[];
+  primaryContactId?: string;
+  teachers?: StudentTeacher[];
+  studyCourse?: string;
+  gender?: string;
+  origin?: string;
+  topicsToDeepen?: string;
+  learningStartDate?: string;
+  learningGoals?: string;
+  firstImpressions?: string;
+  interests?: string;
+  passions?: string;
+  preferredActivities?: string;
+  character?: string;
+  strengths?: string;
+  ambitions?: string;
+  preferences?: string;
+  tariffId?: string;
+  /** Set only when the legacy narrative has been recovered into this record. */
+  legacyNarrativeImported?: boolean;
   lessonMode?: "casa" | "domicilio" | "online";
   lessonDurationMinutes?: number;
   lessonRateCents?: number;

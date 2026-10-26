@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import StudentPhoto from "./StudentPhoto";
 import Link from "next/link";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -102,7 +103,7 @@ export default function StudentDetail({
           {/* INDIETRO */}
           <button
             type="button"
-            onClick={() => router.push("/studenti")}
+            onClick={() => router.push("/studenti/elenco")}
             aria-label="Torna a I miei studenti"
             className="antique-clickable absolute left-[1.8%] top-[0.8%] z-40 h-[5.6%] w-[19.5%] rounded-[12px] bg-transparent"
           />
@@ -131,7 +132,7 @@ export default function StudentDetail({
           {/* FOTOGRAFIA */}
           <div className="absolute left-[5.2%] top-[18.5%] z-30 h-[21.6%] w-[28.1%] overflow-hidden">
             {student.avatarUrl && (
-              <Image
+              <StudentPhoto
                 src={student.avatarUrl}
                 alt={`Fotografia di ${fullName}`}
                 fill
@@ -278,7 +279,7 @@ export default function StudentDetail({
           {/* FINE */}
           <button
             type="button"
-            onClick={() => router.push(`/studenti/${student.id}/modifica`)}
+            onClick={() => router.push(`/studenti/nuovo?id=${encodeURIComponent(student.id)}`)}
             aria-label="Modifica studente"
             className="antique-clickable absolute bottom-[2.0%] right-[5.8%] z-40 h-[6.2%] w-[26.5%] rounded-[16px] bg-transparent"
           />

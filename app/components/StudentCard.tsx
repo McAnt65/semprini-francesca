@@ -1,15 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import StudentPhoto from "./StudentPhoto";
 import Link from "next/link";
 import { useState } from "react";
 import type { StudentRecord } from "../data/students";
-import cardBackground from "../../design-approved-phase3/10-studenti-scheda-final.png";
-import StudentSurface from "../studenti/StudentSurface";
-import { archiveStoredStudent } from "../data/student-storage";
-import { euroFromCents, formatMode, fullName } from "../studenti/student-utils";
-import { useRouter } from "next/navigation";
-import styles from "../studenti/students.module.css";
+import cardBackground from "../assets/student-card-watercolor.webp";
 
 const ink = "font-entry-elegant text-[#51372a]";
 
@@ -30,29 +26,26 @@ function ContactActions({ name, phone, whatsapp, email }: { name: string; phone:
 }
 
 export default function StudentCard({ student }: { student: StudentRecord }) {
-  const router = useRouter();
   const [notesOpen, setNotesOpen] = useState(false);
-  const name = fullName(student);
+  const name = `${student.firstName} ${student.lastName}`.trim();
   const books = (student.books ?? []).map(book => [book.title, book.publisher].filter(Boolean).join(" — ")).filter(Boolean);
   const fallbackBooks = [student.textbooks.math, student.textbooks.physics, student.textbooks.chemistry].filter(Boolean);
   const address = [student.address, student.postalCode, student.city, student.province].filter(Boolean).join(", ");
   const mapHref = address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}` : "";
 
-  function archive() {
-    if (archiveStoredStudent(student.id)) router.push("/studenti/archivio");
-  }
-
-  return <StudentSurface artwork={cardBackground} current="list" className={styles.tallSurface}>
+  return <main className="min-h-dvh w-full bg-[#efe3ce] text-[#51372a]">
+    <div className="relative mx-auto aspect-[941/1672] min-h-dvh w-full max-w-[430px] overflow-hidden sm:min-h-0 sm:rounded-[28px]">
+      <Image src={cardBackground} alt="" fill priority unoptimized sizes="(max-width: 430px) 100vw, 430px" className="pointer-events-none object-fill" />
       <h1 className="sr-only">Scheda di {name}</h1>
-      <Link href="/studenti" aria-label="Indietro agli studenti" className="absolute left-[2%] top-[1%] z-30 h-[6%] w-[25%]" />
+      <Link href="/studenti/elenco" aria-label="Elenco studenti" className="absolute left-[2%] top-[1%] z-30 h-[6%] w-[25%]" />
+      <Link href="/menu" aria-label="Menu" className="absolute right-[2%] top-[1%] z-30 h-[6%] w-[25%]" />
 
       <div className="absolute left-[4%] top-[8.5%] h-[20.5%] w-[32%] overflow-hidden -rotate-[4deg]">
-        {student.avatarUrl && <Image src={student.avatarUrl} alt={`Fotografia di ${name}`} fill unoptimized className="object-cover" />}
+        {student.avatarUrl && <StudentPhoto src={student.avatarUrl} alt={`Fotografia di ${name}`} fill unoptimized className="object-cover" />}
       </div>
       <div className={`absolute left-[39%] top-[19%] h-[10%] w-[49%] overflow-auto text-center ${ink}`}>
         <p className="text-[clamp(19px,5.1vw,26px)] leading-tight text-[#762b3b]">{name}</p>
-        <p className="mt-1 text-[clamp(11px,3vw,15px)]">{student.gradeClass || "—"} · {student.subjects.join(" · ") || "—"}</p>
-        <p className="mt-1 text-[clamp(10px,2.7vw,13px)]">{formatMode(student.lessonMode)} {euroFromCents(student.lessonRateCents)}</p>
+        <p className="mt-1 text-[clamp(11px,3vw,15px)]">{student.subjects.join(" · ")}</p>
       </div>
       {student.personalNotes && <button type="button" onClick={() => setNotesOpen(true)} className="absolute left-[43%] top-[29.5%] z-20 w-[41%] text-center font-entry-elegant text-[clamp(11px,3vw,15px)] text-[#762b3b] underline">Note personali</button>}
 
@@ -87,8 +80,9 @@ export default function StudentCard({ student }: { student: StudentRecord }) {
 
       <nav aria-label="Azioni studente" className="absolute inset-x-[2%] bottom-[1%] h-[8%]">
         <Link href={`/calendario/nuova?studente=${encodeURIComponent(student.id)}&origine=profilo`} aria-label={`Nuova lezione per ${name}`} className="absolute inset-y-0 left-0 w-[33.3%]" />
-        <button type="button" onClick={archive} aria-label={`Archivia ${name}`} className="absolute inset-y-0 left-[33.3%] w-[33.4%] bg-transparent" />
-        <Link href={`/studenti/${encodeURIComponent(student.id)}/modifica`} aria-label={`Modifica ${name}`} className="absolute inset-y-0 right-0 w-[33.3%]" />
+        <Link href={`/studenti/${encodeURIComponent(student.id)}/percorso`} aria-label={`Percorso di ${name}`} className="absolute inset-y-0 left-[33.3%] w-[33.4%]" />
+        <Link href={`/studenti/nuovo?id=${encodeURIComponent(student.id)}`} aria-label={`Modifica ${name}`} className="absolute inset-y-0 right-0 w-[33.3%]" />
       </nav>
-  </StudentSurface>;
+    </div>
+  </main>;
 }

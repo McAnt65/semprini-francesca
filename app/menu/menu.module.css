@@ -1,0 +1,63 @@
+﻿.page {
+  width: 100%;
+  min-width: 0;
+  min-height: 100dvh;
+  box-sizing: border-box;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background: #f3e4ce;
+  color: #741d32;
+}
+.sheet {
+  position: relative;
+  width: min(100%, 560px, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 941 / 1672));
+  margin-inline: auto;
+}
+@media (max-width: 560px) {
+  .sheet { width: 100%; }
+}
+.artwork { display: block; width: 100%; height: auto; pointer-events: none; }
+.hotspot {
+  position: absolute;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 6%;
+  background: transparent;
+  color: inherit;
+}
+.hotspot:focus-visible { outline: 2px solid #741d32; outline-offset: -3px; }
+.unavailable { cursor: default; }
+.notice { display: none; }
+.unavailable:hover .notice, .unavailable:focus .notice {
+  display: block;
+  position: absolute;
+  bottom: 2%;
+  left: 4%;
+  right: 4%;
+  font: italic 12px / 1.2 Georgia, serif;
+  text-align: center;
+}
+/* Preserve the former shortcut without adding a visible card or toolbar. */
+.newLesson {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.newLesson:focus {
+  top: 33%;
+  left: 30%;
+  width: 40%;
+  height: auto;
+  padding: 8px 0;
+  overflow: visible;
+  clip-path: none;
+  white-space: normal;
+  color: #741d32;
+  background: #fff3dc;
+  text-align: center;
+  outline: 2px solid currentColor;
+}

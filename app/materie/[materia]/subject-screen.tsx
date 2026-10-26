@@ -1,36 +1,88 @@
 "use client";
 
-import MaterieFrame, { Hotspot } from "../MaterieFrame";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { contentKey, type SubjectSlug } from "../materie-data";
 import { saveLocalText, useLocalText } from "../local-text";
+import { loadStoredStudents, STUDENTS_STORAGE_KEY } from "../../data/student-storage";
+import type { StudentRecord } from "../../data/students";
+import { selectStudentsForSubject } from "../studenti/student-selection";
+import StandardInterior, { StandardEmptyState, StandardLinkRow, StandardSection, standardInteriorStyles as styles } from "../StandardInterior";
+import { useTopicCatalog } from "../use-topic-catalog";
+import TopicList from "./TopicList";
 
 type Subject = { title: string; image: string; topics: string[]; quick: string[] };
 
-function QuickNote({ slug, section, x, y, w, h }: { slug: SubjectSlug; section: string; x: number; y: number; w: number; h: number }) {
+const subjectBackgrounds: Record<SubjectSlug, string> = {
+  matematica: "/SfondoMatematica.png",
+  fisica: "/SfondoFisica.png",
+  chimica: "/SfondoChimica.png",
+};
+
+function QuickRule({ slug, section }: { slug: SubjectSlug; section: string }) {
   const key = contentKey(slug, `quick:${section}`);
   const value = useLocalText(key);
+  const [saved, setSaved] = useState(true);
 
-  return <textarea aria-label={`${section} di ${slug}`} value={value} onChange={(event) => saveLocalText(key, event.target.value)}
-    placeholder="Tocca per scrivere"
-    className="absolute z-10 resize-none overflow-auto border-0 bg-transparent px-1 text-[clamp(10px,2.7vw,13px)] leading-[1.3] text-[#493b32] outline-none placeholder:text-[#a39284]/60 focus:bg-[#fffaf0]/80"
-    style={{ left: `${x}%`, top: `${y}%`, width: `${w}%`, height: `${h}%` }} />;
+  return <li className={styles.note}>
+    <label className={styles.noteLabel} htmlFor={`quick-${section}`}>{section}</label>
+    <textarea id={`quick-${section}`} className={styles.noteInput} value={value}
+      onChange={(event) => setSaved(saveLocalText(key, event.target.value))}
+      placeholder="Scrivi una regola o un appunto" rows={2} />
+    {!saved && <p className={styles.saveError} role="alert">Impossibile salvare su questo dispositivo.</p>}
+  </li>;
 }
 
 export default function SubjectScreen({ slug, subject }: { slug: SubjectSlug; subject: Subject }) {
-  const layout = {
-    matematica: { topics: { x: 18, y: 42, w: 29, h: 3.9, gap: 3.95 }, notes: { x: 58, y: 43.5, w: 31, h: 5.5, gap: 8.8 }, studentsY: 72 },
-    fisica: { topics: { x: 19, y: 31.5, w: 29, h: 4.5, gap: 4.9 }, notes: { x: 55, y: 34, w: 35, h: 6.5, gap: 11 }, studentsY: 75 },
-    chimica: { topics: { x: 18, y: 31.5, w: 30, h: 4.7, gap: 5.05 }, notes: { x: 57, y: 33.5, w: 30, h: 6, gap: 10.1 }, studentsY: 74 },
-  }[slug];
+  const catalog = useTopicCatalog();
+  const [students, setStudents] = useState<StudentRecord[] | null>(null);
+  const [studentsError, setStudentsError] = useState(false);
 
-  return <MaterieFrame image={subject.image} alt={`Pagina ${subject.title}`} back="/materie">
-    {subject.topics.map((topic, i) => <Hotspot key={topic}
-      href={`/materie/${slug}/argomento?nome=${encodeURIComponent(topic)}`}
-      label={`${topic}: apri appunti e schemi`}
-      x={layout.topics.x} y={layout.topics.y + i * layout.topics.gap} w={layout.topics.w} h={layout.topics.h} />)}
-    {subject.quick.map((section, i) => <QuickNote key={section} slug={slug} section={section}
-      x={layout.notes.x} y={layout.notes.y + i * layout.notes.gap} w={layout.notes.w} h={layout.notes.h} />)}
-    <Hotspot href={`/materie/${slug}/studenti`} label={`Studenti associati a ${subject.title}`}
-      x={22} y={layout.studentsY} w={67} h={6} />
-  </MaterieFrame>;
+  useEffect(() => {
+    const refresh = () => {
+      try {
+        window.localStorage.getItem(STUDENTS_STORAGE_KEY);
+        window.sessionStorage.getItem(STUDENTS_STORAGE_KEY);
+        setStudents(loadStoredStudents());
+        setStudentsError(false);
+      } catch {
+        setStudentsError(true);
+      }
+    };
+    queueMicrotask(refresh);
+    window.addEventListener("storage", refresh);
+    window.addEventListener("pageshow", refresh);
+    return () => {
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener("pageshow", refresh);
+    };
+  }, []);
+
+  const associated = students ? selectStudentsForSubject(students, subject.title, false) : [];
+
+  return <StandardInterior title={subject.title} backHref="/materie" backLabel="MATERIE"
+    backgroundSrc={subjectBackgrounds[slug]} illustratedTitle>
+    {catalog?.status === "ready" ? <TopicList slug={slug} topics={catalog.topics[slug]} /> :
+      <StandardSection title="ARGOMENTI"><StandardEmptyState>
+        {catalog?.status === "error" ? "Archivio argomenti non leggibile su questo dispositivo." : "Caricamento argomenti…"}
+      </StandardEmptyState></StandardSection>}
+    <StandardSection title="REGOLE RAPIDE">
+      {subject.quick.length ? <ul className={styles.noteList}>
+        {subject.quick.map((section) => <QuickRule key={section} slug={slug} section={section} />)}
+      </ul> : <StandardEmptyState>Nessuna regola disponibile.</StandardEmptyState>}
+    </StandardSection>
+    <StandardSection title="STUDENTI ASSOCIATI">
+      {studentsError ? <StandardEmptyState>L’archivio studenti non è leggibile su questo dispositivo.</StandardEmptyState>
+        : students === null ? <StandardEmptyState>Caricamento studenti…</StandardEmptyState>
+          : associated.length ? <ul className={styles.list}>
+            {associated.map((student) => <StandardLinkRow key={student.id}
+              href={`/studenti/${encodeURIComponent(student.id)}`}>
+              {student.firstName} {student.lastName}
+            </StandardLinkRow>)}
+          </ul> : <StandardEmptyState>Nessuno studente attivo associato a {subject.title}.</StandardEmptyState>}
+      <Link className={styles.sectionAction} href={`/materie/${slug}/studenti`}>
+        Apri elenco per materia <span aria-hidden="true">→</span>
+      </Link>
+    </StandardSection>
+  </StandardInterior>;
 }

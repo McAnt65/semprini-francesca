@@ -30,6 +30,48 @@
   height: 100dvh;
 }
 
+.newEntry { background: #fbf4e9; color: #503a37; }
+.newEntry > .artwork { display: none; }
+.entryHeader { position:absolute; top:2.5%; left:5%; right:5%; height:10%; display:grid; grid-template-columns:1fr 2fr 1fr; align-items:start; gap:5px; text-align:center; color:#78394b; font-family:var(--font-entry-elegant), Georgia, serif; }
+.entryHeader a { color:inherit; font-size:14px; text-decoration:none; }
+.entryHeader > span { font-size:17px; font-style:italic; white-space:nowrap; }
+.entryHeader h2 { grid-column:1/-1; margin:5px 0 0; color:#8d334a; font-size:27px; font-style:italic; font-weight:500; }
+.entryForm { position:absolute; inset:14% 5% 11%; display:flex; flex-direction:column; min-height:0; }
+.identity { flex:0 0 23%; display:grid; grid-template-columns:30% 1fr; grid-template-rows:1fr auto; gap:8px 12px; align-items:center; }
+.identityPhoto { position:relative; grid-row:1; width:100%; aspect-ratio:1; overflow:hidden; border:1px solid rgba(144,93,81,.38); border-radius:50%; background:rgba(255,252,245,.65); color:#8b5960; font:italic 16px var(--font-entry-elegant), Georgia, serif; }
+.identityPhoto img { object-fit:cover; }
+.identityFields { display:grid; gap:8px; }
+.quickContacts { grid-column:1/-1; display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+.quickContacts a { padding:7px 2px; border:1px solid rgba(144,93,81,.28); border-radius:8px; color:#743b4b; font:13px var(--font-entry-elegant), Georgia, serif; text-align:center; text-decoration:none; }
+.quickContacts a[aria-disabled="true"] { opacity:.48; }
+.entryTabs { flex:0 0 8%; display:grid; grid-template-columns:1fr 1fr; border-bottom:1px solid rgba(162,103,105,.36); }
+.entryTabs button { border:0; border-radius:9px 9px 0 0; background:transparent; color:#843f51; font:italic 18px var(--font-entry-elegant), Georgia, serif; }
+.entryTabs button[aria-selected="true"] { background:rgba(213,154,160,.34); box-shadow:inset 0 -2px #a94d61; }
+.entryScroll { flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; background:rgba(255,251,243,.6); border-radius:8px; }
+.entryScroll::-webkit-scrollbar { display:none; }
+.profileContent { padding:5px 14px 12px; }
+.profileSection { display:grid; gap:9px; padding:12px 0 14px; border-bottom:1px solid rgba(173,110,107,.35); }
+.profileSection:last-child { border-bottom:0; }
+.profileSection h3 { margin:0 0 2px; color:#a13c54; font:italic 22px var(--font-entry-elegant), Georgia, serif; }
+.newEntry .field, .newEntry .entryField, .newEntry .area { position:static; display:grid; grid-template-columns:minmax(112px,42%) minmax(0,1fr); align-items:center; gap:8px; min-width:0; color:#503a37; font:15px var(--font-entry-elegant), Georgia, serif; line-height:1.2; text-transform:none; }
+.newEntry .entryField > span, .newEntry .field > span, .newEntry .area > span { position:static; width:auto; height:auto; overflow:visible; clip:auto; white-space:normal; }
+.newEntry .field input, .newEntry .entryField select, .newEntry .area textarea { min-width:0; min-height:40px; border:1px solid rgba(151,119,105,.32); border-radius:8px; background:rgba(255,255,255,.58); padding:7px 9px; color:#503a37; font:15px var(--font-entry-elegant), Georgia, serif; }
+.newEntry .area { align-items:start; }
+.newEntry .area textarea { min-height:70px; }
+.entryChoices { display:flex; flex-wrap:wrap; gap:10px 16px; color:#503a37; font:15px var(--font-entry-elegant), Georgia, serif; }
+.entryChoices label { display:inline-flex; align-items:center; gap:6px; }
+.entryChoices input { accent-color:#a94d61; }
+.entryActions { flex:0 0 9%; display:grid; grid-template-columns:1fr 1.2fr; gap:10px; align-items:center; }
+.entryActions button { min-height:40px; border:1px solid #a94d61; border-radius:9px; background:transparent; color:#7d3d4d; font:16px var(--font-entry-elegant), Georgia, serif; }
+.entryActions button[type="submit"] { background:rgba(205,130,142,.72); color:#fffaf5; }
+.entryMessage { position:absolute; inset:auto 0 0; margin:0; color:#8d334a; font-size:13px; text-align:center; }
+.newEntry .navigation a { display:flex; align-items:center; justify-content:center; color:#743b4b; font:13px var(--font-entry-elegant), Georgia, serif; text-decoration:none; }
+.newEntry .navigation a:nth-child(1)::after { content:"I miei studenti"; }
+.newEntry .navigation a:nth-child(2)::after { content:"Nuovo studente"; }
+.newEntry .navigation a:nth-child(3)::after { content:"Diario"; }
+.newEntry .navigation a:nth-child(4)::after { content:"Archivio"; }
+.newEntry .navigation a[data-current="true"] { background:rgba(213,154,160,.3); }
+
 /* Cover only the controls painted into the artwork on the list page. */
 .register .controls::before {
   content: "";
@@ -632,6 +674,16 @@
 .fieldParentPhone { left: 39%; top: 68.2%; width: 26%; }
 .fieldParentMail { left: 66%; top: 68.2%; width: 26%; }
 .fieldBooks { left: 39%; top: 84.4%; width: 53%; }
+.bookEditor { position: absolute; height: 6.7%; min-height: 44px; min-width: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: none; }
+.formScroll .bookEditor:focus-within { z-index: 2; height: clamp(150px, 28%, 230px); background: #fbf4e9; }
+.bookEditor::-webkit-scrollbar { display: none; }
+.bookRow { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 5px; margin-bottom: 3px; }
+.bookRow label { min-width: 0; }
+.bookEditor input { box-sizing: border-box; width: 100%; min-width: 0; min-height: 36px; border: 0; border-bottom: 1px solid rgba(116, 44, 64, 0.28); border-radius: 0; background: transparent; padding: 5px 3px 4px; color: #4b3024; font: inherit; font-size: clamp(15px, 3.8vw, 17px); }
+.bookEditor button { min-height: 44px; border: 0; background: transparent; color: #742c40; font: inherit; cursor: pointer; }
+.bookRow button { grid-column: 1 / -1; justify-self: start; }
+.bookEditor :is(input, button):focus-visible { outline: 2px solid #742c40; outline-offset: -2px; }
+.newEntry .bookEditor { position: static; height: auto; overflow: visible; }
 .fieldNotes { left: 39%; top: 91.5%; width: 53%; padding-bottom: 12%; }
 
 .diaryControls input,
@@ -885,3 +937,18 @@
   color: inherit;
   text-decoration: none;
 }
+.archiveCard .archiveDiaryLink,
+.archiveCard button {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #741d32;
+  font: italic 400 clamp(13px, 3.2vw, 18px)/1.25 "Berenis ADF Pro Oggi", serif;
+  cursor: pointer;
+}
+.archiveMessage { margin: 0; color: #70513e; }

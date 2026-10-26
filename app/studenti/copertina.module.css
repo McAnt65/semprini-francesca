@@ -1,0 +1,19 @@
+﻿.page {
+  width: 100%;
+  min-width: 0;
+  min-height: 100dvh;
+  box-sizing: border-box;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background: #f3e4ce;
+}
+.canvas {
+  position: relative;
+  width: min(100%, 560px, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 941 / 1672));
+  margin-inline: auto;
+}
+@media (max-width: 560px) {
+  .canvas { width: 100%; }
+}
+.artwork { display: block; width: 100%; height: auto; pointer-events: none; }
+.hotspot { position: absolute; display: block; background: transparent; border-radius: 6%; }
+.hotspot:focus-visible { outline: 2px solid #741d32; outline-offset: -3px; }

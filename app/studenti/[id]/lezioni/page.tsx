@@ -1,9 +1,9 @@
 "use client";
 
 import { use } from "react";
-import LessonRegister from "../../../lezioni/LessonRegister";
+import StudentDiary from "../../diario/StudentDiary";
 
 export default function StudentLessonsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  return <LessonRegister view="diary" studentId={id} backHref={`/studenti/${encodeURIComponent(id)}`} />;
+  return <StudentDiary studentId={id} />;
 }

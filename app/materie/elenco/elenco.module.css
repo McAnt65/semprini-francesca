@@ -1,0 +1,110 @@
+@font-face {
+  font-family: "Berenis ADF Pro Materie";
+  src: url("/fonts/berenis-adf/BerenisADFPro-Italic.otf") format("opentype");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+.page {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: #f3e4ce;
+  color: #493025;
+}
+
+.sheet {
+  position: relative;
+  container-type: inline-size;
+  width: min(100%, 560px, calc(100dvh * 941 / 1672));
+  aspect-ratio: 941 / 1672;
+  font: italic 400 16px/1.45 "Berenis ADF Pro Materie", Georgia, serif;
+}
+
+.artwork {
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.navigation {
+  position: absolute;
+  z-index: 2;
+  top: 42%;
+  right: 9%;
+  left: 9%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+}
+
+.navigation a {
+  display: flex;
+  min-width: 0;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  color: #741d32;
+  font: italic 400 clamp(14px, 3.7cqw, 19px)/1 "Berenis ADF Pro Materie", Georgia, serif;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.workspace {
+  position: absolute;
+  z-index: 1;
+  top: calc(42% + 44px);
+  right: 10%;
+  bottom: 9%;
+  left: 10%;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.workspace::-webkit-scrollbar { display: none; }
+
+.subjects {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid rgb(182 154 123 / 65%);
+  list-style: none;
+}
+
+.subjects li { border-bottom: 1px solid rgb(182 154 123 / 65%); }
+
+.subjectLink {
+  display: flex;
+  min-height: clamp(78px, 17cqw, 100px);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 4px;
+  color: #741d32;
+  text-align: center;
+  text-decoration: none;
+}
+
+.subjectName {
+  font-size: clamp(24px, 6cqw, 32px);
+  line-height: 1.15;
+}
+
+.details {
+  color: #5d4232;
+  font: normal 400 clamp(13px, 3.1cqw, 16px)/1.4 Georgia, serif;
+}
+
+.page a:focus-visible {
+  outline: 2px solid #741d32;
+  outline-offset: -2px;
+  background: rgb(116 29 50 / 9%);
+}
+
+.page a:hover { text-decoration: underline; text-underline-offset: 4px; }

@@ -1,0 +1,44 @@
+@font-face {
+  font-family: "Berenis ADF Pro Tariffario";
+  src: url("/fonts/berenis-adf/BerenisADFPro-Italic.otf") format("opentype");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+.page { display: grid; place-items: center; width: 100%; min-height: 100dvh; overflow: hidden; background: #f3e4ce; color: #493025; }
+.sheet { position: relative; container-type: inline-size; width: min(100%, 560px, calc(100dvh * 941 / 1672)); aspect-ratio: 941 / 1672; font: italic 400 16px/1.45 "Berenis ADF Pro Tariffario", Georgia, serif; }
+.artwork { object-fit: contain; pointer-events: none; user-select: none; }
+.topLinks { top: 37.5%; }
+.workspace { position: absolute; z-index: 1; top: calc(37.5% + 44px); right: 8%; bottom: 16%; left: 8%; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.workspace::-webkit-scrollbar { display: none; }
+.notice { margin: 6px 0 12px; color: #42634e; font-size: 14px; }
+.listHeader { display: flex; min-height: 52px; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid rgb(182 154 123 / 60%); }
+.listHeader p { margin: 0; color: #5d4232; }
+.listHeader button, .tariffFoot button, .formActions button { min-height: 44px; padding: 5px 10px; border: 1px solid #b69a7b; border-radius: 0; background: transparent; color: #741d32; font: inherit; cursor: pointer; }
+.listHeader button { white-space: nowrap; }
+.search, .form label { display: grid; gap: 5px; color: #493025; font-size: 15px; }
+.search { margin: 10px 0 4px; }
+.search input, .form input, .form select { width: 100%; min-width: 0; min-height: 44px; padding: 6px 4px; border: 0; border-bottom: 1px solid #b69a7b; border-radius: 0; background: transparent; color: #493025; font: normal 16px Georgia, serif; }
+.search input { min-height: 44px; }
+.tariff { padding: 13px 0 15px; border-bottom: 1px solid rgb(182 154 123 / 50%); }
+.tariffHeading { display: flex; min-width: 0; align-items: start; justify-content: space-between; gap: 8px; }
+.tariffHeading > div { min-width: 0; }
+.tariffHeading strong:first-child { color: #741d32; font-size: 14px; }
+.tariffHeading h2 { margin: 0; color: #9b2747; font-size: 18px; font-weight: 400; overflow-wrap: anywhere; }
+.tariffHeading .amount { flex: none; color: #9b2747; font-size: 19px; font-weight: 400; white-space: nowrap; }
+.tariff p { margin: 6px 0; color: #493025; font-size: 15px; overflow-wrap: anywhere; }
+.tariffFoot { display: flex; min-height: 44px; align-items: center; justify-content: flex-end; gap: 14px; }
+.tariffFoot button { min-width: 80px; }
+.tariffFoot .deleteButton { color: #741d32; border-color: rgb(182 154 123 / 65%); }
+.empty { padding: 24px 0; text-align: center; }
+.form { display: grid; gap: 11px; padding: 3px 0 18px; }
+.form h2 { margin: 0 0 4px; color: #9b2747; font-size: 22px; font-weight: 400; }
+.error { margin: 0; color: #9b2747; }
+.formActions { display: flex; gap: 10px; }
+.formActions button { flex: 1; }
+.formActions { margin-top: 16px; }
+.page a:focus-visible, .page button:focus-visible, .page input:focus-visible, .page select:focus-visible { outline: 2px solid #741d32; outline-offset: 2px; }
+.page a:hover, .page button:hover { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 380px) { .workspace { right: 6%; left: 6%; } }
+@container (max-width: 300px) { .topLinks { grid-template-columns: repeat(2, minmax(0, 1fr)); } .topLinks a:nth-child(2) { grid-column: 1 / -1; grid-row: 2; } .topLinks a:nth-child(3) { grid-column: 2; grid-row: 1; } .workspace { top: calc(37.5% + 88px); } }

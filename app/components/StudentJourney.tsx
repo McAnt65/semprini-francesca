@@ -1,13 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import StudentPhoto from "./StudentPhoto";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import journeyBackground from "../assets/student-journey-watercolor.webp";
 import { toLocalDate } from "../data/calendario/calendar-dates";
 import { selectOccurrencesInRange } from "../data/calendario/calendar-selectors";
 import { createSingleOccurrenceException } from "../data/calendario/calendar-recurrence";
-import { loadCalendarAppointments, loadCalendarSeries, upsertCalendarAppointment } from "../data/calendario/calendar-storage";
+import { loadCalendarAppointments, loadCalendarSeries, upsertCalendarAppointmentResult } from "../data/calendario/calendar-storage";
+import { TEMPORARY_SAVE_WARNING } from "../data/save-result";
 import type { CalendarOccurrence } from "../data/calendario/calendar-types";
 import type { StudentRecord } from "../data/students";
 
@@ -53,8 +55,9 @@ export default function StudentJourney({ student }: { student: StudentRecord }) 
       : series
         ? createSingleOccurrenceException(series, item.originalOccurrenceDate ?? item.date, crypto.randomUUID(), { topic: topic.trim(), notes: notes.trim(), status: "svolta" })
         : null;
-    if (!update || !upsertCalendarAppointment(update)) {
-      setError("Impossibile salvare gli appunti. Riprova.");
+    const result = update ? upsertCalendarAppointmentResult(update) : { status: "failed" };
+    if (result.status !== "saved") {
+      setError(result.status === "temporary" ? TEMPORARY_SAVE_WARNING : "Impossibile salvare gli appunti. Riprova.");
       return;
     }
     setLessons(readLessons(student.id));
@@ -69,7 +72,7 @@ export default function StudentJourney({ student }: { student: StudentRecord }) 
       <Link href={`/studenti/${encodeURIComponent(student.id)}`} aria-label="Torna alla scheda dello studente" className="absolute left-[2%] top-[1%] z-30 h-[6%] w-[25%]" />
       <Link href="/menu" aria-label="Menu" className="absolute right-[2%] top-[1%] z-30 h-[6%] w-[25%]" />
       <div className="absolute left-[4%] top-[8.5%] h-[20.5%] w-[32%] overflow-hidden -rotate-[4deg]">
-        {student.avatarUrl && <Image src={student.avatarUrl} alt={`Fotografia di ${name}`} fill unoptimized className="object-cover" />}
+        {student.avatarUrl && <StudentPhoto src={student.avatarUrl} alt={`Fotografia di ${name}`} fill unoptimized className="object-cover" />}
       </div>
       <div className="absolute left-[38%] top-[22%] h-[12%] w-[52%] overflow-auto text-center font-entry-elegant">
         <p className="text-[clamp(18px,5vw,27px)] leading-tight text-[#762b3b]">{name}</p>
@@ -97,7 +100,7 @@ export default function StudentJourney({ student }: { student: StudentRecord }) 
       <nav aria-label="Azioni studente" className="absolute inset-x-[2%] bottom-[1%] h-[8%]">
         <Link href={`/calendario/nuova?studente=${encodeURIComponent(student.id)}&origine=profilo`} aria-label={`Nuova lezione per ${name}`} className="absolute inset-y-0 left-0 w-[33.3%]" />
         <Link href={`/studenti/${encodeURIComponent(student.id)}/lezioni`} aria-label={`Diario completo di ${name}`} className="absolute inset-y-0 left-[33.3%] w-[33.4%]" />
-        <Link href={`/studenti/${encodeURIComponent(student.id)}/modifica`} aria-label={`Modifica ${name}`} className="absolute inset-y-0 right-0 w-[33.3%]" />
+        <Link href={`/studenti/nuovo?id=${encodeURIComponent(student.id)}`} aria-label={`Modifica ${name}`} className="absolute inset-y-0 right-0 w-[33.3%]" />
       </nav>
     </div>
   </main>;

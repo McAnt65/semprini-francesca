@@ -1,0 +1,140 @@
+@font-face {
+  font-family: "Berenis ADF Pro Elenco";
+  src: url("/fonts/berenis-adf/BerenisADFPro-Italic.otf") format("opentype");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+.page {
+  --ink: #493025;
+  --accent: #741D32;
+  --sepia: #70513e;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  height: 100dvh;
+  overflow: hidden;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background: #f3e4ce;
+  color: var(--ink);
+  font-family: var(--font-entry-elegant), Georgia, serif;
+}
+
+.sheet {
+  container-type: inline-size;
+  position: relative;
+  margin-inline: auto;
+  width: min(100%, 560px, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 941 / 1672));
+  aspect-ratio: 941 / 1672;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.artwork {
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+.content {
+  position: absolute;
+  inset: 31% 8% 5.5%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.header { flex-shrink: 0; }
+.navigation { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding-bottom: 2px; }
+.navigation a, .navigation span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 44px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font: italic 400 clamp(13px, 3.6vw, 18px) / 1.3 "Berenis ADF Pro Elenco", serif;
+  font-synthesis: none;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.navigation > :first-child { justify-content: flex-start; transform: translateX(clamp(12px, 3.6cqw, 20px)); }
+.navigation > :nth-child(2) { font-size: clamp(12px, 3.2vw, 16px); }
+.navigation > :last-child { justify-content: flex-end; transform: translateX(clamp(-20px, -3.6cqw, -12px)); }
+.navigation span[aria-disabled="true"] { opacity: .55; cursor: default; }
+.workspace {
+  /* Georgia is the readable serif fallback already used by /oggi. */
+  font-family: Georgia, var(--font-entry-elegant), serif;
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 4px 0;
+  overflow-wrap: anywhere;
+  font-size: clamp(16px, 4vw, 20px);
+  line-height: 1.5;
+}
+.scroll {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  background: transparent;
+  border: 0;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+.scroll::-webkit-scrollbar { display: none; }
+.rowsBackdrop { background-color: rgb(255 249 236 / 22%); }
+.controls {
+  flex-shrink: 0;
+  font-size: 14px;
+  line-height: 1.3;
+  padding-bottom: 2px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid rgb(112 81 62 / 50%);
+}
+.controlRow { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: clamp(12px, 4cqw, 22px); }
+.control { display: flex; align-items: center; gap: 4px; min-width: 0; color: var(--sepia); font: italic 400 14px/1.3 "Berenis ADF Pro Elenco", serif; white-space: nowrap; }
+.control select, .contextualControl :is(input, select) {
+  min-width: 0;
+  min-height: 44px;
+  border: 0;
+  border-bottom: 1px solid rgb(112 81 62 / 50%);
+  border-radius: 0;
+  background: transparent;
+  color: var(--accent);
+  font: italic 400 14px/1.3 "Berenis ADF Pro Elenco", serif;
+}
+.control select { flex: 1; width: 0; padding: 0 1.05em 0 2px; border-bottom: 0; }
+.contextualControl :is(input, select) { box-sizing: border-box; width: 100%; padding: 0 2px; }
+.contextualControl[hidden] { display: none; }
+.contextualControl input::placeholder { color: var(--sepia); opacity: 1; }
+.control select, .contextualControl select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='m2 2 4 4 4-4' fill='none' stroke='%2370513e' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 2px center;
+  background-size: .75em .5em;
+}
+.contextualControl select { padding-right: 1.25em; }
+.link { display: inline-flex; align-items: center; min-height: 44px; padding-block: 7px; color: var(--accent); font-style: italic; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.studentRow { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 12px; align-items: start; min-height: 44px; padding: 10px 0; margin-bottom: 8px; border-bottom: 1px solid rgb(112 81 62 / 38%); color: var(--ink); text-decoration: none; font-family: var(--font-entry-elegant), Georgia, serif; font-weight: 400; }
+.studentInfo, .lessonInfo { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lessonInfo { align-items: flex-end; text-align: right; }
+.studentInfo > span, .lessonInfo > span { min-width: 0; overflow-wrap: anywhere; }
+.studentName, .lessonLabel { font-family: "Berenis ADF Pro Elenco", serif; font-size: 1.2em; font-style: italic; font-weight: 400; font-synthesis: none; }
+.studentName { font-size: 1.25em; color: #9b2747; text-decoration: underline; text-decoration-color: rgb(116 29 50 / 35%); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.lessonLabel { font-size: .9em; color: var(--sepia); white-space: nowrap; }
+.details, .nextLesson, .lessonMode { font-family: var(--font-entry-elegant), Georgia, serif; font-size: max(14px, calc(1em - 3pt)); font-style: normal; font-weight: 400; color: #9b2747; }
+.empty { margin: 20px 0; font-style: italic; text-align: center; }
+
+.page a:hover, .page button:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.page a:focus-visible, .page button:focus-visible, .page input:focus-visible, .page select:focus-visible, .scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

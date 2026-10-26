@@ -1,0 +1,105 @@
+.page {
+  --narrative-value-color: #9b2747;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 100dvh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  overflow: hidden;
+  background: #f3e4ce;
+  color: #70513e;
+  font-family: var(--font-entry-elegant), Georgia, serif;
+}
+.sheet {
+  position: relative;
+  container-type: inline-size;
+  width: min(100%, 560px, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 941 / 1672));
+  max-height: 100%;
+  aspect-ratio: 941 / 1672;
+  overflow: hidden;
+  margin-inline: auto;
+}
+.artwork { object-fit: contain; pointer-events: none; user-select: none; }
+.content { position: absolute; inset: 31.5% 8% 4.5%; display: flex; flex-direction: column; min-height: 0; }
+.navigation { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; flex-shrink: 0; }
+.navigation a, .navigation span, .actions button {
+  display: flex; align-items: center; justify-content: center; min-height: 44px;
+  border: 0; padding: 4px 0; background: transparent; color: #741d32;
+  font: italic 400 clamp(13px, 3.6vw, 18px)/1.3 "Berenis ADF Pro Oggi", serif;
+  font-synthesis: none; text-align: center; text-decoration: none; white-space: nowrap;
+}
+.navigation > :first-child { justify-content: flex-start; text-align: left; transform: translateX(clamp(12px, 3.6cqw, 20px)); }
+.navigation > :nth-child(2) { font-size: clamp(12px, 3.2vw, 16px); }
+.navigation > :last-child { justify-content: flex-end; text-align: right; transform: translateX(clamp(-20px, -3.6cqw, -12px)); }
+.navigation span[aria-disabled="true"] { opacity: .55; }
+.footer { position: relative; display: flex; flex-direction: column; flex: 0 0 auto; }
+.actions { display: grid; grid-template-columns: 6em 6em; justify-content: center; align-items: center; gap: 9cqw; min-height: 44px; }
+.actions button { width: 6em; min-height: 44px; cursor: pointer; font-size: clamp(13px, 3.6vw, 18px); }
+.actions button:disabled { opacity: .55; }
+.status { position: absolute; right: 0; bottom: calc(100% + 3px); left: 0; min-height: 0; color: #70513e; font-size: 14px; font-style: italic; text-align: center; }
+.status:empty { display: none; }
+.scroll {
+  min-height: 0; flex: 1; overflow-y: auto; overflow-x: hidden;
+  overscroll-behavior: contain; scrollbar-width: none; -ms-overflow-style: none;
+  padding: 0 3px max(28px, env(safe-area-inset-bottom));
+  font-size: clamp(14px, calc(3.8vw - 2px), 16px); line-height: 1.5; font-style: italic;
+}
+.scroll::-webkit-scrollbar { display: none; }
+.scroll p { margin: 0 0 10px; text-indent: 1.5em; }
+.scroll p.signature { text-indent: 0; }
+.scroll section { border: 0; background: transparent; }
+.scroll h2 { margin: 0 0 8px; color: #741d32; font: italic 400 clamp(18px, 4.6vw, 25px)/1.2 "Berenis ADF Pro Oggi", serif; font-synthesis: none; }
+.firstChapter h2 { text-align: center; }
+.firstChapter { min-width: 0; }
+.chapters { padding-top: 14px; }
+.chapters section { margin: 0 0 20px; padding-top: 12px; border-top: 1px solid rgb(112 81 62 / 30%); }
+.chapters > .firstChapter { padding-top: 0; border-top: 0; }
+.openingReveal { animation: openingAppear 180ms ease-out both; }
+@keyframes openingAppear { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .openingReveal { animation: none; } }
+.narrativeNext { display: inline-flex; align-items: center; min-height: 36px; margin-left: .35em; border: 0; padding: 2px 4px; background: transparent; color: #741d32; font: italic 400 .88em/1.2 "Berenis ADF Pro Oggi", serif; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; white-space: nowrap; vertical-align: middle; }
+.narrativeNext:hover { color: #5f1829; }
+.confirmedOpeningValue { color: var(--narrative-value-color); font-size: calc(1em + 1px); white-space: normal; overflow-wrap: anywhere; cursor: pointer; }
+.confirmedOpeningValue:focus-visible { outline: 1px solid #741d32; outline-offset: 2px; border-radius: 2px; }
+.value { color: var(--narrative-value-color); font-size: calc(1em + 1px); white-space: pre-wrap; overflow-wrap: anywhere; }
+.fieldWrap { position: relative; display: inline-block; max-width: 100%; vertical-align: baseline; }
+.fieldHint { position: absolute; z-index: 2; bottom: calc(100% + 3px); left: 0; width: max-content; max-width: min(24ch, 75vw); padding: 2px 5px; background: rgb(251 244 231 / 96%); color: #70513e; font-size: 12px; line-height: 1.25; white-space: normal; pointer-events: none; opacity: 0; visibility: hidden; }
+.fieldWrap:hover .fieldHint, .fieldWrap:focus-within .fieldHint { opacity: 1; visibility: visible; }
+.inlineField, .longField, .inlineSelect {
+  display: inline-block; box-sizing: border-box; vertical-align: baseline; max-width: 100%;
+  margin: 0 1px; padding: 1px 2px; border: 1px solid transparent;
+  border-radius: 2px; background: transparent; color: var(--narrative-value-color); font: inherit;
+  font-size: calc(1em + 1px); font-style: italic; line-height: 1.35; box-shadow: none;
+}
+.dateField { position: relative; display: inline-grid; min-width: 11em; max-width: 100%; min-height: 1.5em; vertical-align: baseline; }
+.dateValue { grid-area: 1 / 1; align-self: center; color: var(--narrative-value-color); font-size: calc(1em + 1px); white-space: nowrap; }
+.datePicker { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; border: 1px solid transparent; border-radius: 2px; opacity: 0; cursor: pointer; }
+.dateField:focus-within { outline: 1px solid rgb(116 29 50 / 65%); outline-offset: 2px; border-radius: 2px; background: rgb(116 29 50 / 5%); }
+.datePicker:focus-visible { outline: none; }
+.birthDateEntry { position: relative; display: inline-flex; align-items: baseline; max-width: 100%; vertical-align: baseline; }
+.birthDateCalendarButton { display: inline-flex; flex: 0 0 26px; align-items: center; justify-content: center; width: 26px; height: 28px; margin-left: 1px; border: 0; padding: 4px; background: transparent; color: #741d32; cursor: pointer; }
+.birthDateCalendarButton svg { width: 15px; height: 15px; }
+.birthDateCalendarPicker { position: absolute; right: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; clip-path: inset(50%); pointer-events: none; }
+.longField { min-height: 1.5em; resize: none; overflow: hidden; white-space: pre-wrap; overflow-wrap: anywhere; }
+.inlineField::placeholder, .longField::placeholder { color: #947165; opacity: 1; font-style: italic; }
+.inlineField:focus-visible, .longField:focus-visible, .inlineSelect:focus-visible { outline: 1px solid rgb(116 29 50 / 65%); outline-offset: 2px; background: rgb(116 29 50 / 5%); }
+.inlineSelect { width: auto; min-height: 32px; cursor: pointer; }
+.bookList { margin: 0 0 10px 2.7em; padding: 0; }
+.bookList li { margin: 0 0 3px; padding: 0; }
+.bookInputs { display: inline-flex; flex-wrap: wrap; max-width: 100%; gap: .3em; vertical-align: baseline; }
+.bookInputs input { width: min(18ch, 100%); min-width: 8ch; }
+.familyExtras { margin: 4px 0 10px 1.5em; }
+.familyContact { margin: 0 0 9px; }
+.familyContact label { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: .25em; margin-right: .6em; }
+.familyContact input { width: min(17ch, 100%); }
+.lessonPreferences { margin: 14px 0 24px; color: #70513e; }
+.lessonPreferences summary { width: fit-content; color: #741d32; cursor: pointer; font: italic 400 16px/1.4 "Berenis ADF Pro Oggi", serif; }
+.preferenceFields { display: grid; gap: 7px; padding: 9px 0 0 1.5em; }
+.preferenceFields label { display: flex; flex-wrap: wrap; align-items: baseline; gap: .4em; }
+.preferenceFields select { color: var(--narrative-value-color); }
+.addTeacher { min-height: 44px; padding: 4px 0; border: 0; background: transparent; color: #741d32; font: italic 400 16px/1.3 "Berenis ADF Pro Oggi", serif; text-decoration: underline; text-decoration-thickness: 1px; cursor: pointer; }
+.signature { padding: 8px 0 0; color: #741d32; font: italic 400 24px/1.3 "Berenis ADF Pro Oggi", serif; text-align: right; }
+.page :is(a, button, input, textarea, select):focus-visible, .scroll:focus-visible { outline: 2px solid #741d32; outline-offset: 2px; }

@@ -16,6 +16,17 @@ export type PaymentStatus =
   | "parziale"
   | "non_dovuta";
 
+export type PaymentMovement =
+  | { id: string; kind: "payment"; amountCents: number; paymentDate: LocalDate; recordedAt: string; operationId: string }
+  | { id: string; kind: "reversal"; amountCents: number; originalMovementId: string; recordedAt: string; operationId: string }
+  | { id: string; kind: "legacy_adjustment"; amountCents: number; recordedAt: string; operationId: string };
+
+export interface PaymentHistory {
+  /** Existing undated payments, captured only when the first new movement is recorded. */
+  historicalPaidAmountCents?: number;
+  paymentMovements?: PaymentMovement[];
+}
+
 export type AppointmentSource =
   | "manuale"
   | "richiesta_ricevuta"
@@ -35,13 +46,17 @@ export interface LessonSnapshot {
   mode: LessonMode;
   status: LessonStatus;
   topic: string;
+  /** Set on new lessons: `topic` is a plan, never proof that it was taught. */
+  topicKind?: "planned";
+  /** Explicitly recorded after the lesson. Undefined means no such confirmation exists. */
+  coveredTopic?: string;
   notes: string;
   hourlyRateCents: number;
   lessonAmountCents: number;
   paymentStatus: PaymentStatus;
 }
 
-export interface CalendarAppointment extends LessonSnapshot {
+export interface CalendarAppointment extends LessonSnapshot, PaymentHistory {
   id: string;
   date: LocalDate;
   startTime: LocalTime;
@@ -78,7 +93,7 @@ export interface CalendarRequest extends LessonSnapshot {
   updatedAt: string;
 }
 
-export interface CalendarOccurrence extends LessonSnapshot {
+export interface CalendarOccurrence extends LessonSnapshot, PaymentHistory {
   occurrenceId: string;
   appointmentId?: string;
   seriesId?: string;
@@ -101,6 +116,8 @@ export type SeriesLessonPatch = Partial<
     | "mode"
     | "status"
     | "topic"
+    | "topicKind"
+    | "coveredTopic"
     | "notes"
     | "hourlyRateCents"
     | "lessonAmountCents"

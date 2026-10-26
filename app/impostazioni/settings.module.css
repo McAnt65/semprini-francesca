@@ -1,0 +1,60 @@
+@font-face {
+  font-family: "Berenis ADF Pro Settings";
+  src: url("/fonts/berenis-adf/BerenisADFPro-Italic.otf") format("opentype");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+.page {
+  min-height: 100dvh;
+  padding: clamp(20px, 5vw, 48px) 18px;
+  background: #f3e4ce;
+  color: #493025;
+  font: italic 400 18px/1.4 "Berenis ADF Pro Settings", Georgia, serif;
+}
+
+.sheet {
+  width: min(100%, 560px);
+  margin-inline: auto;
+  padding: clamp(24px, 7vw, 48px);
+  background: #fff9ed;
+}
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 42px;
+}
+
+.navigation a, .form button { color: #741d32; text-decoration: none; }
+.page h1 { margin: 0 0 48px; color: #741d32; font-size: clamp(28px, 7vw, 38px); text-align: center; font-weight: 400; }
+.page h2 { margin: 0 0 10px; color: #741d32; font-size: clamp(21px, 5vw, 26px); font-weight: 400; }
+.page section > p { margin: 0 0 22px; }
+
+.form { display: grid; grid-template-columns: minmax(0, 2fr) minmax(90px, 1fr); gap: 18px 16px; }
+.form label { display: grid; gap: 5px; min-width: 0; }
+.form label:nth-of-type(3) { grid-column: 1; }
+.form input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid #b69a7b;
+  border-radius: 2px;
+  background: #fffdf7;
+  color: #9b2747;
+  font: inherit;
+}
+.country { grid-column: 1 / -1; margin: 0; }
+.travelMargin { grid-column: 1 / -1; }
+.travelMargin input { max-width: 10ch; }
+.form button { grid-column: 1 / -1; justify-self: start; min-height: 44px; padding: 5px 16px; border: 1px solid #b69a7b; background: transparent; font: inherit; cursor: pointer; }
+.message { min-height: 1.4em; margin-top: 18px !important; color: #9b2747; }
+.page :focus-visible { outline: 2px solid #741d32; outline-offset: 2px; }
+
+@media (max-width: 390px) {
+  .page { padding-inline: 10px; }
+  .sheet { padding-inline: 20px; }
+  .form { gap: 16px 10px; }
+}

@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Berenis ADF Pro Oggi";
+  src: url("/fonts/berenis-adf/BerenisADFPro-Italic.otf") format("opentype");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
   --background: #f4eddf;
   --foreground: #4b3024;
@@ -18,7 +26,6 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-register-serif);
-  --font-mono: var(--font-geist-mono);
 }
 
 html,

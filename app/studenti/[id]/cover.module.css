@@ -1,0 +1,32 @@
+.page, .loading, .missing { min-height: 100dvh; background: #f3e4ce; color: #70513e; }
+.page { display: grid; place-items: center; overflow: hidden; }
+.sheet { position: relative; container-type: inline-size; width: min(100%, 560px, calc(100dvh * 941 / 1672)); aspect-ratio: 941 / 1672; overflow: hidden; }
+.artwork { object-fit: contain; pointer-events: none; user-select: none; }
+.navigation { position: absolute; top: calc(37.5% - clamp(35px, 8cqw, 45px)); left: 9%; width: 82%; display: grid; grid-template-columns: 1fr 1.7fr 1fr; align-items: center; text-align: center; gap: 2%; }
+.navigation a, .navigation span, .actions a, .actions span { color: #741d32; font: italic 400 clamp(13px, 3.2cqw, 18px)/1.25 "Berenis ADF Pro Oggi", serif; text-decoration: none; }
+.navigation a { min-height: 44px; display: grid; place-items: center; }
+.navigation span { color: #9b2747; }
+.workspace { position: absolute; top: max(34%, calc(37.5% - clamp(35px, 8cqw, 45px) + 54px)); bottom: 7%; left: 11%; right: 11%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; row-gap: 7px; min-height: 0; overflow: hidden; padding: 0 2%; text-align: left; font: italic 400 clamp(18px, 3.4cqw, 19px)/1.35 "Berenis ADF Pro Oggi", serif; }
+.name { min-width: 0; margin: 0; color: #9b2747; font-size: clamp(27px, 6cqw, 36px); line-height: 1.17; overflow-wrap: anywhere; }
+.details { min-height: 0; overflow: auto; scrollbar-width: none; -ms-overflow-style: none; overscroll-behavior: contain; padding: 0 2px .3em; }
+.details::-webkit-scrollbar { display: none; }
+.group { margin: 0 0 .6em; }
+.group h2 { margin: 0 0 .15em; color: #70513e; font: italic 400 clamp(19px, 3.6cqw, 20px)/1.28 "Berenis ADF Pro Oggi", serif; }
+.group p { margin: 0; }
+.value { color: #9b2747; overflow-wrap: anywhere; }
+.footer { flex: 0 0 auto; }
+.contacts { display: flex; flex-wrap: wrap; justify-content: center; gap: .1em .8em; margin-top: .2em; }
+.contacts a { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; color: #741d32; }
+.contacts svg { width: 30px; height: 30px; fill: currentColor; }
+.actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; justify-items: stretch; column-gap: 0; margin-inline: -3%; }
+.actions a, .actions > span { display: inline-flex; width: 100%; min-width: 0; min-height: 44px; align-items: center; justify-content: center; padding-inline: 1px; font-size: clamp(11px, 2.85cqw, 16px); text-align: center; white-space: nowrap; }
+.actions a { text-decoration: underline; text-underline-offset: 3px; }
+.pending { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; opacity: .55; cursor: default; }
+.editLink { display: inline-flex; min-height: 36px; align-items: center; color: #741d32; font: italic 400 clamp(13px, 3.2cqw, 18px)/1.25 "Berenis ADF Pro Oggi", serif; text-underline-offset: 3px; }
+.archiveSuggestion { margin: .2em 0 .35em; color: #70513e; font-size: .85em; }
+.archiveAction { display: flex; justify-content: center; margin: 0 0 .05em; }
+.archiveAction button { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 0 8px; border: 0; background: transparent; color: #741d32; font: italic 400 clamp(11px, 2.5cqw, 14px)/1.25 "Berenis ADF Pro Oggi", serif; cursor: pointer; }
+.archiveAction p { margin: 0 0 .2em; color: #70513e; font-size: .85em; text-align: center; }
+.page :is(a, button, .details):focus-visible, .missing a:focus-visible { outline: 2px solid #741d32; outline-offset: 3px; }
+.missing { display: grid; place-content: center; gap: 1em; text-align: center; font-family: "Berenis ADF Pro Oggi", serif; }
+@media (max-width: 560px) { .sheet { width: min(100%, calc(100dvh * 941 / 1672)); } }

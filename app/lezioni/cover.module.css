@@ -1,0 +1,44 @@
+.page {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: #f3e4ce;
+}
+
+.sheet {
+  position: relative;
+  width: min(100%, 560px, calc(100dvh * 941 / 1672));
+  aspect-ratio: 941 / 1672;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.artwork {
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.hotspot {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  border-radius: 3%;
+  background: transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.today { left: 2.5%; top: 2.4%; width: 22%; height: 6.5%; }
+.menu { right: 2.5%; top: 2.4%; width: 22%; height: 6.5%; }
+.upcoming { left: 5%; top: 62.5%; width: 44.5%; height: 17.2%; }
+.newLesson { right: 5%; top: 62.5%; width: 44.5%; height: 17.2%; }
+.history { left: 5%; top: 80.2%; width: 44.5%; height: 17.1%; }
+.diary { right: 5%; top: 80.2%; width: 44.5%; height: 17.1%; }
+
+.hotspot:focus-visible {
+  outline: 3px solid #741d32;
+  outline-offset: -5px;
+  background: rgb(116 29 50 / 9%);
+}

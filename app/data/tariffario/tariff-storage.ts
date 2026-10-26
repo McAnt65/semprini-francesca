@@ -1,9 +1,12 @@
 import type { LessonFormat, Tariff, TariffDraft } from "./tariff-types";
 import type { LessonMode } from "../calendario/calendar-types";
+import { writeAndVerify, type SaveResult } from "../save-result";
 
 export const TARIFF_STORAGE_KEY = "semprini:tariffs:v1";
+const TEMPORARY_SNAPSHOT_KEY = "semprini:tariffs:v1:temporary-snapshot";
 
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+type AvailableStorage = { storage: StorageLike; persistent: boolean };
 
 const MODES: LessonMode[] = ["casa", "domicilio", "online"];
 const FORMATS: LessonFormat[] = ["singola", "gruppo"];
@@ -11,8 +14,16 @@ const FORMATS: LessonFormat[] = ["singola", "gruppo"];
 export function loadTariffs(): Tariff[] {
   if (typeof window === "undefined") return [];
   const byId = new Map<string, Tariff>();
+  const storages = availableStorages();
+  let selected = storages;
+  try {
+    const temporary = storages.find((item) => !item.persistent);
+    const raw = temporary?.storage.getItem(TARIFF_STORAGE_KEY);
+    if (temporary?.storage.getItem(TEMPORARY_SNAPSHOT_KEY) === "yes" && raw &&
+        Array.isArray(JSON.parse(raw))) selected = [temporary];
+  } catch { /* Read the other available archive. */ }
 
-  for (const storage of availableStorages()) {
+  for (const { storage } of selected) {
     try {
       const raw = storage.getItem(TARIFF_STORAGE_KEY);
       if (!raw) continue;
@@ -36,7 +47,11 @@ export function loadTariffs(): Tariff[] {
 }
 
 export function saveTariffs(tariffs: Tariff[]): boolean {
-  if (typeof window === "undefined") return false;
+  return saveTariffsResult(tariffs).status !== "failed";
+}
+
+export function saveTariffsResult(tariffs: Tariff[]): SaveResult {
+  if (typeof window === "undefined") return { status: "failed" };
 
   const normalized = tariffs
     .map(normalizeTariff)
@@ -46,23 +61,37 @@ export function saveTariffs(tariffs: Tariff[]): boolean {
   const serialized = JSON.stringify(normalized);
   const storages = availableStorages();
 
-  for (let index = 0; index < storages.length; index += 1) {
-    try {
-      storages[index].setItem(TARIFF_STORAGE_KEY, serialized);
-      if (index === 0 && storages[1]) {
-        try {
-          storages[1].removeItem(TARIFF_STORAGE_KEY);
-        } catch {
-          // Non bloccare il salvataggio principale.
+  for (const { storage, persistent } of storages) {
+    let previous: string | null = null;
+    try { previous = storage.getItem(TARIFF_STORAGE_KEY); } catch { continue; }
+    if (writeAndVerify(storage, TARIFF_STORAGE_KEY, serialized)) {
+      if (persistent) {
+        for (const fallback of storages.filter((item) => !item.persistent)) {
+          try {
+            fallback.storage.removeItem(TARIFF_STORAGE_KEY);
+            fallback.storage.removeItem(TEMPORARY_SNAPSHOT_KEY);
+          } catch {
+            // Non bloccare il salvataggio principale.
+          }
         }
       }
-      return true;
-    } catch {
-      // localStorage può essere pieno o bloccato: prova sessionStorage.
+      if (!persistent) {
+        let marked = false;
+        try { marked = storage.getItem(TEMPORARY_SNAPSHOT_KEY) === "yes"; } catch {}
+        if (!marked) marked = writeAndVerify(storage, TEMPORARY_SNAPSHOT_KEY, "yes");
+        if (!marked) {
+          try {
+            if (previous === null) storage.removeItem(TARIFF_STORAGE_KEY);
+            else storage.setItem(TARIFF_STORAGE_KEY, previous);
+          } catch { /* The persistent archive is still untouched. */ }
+          return { status: "failed" };
+        }
+      }
+      return { status: persistent ? "saved" : "temporary" };
     }
   }
 
-  return false;
+  return { status: "failed" };
 }
 
 export function createTariff(draft: TariffDraft): Tariff {
@@ -150,15 +179,15 @@ function compareTariffs(a: Tariff, b: Tariff) {
   return aNumber - bNumber || a.code.localeCompare(b.code);
 }
 
-function availableStorages(): StorageLike[] {
+function availableStorages(): AvailableStorage[] {
   if (typeof window === "undefined") return [];
-  const storages: StorageLike[] = [];
+  const storages: AvailableStorage[] = [];
 
   try {
-    storages.push(window.localStorage);
+    storages.push({ storage: window.localStorage, persistent: true });
   } catch {}
   try {
-    storages.push(window.sessionStorage);
+    storages.push({ storage: window.sessionStorage, persistent: false });
   } catch {}
 
   return storages;

@@ -1,11 +1,10 @@
-import { use } from "react";
-import StudentForm from "../../StudentForm";
+import { redirect } from "next/navigation";
 
-export default function StudentEditMenuPage({
+export default async function StudentEditMenuPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = use(params);
-  return <StudentForm studentId={id} />;
+  const { id } = await params;
+  redirect(`/studenti/nuovo?id=${encodeURIComponent(id)}`);
 }

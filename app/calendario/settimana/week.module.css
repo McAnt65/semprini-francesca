@@ -1,0 +1,30 @@
+@font-face { font-family: "Berenis ADF Pro Settimana"; src: url("/fonts/berenis-adf/BerenisADFPro-Italic.otf") format("opentype"); font-style: italic; font-weight: 400; font-display: swap; }
+
+.page { display: grid; place-items: center; width: 100%; min-height: 100dvh; overflow: hidden; background: #f3e4ce; color: #493025; }
+.sheet { position: relative; container-type: inline-size; width: min(100%, 560px, calc(100dvh * 941 / 1672)); aspect-ratio: 941 / 1672; overflow: hidden; }
+.artwork { object-fit: contain; pointer-events: none; user-select: none; }
+.views { position: absolute; z-index: 2; top: 32.5%; left: 9%; width: 82%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; }
+.views a { display: flex; min-height: 44px; align-items: center; justify-content: center; color: #741d32; font: italic 400 clamp(14px, 3.7cqw, 19px)/1 "Berenis ADF Pro Settimana", Georgia, serif; text-decoration: none; }
+.views a[aria-current="page"] { text-decoration: underline; text-decoration-color: #b7907f; text-decoration-thickness: 1px; text-underline-offset: 6px; }
+.weekSelector { position: absolute; z-index: 2; top: calc(32.5% + 44px); left: 8%; right: 8%; display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; min-height: 48px; align-items: center; }
+.weekSelector button { display: grid; width: 48px; min-height: 48px; place-items: center; border: 0; background: transparent; color: #741d32; font: 32px/1 Georgia, serif; cursor: pointer; }
+.weekSelector h2 { margin: 0; color: #642b36; font: italic 400 clamp(16px, 4.2cqw, 23px)/1.2 "Berenis ADF Pro Settimana", Georgia, serif; text-align: center; }
+.returnLink { position: absolute; z-index: 2; top: calc(32.5% + 92px); left: 12%; right: 12%; display: flex; min-height: 44px; align-items: center; justify-content: center; color: #741d32; font: italic 400 clamp(13px, 3.3cqw, 17px) "Berenis ADF Pro Settimana", Georgia, serif; text-decoration: underline; }
+.appointments { position: absolute; z-index: 1; top: calc(32.5% + 100px + var(--selection-extra, 0px)); right: 8%; bottom: 16%; left: 8%; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; background: transparent; font: italic 400 clamp(15px, 4.1cqw, 17px)/1.4 "Berenis ADF Pro Settimana", Georgia, serif; }
+.appointments::-webkit-scrollbar { display: none; }
+.day { background: transparent; border-top: 1px solid rgb(182 154 123 / 42%); }
+.day:first-child { border-top: 0; }
+.dayHeading { display: flex; min-height: 44px; align-items: center; justify-content: space-between; gap: 10px; padding: 5px 8px; color: #9b2747; font-size: clamp(16px, 4.35cqw, 17px); font-weight: 500; line-height: 1.35; text-decoration: none; }
+.dayHeading[aria-current="date"] { text-decoration: underline; text-decoration-color: #b7907f; text-underline-offset: 3px; }
+.count { flex: none; color: #493025; font-size: 14px; font-weight: 500; line-height: 1.35; }
+.empty { margin: 0; padding: 1px 8px 9px; color: #493025; font-size: 15px; line-height: 1.4; }
+.lesson { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 8px; align-items: start; min-height: 44px; padding: 6px 8px 9px; border-top: 1px solid rgb(182 154 123 / 24%); background: transparent; color: #493025; text-decoration: none; }
+.time { color: #9b2747; font-size: clamp(16px, 4.35cqw, 17px); font-weight: 500; line-height: 1.4; }
+.lessonDescription { display: grid; min-width: 0; gap: 2px; overflow-wrap: anywhere; color: #3f2d25; }
+.lessonDescription > span:first-child { color: #9b2747; font-size: clamp(15px, 4.1cqw, 16px); font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
+.lessonMeta { display: flex; flex-wrap: wrap; gap: 0 5px; margin-top: 1px; color: #493025; font-size: 14.5px; line-height: 1.4; }
+.completedStatus { color: #42634e; text-transform: uppercase; }
+.bottomNavigation { position: absolute; z-index: 2; right: 9%; bottom: 8.5%; left: 9%; display: flex; align-items: center; justify-content: space-between; }
+.bottomNavigation a { display: flex; min-width: 92px; min-height: 44px; align-items: center; justify-content: center; color: #741d32; font: italic 400 clamp(14px, 3.7cqw, 19px)/1 "Berenis ADF Pro Settimana", Georgia, serif; text-decoration: none; }
+.page a:focus-visible, .page button:focus-visible { outline: 2px solid #741d32; outline-offset: 2px; }
+.page a:hover { text-decoration: underline; text-underline-offset: 3px; }

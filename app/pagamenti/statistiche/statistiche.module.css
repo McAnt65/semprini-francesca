@@ -1,0 +1,47 @@
+@font-face {
+  font-family: "Berenis Statistiche";
+  src: url("/fonts/berenis-adf/BerenisADFPro-Italic.otf") format("opentype");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+.page { display: grid; place-items: center; width: 100%; min-height: 100dvh; overflow: hidden; background: #f3e4ce; color: #493025; }
+.sheet { position: relative; container-type: inline-size; width: min(100%, 560px, calc(100dvh * 941 / 1672)); aspect-ratio: 941 / 1672; font: italic 400 16px/1.45 "Berenis Statistiche", Georgia, serif; }
+.artwork { object-fit: contain; pointer-events: none; user-select: none; }
+.topLinks { top: 33.5%; }
+.workspace { position: absolute; z-index: 1; top: calc(33.5% + 44px); right: 8%; bottom: 16%; left: 8%; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.workspace::-webkit-scrollbar { display: none; }
+.periodNav { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; min-height: 44px; }
+.periodNav button { min-height: 44px; border: 0; background: transparent; color: #741d32; font: 32px/1 Georgia, serif; cursor: pointer; }
+.periodNav button:disabled { opacity: .35; cursor: default; }
+.periodNav p { margin: 0; color: #9b2747; font-size: clamp(18px, 4.5cqw, 21px); text-align: center; }
+.periodFields { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 12px; margin: 7px 0 17px; }
+.periodFields label, .studentFilter { display: grid; gap: 5px; color: #493025; font-size: 15px; }
+.periodFields select, .periodFields input, .studentFilter select { width: 100%; min-width: 0; min-height: 44px; padding: 7px 9px; border: 1px solid #b69a7b; border-radius: 0; background: rgb(255 251 240 / 68%); color: #741d32; font: normal 16px Georgia, serif; }
+.section { padding: 13px 0 18px; border-top: 1px solid rgb(182 154 123 / 58%); }
+.section h2 { margin: 0 0 11px; color: #9b2747; font-size: clamp(20px, 5cqw, 23px); font-weight: 400; }
+.section h3 { margin: 13px 0 5px; color: #9b2747; font-size: 17px; font-weight: 400; }
+.metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 10px; margin: 0; }
+.metrics div, .figures div, .studentFigures div { min-width: 0; }
+.metrics dt, .figures dt, .studentFigures dt { color: #493025; font-size: 15px; }
+.metrics dd, .figures dd, .studentFigures dd { margin: 4px 0 0; color: #9b2747; font-size: clamp(18px, 4.6cqw, 20px); overflow-wrap: anywhere; }
+.figures, .studentFigures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin: 0 0 15px; }
+.figures div:nth-child(2) dd, .studentFigures div:nth-child(2) dd { color: #42634e; }
+.studentFigures { margin: 5px 0 0; }
+.studentFigures dd { font-size: 18px; }
+.rows { margin: 0; padding: 0; list-style: none; }
+.rows li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgb(182 154 123 / 25%); font-size: 15px; }
+.rows li span { overflow-wrap: anywhere; }
+.rows strong { color: #741d32; font-weight: 400; white-space: nowrap; }
+.note, .empty, .warning { margin: 8px 0 0; color: #5d4232; font-size: 14px; }
+.warning { color: #9b2747; }
+.studentFilter { margin: 0 0 7px; }
+.student { padding: 12px 0 16px; border-bottom: 1px solid rgb(182 154 123 / 35%); }
+.student:last-child { border-bottom: 0; }
+.student h3 { margin: 0; font-size: 17px; }
+.student p { margin: 4px 0 8px; color: #493025; font-size: 15px; }
+.page a:focus-visible, .page button:focus-visible, .page select:focus-visible, .page input:focus-visible { outline: 2px solid #741d32; outline-offset: 2px; }
+.page a:hover, .page button:hover:not(:disabled) { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 380px) { .workspace { right: 6%; left: 6%; } .figures, .studentFigures { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (max-width: 300px) { .topLinks { grid-template-columns: repeat(2, minmax(0, 1fr)); } .topLinks a:nth-child(2) { grid-column: 1 / -1; grid-row: 2; } .topLinks a:nth-child(3) { grid-column: 2; grid-row: 1; } .workspace { top: calc(33.5% + 88px); } }

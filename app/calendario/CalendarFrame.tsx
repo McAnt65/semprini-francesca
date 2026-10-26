@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
+import { calendarSelectionHref, returnToNewLessonHref } from "./nuova/lesson-selection";
 
 type View = "month" | "week" | "day";
 
@@ -13,8 +14,8 @@ const images: Record<View, string> = {
   day: "/calendar-day-watercolor-approved.png",
 };
 
-export default function CalendarFrame({ view, date, children, previous, next }: {
-  view: View; date: string; children: ReactNode; previous: () => void; next: () => void;
+export default function CalendarFrame({ view, date, children, previous, next, selectionToken }: {
+  view: View; date: string; children: ReactNode; previous: () => void; next: () => void; selectionToken?: string;
 }) {
   const router = useRouter();
   const hit = "antique-clickable absolute z-30 bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#813247]";
@@ -24,16 +25,17 @@ export default function CalendarFrame({ view, date, children, previous, next }: 
         <Image src={images[view]} alt="" fill priority unoptimized sizes="(max-width: 430px) 100vw, 430px" className="pointer-events-none select-none object-fill" />
         <button onClick={() => router.back()} aria-label="Indietro" className={`${hit} left-[3%] top-[1.4%] h-[7.3%] w-[23%]`} />
         <Link href="/menu" aria-label="Menu" className={`${hit} right-[3%] top-[1.4%] h-[8%] w-[16%]`} />
-        <Link href={`/calendario?data=${date}`} aria-label="Vista mese" aria-current={view === "month" ? "page" : undefined} className={`${hit} left-[5%] top-[14.5%] h-[5.3%] w-[30%]`} />
-        <Link href={`/calendario/settimana?data=${date}`} aria-label="Vista settimana" aria-current={view === "week" ? "page" : undefined} className={`${hit} left-[35%] top-[14.5%] h-[5.3%] w-[30%]`} />
-        <Link href={`/calendario/giorno?data=${date}`} aria-label="Vista giorno" aria-current={view === "day" ? "page" : undefined} className={`${hit} left-[65%] top-[14.5%] h-[5.3%] w-[30%]`} />
+        <Link href={selectionToken ? calendarSelectionHref("month", date, selectionToken) : `/calendario/mese?data=${date}`} aria-label="Vista mese" aria-current={view === "month" ? "page" : undefined} className={`${hit} left-[5%] top-[14.5%] h-[5.3%] w-[30%]`} />
+        <Link href={selectionToken ? calendarSelectionHref("week", date, selectionToken) : `/calendario/settimana?data=${date}`} aria-label="Vista settimana" aria-current={view === "week" ? "page" : undefined} className={`${hit} left-[35%] top-[14.5%] h-[5.3%] w-[30%]`} />
+        <Link href={selectionToken ? calendarSelectionHref("day", date, selectionToken) : `/calendario/giorno?data=${date}`} aria-label="Vista giorno" aria-current={view === "day" ? "page" : undefined} className={`${hit} left-[65%] top-[14.5%] h-[5.3%] w-[30%]`} />
         <button onClick={previous} aria-label="Periodo precedente" className={`${hit} left-[3%] top-[20.7%] h-[6.4%] w-[14%]`} />
         <button onClick={next} aria-label="Periodo successivo" className={`${hit} right-[3%] top-[20.7%] h-[6.4%] w-[14%]`} />
+        {selectionToken && <Link href={returnToNewLessonHref(selectionToken)} className="absolute left-[20%] top-[26.5%] z-30 flex min-h-8 w-[60%] items-center justify-center bg-[#fff8ea]/80 px-1 text-center font-entry-elegant text-[clamp(12px,3.2vw,15px)] text-[#741d32] underline focus-visible:outline-2 focus-visible:outline-[#741d32]">TORNA ALLA LEZIONE</Link>}
         {children}
         <nav aria-label="Navigazione principale" className="absolute inset-x-[2%] bottom-[1%] z-30 h-[10.2%]">
           <Link href="/studenti" aria-label="Studenti" className={`${hit} inset-y-0 left-0 w-[20%]`} />
           <Link href="/calendario" aria-label="Calendario" aria-current="page" className={`${hit} inset-y-0 left-[20%] w-[20%]`} />
-          <Link href={`/calendario/nuova?data=${date}`} aria-label="Nuova lezione" className={`${hit} inset-y-0 left-[40%] w-[20%]`} />
+          <Link href={selectionToken ? returnToNewLessonHref(selectionToken) : `/calendario/nuova?data=${date}`} aria-label={selectionToken ? "Torna alla lezione" : "Nuova lezione"} className={`${hit} inset-y-0 left-[40%] w-[20%]`} />
           <Link href="/materie" aria-label="Materie" className={`${hit} inset-y-0 left-[60%] w-[20%]`} />
           <Link href="/menu" aria-label="Menu" className={`${hit} inset-y-0 left-[80%] w-[20%]`} />
         </nav>
