@@ -1,85 +1,31 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
+import menuImage from "../../design-approved-phase1/07-menu.png";
+
+const entries = [
+  { label: "Oggi", href: "/oggi" },
+  { label: "Studenti", href: "/studenti/home" },
+  { label: "Lezioni", href: "/lezioni" },
+  { label: "Materie", href: "/materie" },
+  { label: "Calendario", href: "/calendario" },
+  { label: "Pagamenti", href: "/tariffario/pagamenti" },
+  { label: "Archivio", href: "/menu" },
+  { label: "Impostazioni", href: "/menu" },
+];
 
 export default function MenuPage() {
-  return (
-    <main className="min-h-dvh w-full overflow-x-hidden bg-[#f4eddf]">
-      <div className="mx-auto w-full max-w-[430px]">
-        <div className="relative aspect-[9/16] w-full min-h-dvh sm:min-h-0">
-          <Image
-            src="/menu.png?v=20260928"
-            alt="Menu del Registro"
-            fill
-            priority
-            unoptimized
-            sizes="(max-width: 430px) 100vw, 430px"
-            className="object-fill"
-          />
-          <Link href="/oggi" aria-label="Torna a Oggi" className="absolute left-[3%] top-[1%] z-20 flex h-[8%] w-[20%] items-start pt-2 font-entry-elegant text-[clamp(13px,3.4vw,16px)] text-[#60412f]">‹ Oggi</Link>
-
-          <Link
-            href="/studenti"
-            aria-label="I miei studenti"
-            className="antique-clickable absolute left-[8%] top-[18.2%] h-[18.5%] w-[25.5%] rounded-xl bg-transparent"
-          />
-
-          <Link
-            href="/calendario"
-            aria-label="Calendario"
-            className="antique-clickable absolute left-[37.2%] top-[18.2%] h-[18.5%] w-[25.5%] rounded-xl bg-transparent"
-          />
-
-          <Link
-            href="/materie"
-            aria-label="Materie"
-            className="antique-clickable absolute left-[66.5%] top-[18.2%] h-[18.5%] w-[25.5%] rounded-xl bg-transparent"
-          />
-
-          <Link
-            href="/libri"
-            aria-label="Libri di testo"
-            className="antique-clickable absolute left-[8%] top-[38.8%] h-[18.5%] w-[25.5%] rounded-xl bg-transparent"
-          />
-
-          <Link
-            href="/archivio-condiviso"
-            aria-label="Archivio condiviso"
-            className="antique-clickable absolute left-[37.2%] top-[38.8%] h-[18.5%] w-[25.5%] rounded-xl bg-transparent"
-          />
-
-          <Link
-            href="/archivio-personale"
-            aria-label="Archivio personale"
-            className="antique-clickable absolute left-[66.5%] top-[38.8%] h-[18.5%] w-[25.5%] rounded-xl bg-transparent"
-          />
-
-          <Link
-            href="/richieste"
-            aria-label="Richieste lezioni"
-            className="antique-clickable absolute left-[8%] top-[59.4%] h-[18.5%] w-[25.5%] rounded-xl bg-transparent"
-          />
-
-          <Link
-            href="/lezioni"
-            aria-label="Lezione"
-            className="antique-clickable absolute left-[37.2%] top-[59.4%] h-[18.5%] w-[25.5%] rounded-xl bg-transparent"
-          />
-
-          <Link
-            href="/tariffario"
-            aria-label="Tariffe e pagamenti"
-            className="antique-clickable absolute left-[66.5%] top-[59.4%] h-[18.5%] w-[25.5%] rounded-xl bg-transparent"
-          />
-
-          <Link
-            href="/diario"
-            aria-label="Diario della professoressa"
-            className="antique-clickable absolute left-[8%] top-[80%] h-[12.5%] w-[84%] rounded-2xl bg-transparent"
-          />
-        </div>
-      </div>
-    </main>
-  );
+  return <main className="min-h-dvh bg-[#fbf1de] text-[#4b3024]">
+    <div className="relative mx-auto w-full max-w-[430px]">
+      <Image src={menuImage} alt="" priority sizes="(max-width: 430px) 100vw, 430px" className="block h-auto w-full" />
+      <h1 className="sr-only">Menu del Registro</h1>
+      <Link href="/calendario/nuova" aria-label="Nuova lezione" className="absolute left-[4%] top-[1%] h-[8%] w-[27%] rounded-xl focus-visible:outline-2 focus-visible:outline-[#813247]" />
+      <nav aria-label="Navigazione globale">
+        {entries.map((entry, index) => {
+          const style = { left: `${index % 2 ? 51 : 3}%`, top: `${28.6 + Math.floor(index / 2) * 14.5}%`, width: "46%", height: "13.8%" };
+          const className = "absolute rounded-xl focus-visible:outline-2 focus-visible:outline-[#813247]";
+          return <Link key={entry.label} href={entry.href} aria-label={entry.label} className={className} style={style} />;
+        })}
+      </nav>
+    </div>
+  </main>;
 }

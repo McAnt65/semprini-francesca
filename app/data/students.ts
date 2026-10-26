@@ -1,5 +1,6 @@
 export interface StudentRecord {
   id: string;
+  status?: "active" | "archived";
   enrollmentDate: string;
   avatarUrl?: string;
   firstName: string;
@@ -35,6 +36,9 @@ export interface StudentRecord {
   };
   personalNotes?: string;
   familyNotes?: string;
+  lessonMode?: "casa" | "domicilio" | "online";
+  lessonDurationMinutes?: number;
+  lessonRateCents?: number;
   nextLesson?: string;
   updatedAt?: string;
 }

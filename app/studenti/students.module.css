@@ -1,0 +1,887 @@
+.page {
+  min-height: 100dvh;
+  overflow: hidden;
+  background: #fbf1de;
+  color: #4b3024;
+  font-family: var(--font-entry-elegant);
+}
+
+.surface {
+  position: relative;
+  width: 100%;
+  max-width: 430px;
+  height: 100dvh;
+  margin: 0 auto;
+  overflow: hidden;
+  background: #f4e7cf;
+}
+
+.tallSurface {
+  min-height: 100dvh;
+}
+
+.artwork {
+  pointer-events: none;
+  object-fit: fill;
+  user-select: none;
+}
+
+.register {
+  height: 100dvh;
+}
+
+/* Cover only the controls painted into the artwork on the list page. */
+.register .controls::before {
+  content: "";
+  position: absolute;
+  inset: 26.3% 1.5% auto;
+  height: 10.6%;
+  background: #fbefdc;
+}
+
+.register .newStudentControl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 20.7%;
+  height: 5.1%;
+  left: 66.8%;
+  width: 30.5%;
+  border-radius: 0;
+  background: #fbefdc;
+  box-shadow: 0 0 0 3px #fbefdc;
+  color: #75273d;
+  font-family: var(--font-entry-elegant), Georgia, serif;
+  font-size: 18px;
+  font-style: italic;
+  text-decoration: none;
+}
+
+.register .filter {
+  color: #75273d;
+  font-family: var(--font-entry-elegant), Georgia, serif;
+  font-size: 18px;
+  font-style: italic;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.register .filter[aria-pressed="true"] {
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 7px;
+}
+
+.register .options,
+.register .gridView {
+  color: #75273d;
+  font-family: var(--font-entry-elegant), Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
+  padding: 0;
+  width: 12%;
+  left: 75%;
+}
+
+.register .gridView {
+  left: 88%;
+  opacity: 0.42;
+  font-size: 14px;
+}
+
+.orderCaption {
+  position: absolute;
+  top: 32.6%;
+  left: 4%;
+  height: 3.5%;
+  display: flex;
+  align-items: center;
+  color: #57382f;
+  font-family: var(--font-entry-elegant), Georgia, serif;
+  font-size: 16px;
+  font-style: italic;
+}
+
+.register .orderTrigger {
+  left: 23%;
+  width: 48%;
+  padding: 0 3px;
+  text-align: left;
+  color: #75273d;
+  font-family: var(--font-entry-elegant), Georgia, serif;
+  font-size: 17px;
+  font-style: italic;
+  cursor: pointer;
+}
+
+.register .order {
+  top: 31.9%;
+  left: 22%;
+  width: 49%;
+  padding: 4px;
+  border: 0;
+  border-radius: 0;
+  background: #fbefdc;
+  box-shadow: none;
+  font-size: 0;
+}
+
+.register .order select {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #75273d;
+  font: 14px var(--font-entry-elegant);
+}
+
+/* Temporary hotspot inspection mode for /studenti. */
+.debugHotspots .oggi,
+.debugHotspots .menu,
+.debugHotspots .newStudentControl,
+.debugHotspots .search,
+.debugHotspots .filter,
+.debugHotspots .options,
+.debugHotspots .gridView,
+.debugHotspots .orderTrigger,
+.debugHotspots .order,
+.debugHotspots .order select,
+.debugHotspots .search button,
+.debugHotspots .card,
+.debugHotspots .navigation a {
+  z-index: 60;
+  outline: 2px solid rgba(220, 0, 0, 0.96);
+  outline-offset: -2px;
+  background: rgba(255, 0, 0, 0.16) !important;
+}
+
+.debugHotspots .order,
+.debugHotspots .list {
+  outline: none;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.debugHotspots .order {
+  pointer-events: none;
+}
+
+.debugHotspots .order select {
+  pointer-events: auto;
+}
+
+.newStudent,
+.menu,
+.oggi,
+.newStudentControl {
+  position: absolute;
+  z-index: 30;
+  height: 6.4%;
+  border-radius: 12px;
+}
+
+.newStudent { left: 2%; width: 27%; }
+.oggi,
+.menu {
+  top: 3.1%;
+  width: 16.7%;
+  height: 6.2%;
+}
+
+.oggi { left: 3.6%; }
+.menu { right: 3.6%; }
+.newStudentControl {
+  left: 67.2%;
+  top: 20.9%;
+  width: 29.3%;
+  height: 4.4%;
+}
+
+.controls {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  pointer-events: none;
+}
+
+.search {
+  position: absolute;
+  left: 3.1%;
+  top: 20.9%;
+  width: 62.9%;
+  height: 4.4%;
+  pointer-events: auto;
+}
+
+.search > span:first-child { display: none; }
+
+.search input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  padding: 0 11% 0 11%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #4b3024;
+  font-family: var(--font-entry-elegant);
+  font-size: clamp(14px, 3.7vw, 17px);
+}
+
+.search input::placeholder { color: transparent; }
+
+.search button {
+  position: absolute;
+  right: 1%;
+  top: 3%;
+  width: 10%;
+  height: 90%;
+  border: 0;
+  background: transparent;
+  font-size: 22px;
+  color: #783146;
+}
+
+.filters {
+  position: absolute;
+  left: 3%;
+  top: 27.1%;
+  width: 94%;
+  height: 4.2%;
+  pointer-events: none;
+}
+
+.filter,
+.options,
+.gridView {
+  position: absolute;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: transparent;
+  font-size: 0;
+  margin: 0;
+  pointer-events: auto;
+}
+
+.filter:nth-child(1) { left: 0; width: 23.7%; }
+.filter:nth-child(2) { left: 25.6%; width: 23.4%; }
+.filter:nth-child(3) { left: 50.9%; width: 23.4%; }
+.filter:nth-child(4) { left: 76.4%; width: 23.4%; }
+
+.filter {
+  top: 0;
+  height: 100%;
+}
+
+.filter[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 2px rgba(128, 36, 59, 0.38);
+  background: rgba(128, 36, 59, 0.08);
+}
+
+.options {
+  display: block;
+  left: 85.8%;
+  top: 130%;
+  width: 6.2%;
+  height: 82%;
+}
+
+.gridView {
+  display: block;
+  left: 92.6%;
+  top: 130%;
+  width: 6.2%;
+  height: 82%;
+}
+
+.order {
+  position: absolute;
+  z-index: 50;
+  left: 17.2%;
+  top: 28.25%;
+  width: 27.7%;
+  padding: 8px 10px;
+  border: 1px solid #c5aa86;
+  border-radius: 10px;
+  background: rgba(255, 248, 233, 0.97);
+  box-shadow: 0 3px 10px rgba(74, 45, 28, 0.15);
+  font-size: 14px;
+  pointer-events: auto;
+}
+
+.orderTrigger {
+  position: absolute;
+  z-index: 40;
+  left: 17.2%;
+  top: 32.6%;
+  width: 29.8%;
+  height: 3.5%;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  pointer-events: auto;
+}
+
+.order select {
+  width: 100%;
+  margin-top: 5px;
+  border: 1px solid #c4a88a;
+  border-radius: 6px;
+  padding: 6px;
+  background: #fff9ed;
+}
+
+.list {
+  position: absolute;
+  z-index: 15;
+  left: 2.7%;
+  top: 39%;
+  width: 94.6%;
+  height: 47%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y proximity;
+  scrollbar-width: none;
+}
+
+.list::-webkit-scrollbar { display: none; }
+
+.card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22% 43% 29%;
+  gap: 2%;
+  height: 26.8%;
+  min-height: 26.8%;
+  padding: 5.5% 4.5% 6.5%;
+  background: transparent;
+  scroll-snap-align: start;
+}
+
+.card::after {
+  position: absolute;
+  right: 4%;
+  bottom: 2%;
+  left: 4%;
+  height: 1px;
+  background: rgba(116, 44, 64, 0.5);
+  content: "";
+}
+
+.cardIllustration {
+  position: relative;
+  align-self: center;
+  width: 100%;
+  height: 82%;
+  overflow: hidden;
+}
+
+.cardIllustration img {
+  object-fit: contain;
+}
+
+.details {
+  align-self: stretch;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 11%;
+  padding: 0;
+}
+.details h2 {
+  margin: 0;
+  color: #75273d;
+  font-family: var(--font-entry-elegant);
+  font-size: clamp(19px, 5.2vw, 24px);
+  font-style: italic;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.details p {
+  margin: 0;
+  color: #4c3226;
+  font-size: clamp(11px, 3vw, 14px);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.details .subjectLine {
+  color: #4c3226;
+}
+
+.nextLesson {
+  align-self: stretch;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5%;
+  padding: 0 14% 0 4%;
+  text-align: left;
+  color: #4c3226;
+  font-size: clamp(11px, 2.9vw, 14px);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.nextLesson strong {
+  color: #9d2943;
+  font-family: var(--font-entry-elegant);
+  font-size: clamp(13px, 3.5vw, 16px);
+  font-style: italic;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.empty {
+  margin: 12% 8%;
+  padding: 18px;
+  text-align: center;
+  font-size: 17px;
+  background: rgba(255, 248, 233, 0.72);
+  border-radius: 12px;
+}
+
+.navigation {
+  position: absolute;
+  z-index: 30;
+  left: 4.2%;
+  bottom: 2%;
+  width: 91.6%;
+  height: 7.5%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: transparent !important;
+  box-shadow: none;
+}
+
+.navigation a,
+.navigation button {
+  position: relative;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+}
+
+.navigation a[data-current="true"] {
+  box-shadow: inset 0 0 0 2px rgba(128, 36, 59, 0.38);
+  background: rgba(128, 36, 59, 0.08);
+}
+
+.register .filter[aria-pressed="true"],
+.register .navigation a[data-current="true"] {
+  box-shadow: none;
+  background: transparent;
+}
+
+.navigation button span { display: none; }
+
+.register a:focus-visible,
+.register button:focus-visible,
+.register input:focus-visible,
+.register select:focus-visible {
+  outline: 2px solid #813247;
+  outline-offset: 2px;
+}
+
+.surface a:focus-visible,
+.surface button:focus-visible,
+.surface input:focus-visible,
+.surface select:focus-visible,
+.surface textarea:focus-visible {
+  outline: 2px solid #813247;
+  outline-offset: 2px;
+}
+
+.formScroll,
+.diaryList,
+.archiveList {
+  scrollbar-width: none;
+}
+
+.formScroll::-webkit-scrollbar,
+.diaryList::-webkit-scrollbar,
+.archiveList::-webkit-scrollbar {
+  display: none;
+}
+
+.formScroll {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  top: 10.5%;
+  width: 100%;
+  height: 79%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+}
+
+.formSection {
+  display: contents;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #4b3024;
+}
+
+.formSection h2 {
+  margin: 0 0 1px;
+  color: #742c40;
+  font-size: clamp(16px, 4.2vw, 19px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.visualOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px 11px;
+}
+
+.inlineLabel {
+  margin: 0;
+  color: #742c40;
+  font-size: clamp(12px, 3.1vw, 14px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.field {
+  position: absolute;
+  display: block;
+  min-width: 0;
+  color: #742c40;
+  font-size: clamp(11px, 2.85vw, 13px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.area {
+  position: absolute;
+  display: block;
+  color: #742c40;
+  font-size: clamp(11px, 2.85vw, 13px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.field > span,
+.area > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.field input,
+.field select,
+.area textarea {
+  width: 100%;
+  min-height: 36px;
+  border: 0;
+  border-bottom: 1px solid rgba(116, 44, 64, 0.28);
+  border-radius: 0;
+  background: transparent;
+  padding: 5px 3px 4px;
+  color: #4b3024;
+  font: inherit;
+  font-size: clamp(15px, 3.8vw, 17px);
+  line-height: 1.2;
+  text-transform: none;
+  box-shadow: none;
+  outline: 0;
+}
+
+.fieldName { left: 39%; top: 6.2%; width: 53%; }
+.fieldSurname { left: 39%; top: 10.7%; width: 53%; }
+.fieldBirth { left: 39%; top: 15.2%; width: 53%; }
+.fieldSince { left: 39%; top: 19.7%; width: 53%; }
+.fieldPhone { left: 39%; top: 24.1%; width: 53%; }
+.fieldMail { left: 39%; top: 28.4%; width: 53%; }
+.fieldSchool { left: 39%; top: 30%; width: 53%; }
+.fieldClass { left: 39%; top: 34.5%; width: 53%; }
+.fieldDuration { left: 39%; top: 52.8%; width: 53%; }
+.fieldTariff { left: 39%; top: 57.2%; width: 53%; }
+.fieldAddress { left: 39%; top: 77.5%; width: 53%; }
+.fieldParent { left: 39%; top: 63.8%; width: 53%; }
+.fieldParentPhone { left: 39%; top: 68.2%; width: 26%; }
+.fieldParentMail { left: 66%; top: 68.2%; width: 26%; }
+.fieldBooks { left: 39%; top: 84.4%; width: 53%; }
+.fieldNotes { left: 39%; top: 91.5%; width: 53%; padding-bottom: 12%; }
+
+.diaryControls input,
+.diaryControls select,
+.archiveSearch input {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid rgba(143, 106, 79, 0.35);
+  border-radius: 7px;
+  background: rgba(255, 251, 241, 0.78);
+  padding: 6px 8px;
+  color: #4b3024;
+  font: inherit;
+}
+
+.area textarea {
+  min-height: 42px;
+  max-height: 74px;
+  overflow-y: auto;
+  resize: none;
+  line-height: 1.35;
+  scrollbar-width: none;
+}
+
+.area textarea::-webkit-scrollbar {
+  display: none;
+}
+
+.field input:focus,
+.field select:focus,
+.area textarea:focus {
+  background: rgba(255, 248, 232, 0.22);
+  border-bottom-color: rgba(116, 44, 64, 0.58);
+}
+
+.photoPicker {
+  position: relative;
+  position: absolute;
+  left: 7%;
+  top: 6.1%;
+  width: 28%;
+  aspect-ratio: 1 / 1.14;
+  overflow: hidden;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(246, 231, 210, 0.28);
+  color: #742c40;
+  font: inherit;
+}
+
+.photoSection {
+  min-height: 0;
+}
+
+.photoSection h2 {
+  width: 35%;
+  text-align: center;
+}
+
+.photoPicker span {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  padding: 8px;
+  color: transparent;
+  font-size: 0;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.photoReplace,
+.mapsLink {
+  position: absolute;
+  justify-self: auto;
+  min-height: 34px;
+  border: 0;
+  border-bottom: 1px solid rgba(116, 44, 64, 0.3);
+  background: transparent;
+  padding: 5px 2px;
+  color: #742c40;
+  font: inherit;
+  font-size: clamp(12px, 3.1vw, 14px);
+  text-transform: uppercase;
+}
+
+.photoReplace {
+  left: 8%;
+  top: 26.8%;
+  width: 25%;
+  text-align: center;
+  color: transparent;
+  font-size: 0;
+}
+
+.mapsLink {
+  left: 39%;
+  top: 82%;
+  width: 24%;
+  text-align: center;
+}
+
+.mapsLink {
+  text-decoration: none;
+}
+
+.mapsLink[aria-disabled="true"] {
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.choiceRow {
+  position: absolute;
+  left: 7%;
+  top: 41.2%;
+  width: 86%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2%;
+}
+
+#lessons-title + .modeLabel + .choiceRow,
+.modeLabel + .choiceRow {
+  left: 39%;
+  top: 48.4%;
+  width: 53%;
+}
+
+.choiceRow button,
+.formActions button {
+  min-height: 32px;
+  border: 0;
+  border-bottom: 1px solid rgba(116, 44, 64, 0.34);
+  border-radius: 0;
+  background: transparent;
+  padding: 6px 4px;
+  color: #742c40;
+  font: inherit;
+  font-size: clamp(13px, 3.3vw, 15px);
+  text-transform: uppercase;
+}
+
+.modeLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.choiceRow button {
+  color: transparent;
+  font-size: 0;
+}
+
+.choiceRow button[aria-pressed="true"],
+.formActions button:last-child {
+  border-bottom-color: rgba(116, 44, 64, 0.58);
+  background: rgba(116, 44, 64, 0.08);
+  color: #742c40;
+}
+
+.archiveCard button {
+  min-height: 34px;
+  border: 1px solid rgba(116, 44, 64, 0.45);
+  border-radius: 7px;
+  background: rgba(116, 44, 64, 0.12);
+  padding: 6px 10px;
+  color: #742c40;
+  font: inherit;
+}
+
+.formActions {
+  position: absolute;
+  left: 9%;
+  top: 98.5%;
+  width: 82%;
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 10px;
+  margin: 12px 0 0;
+}
+
+.formMessage {
+  position: absolute;
+  left: 8%;
+  top: 127%;
+  width: 84%;
+  margin: 8px 0;
+  text-align: center;
+  color: #742c40;
+}
+
+.diaryControls,
+.archiveSearch {
+  position: absolute;
+  z-index: 20;
+  left: 7%;
+  top: 18.5%;
+  width: 86%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.archiveSearch {
+  grid-template-columns: 1fr;
+}
+
+.diaryList,
+.archiveList {
+  position: absolute;
+  z-index: 20;
+  left: 7%;
+  top: 27%;
+  width: 86%;
+  height: 59%;
+  overflow-y: auto;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.diaryCard,
+.archiveCard {
+  display: grid;
+  gap: 4px;
+  border: 1px solid rgba(141, 103, 70, 0.24);
+  border-radius: 8px;
+  background: rgba(255, 249, 235, 0.58);
+  padding: 10px 12px;
+  color: #4b3024;
+  text-decoration: none;
+}
+
+.diaryCard strong,
+.archiveCard strong {
+  color: #742c40;
+  font-size: clamp(16px, 4.2vw, 19px);
+}
+
+.diaryCard span,
+.archiveCard span {
+  font-size: clamp(12px, 3.2vw, 15px);
+  line-height: 1.25;
+}
+
+.archiveCard a {
+  display: grid;
+  gap: 4px;
+  color: inherit;
+  text-decoration: none;
+}
