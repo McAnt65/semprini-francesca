@@ -51,6 +51,8 @@
 .travelMargin input { max-width: 10ch; }
 .form button { grid-column: 1 / -1; justify-self: start; min-height: 44px; padding: 5px 16px; border: 1px solid #b69a7b; background: transparent; font: inherit; cursor: pointer; }
 .message { min-height: 1.4em; margin-top: 18px !important; color: #9b2747; }
+.helpSection { margin-top: 28px; padding-top: 24px; border-top: 1px solid #d6bfa4; }
+.helpLink { display: inline-flex; min-height: 44px; align-items: center; color: #741d32; text-decoration: underline; text-underline-offset: 3px; }
 .page :focus-visible { outline: 2px solid #741d32; outline-offset: 2px; }
 
 @media (max-width: 390px) {

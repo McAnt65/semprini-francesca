@@ -8,6 +8,7 @@ import {
   type LessonLocation,
 } from "../data/lesson-location";
 import styles from "./settings.module.css";
+import SetupChecklist from "../assistenza/SetupChecklist";
 
 export default function SettingsPage() {
   const [location, setLocation] = useState<LessonLocation>(DEFAULT_LESSON_LOCATION);
@@ -74,6 +75,12 @@ export default function SettingsPage() {
           </form>
           <p className={styles.message} role="status" aria-live="polite">{message}</p>
         </section>
+        <section className={styles.helpSection} aria-labelledby="assistance-title">
+          <h2 id="assistance-title">AIUTO E GUIDA</h2>
+          <p>Manuale ricercabile, tour di primo utilizzo e percorsi per ogni sezione.</p>
+          <Link className={styles.helpLink} href="/impostazioni/guida">APRI MANUALE E TOUR →</Link>
+        </section>
+        <SetupChecklist />
       </div>
     </main>
   );

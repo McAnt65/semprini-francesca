@@ -14,15 +14,7 @@ const FORMATS: LessonFormat[] = ["singola", "gruppo"];
 export function loadTariffs(): Tariff[] {
   if (typeof window === "undefined") return [];
   const byId = new Map<string, Tariff>();
-  const storages = availableStorages();
-  let selected = storages;
-  try {
-    const temporary = storages.find((item) => !item.persistent);
-    const raw = temporary?.storage.getItem(TARIFF_STORAGE_KEY);
-    if (temporary?.storage.getItem(TEMPORARY_SNAPSHOT_KEY) === "yes" && raw &&
-        Array.isArray(JSON.parse(raw))) selected = [temporary];
-  } catch { /* Read the other available archive. */ }
-
+  const selected = selectedReadStorages(availableStorages());
   for (const { storage } of selected) {
     try {
       const raw = storage.getItem(TARIFF_STORAGE_KEY);
@@ -44,6 +36,33 @@ export function loadTariffs(): Tariff[] {
   }
 
   return [...byId.values()].sort(compareTariffs);
+}
+
+function selectedReadStorages(storages: AvailableStorage[]) {
+  let selected = storages;
+  try {
+    const temporary = storages.find((item) => !item.persistent);
+    const raw = temporary?.storage.getItem(TARIFF_STORAGE_KEY);
+    if (temporary?.storage.getItem(TEMPORARY_SNAPSHOT_KEY) === "yes" && raw &&
+        Array.isArray(JSON.parse(raw))) selected = [temporary];
+  } catch { /* Read the other available archive. */ }
+  return selected;
+}
+
+/** Reports damaged selected archives while preserving the app's snapshot precedence. */
+export function inspectTariffsReadOnly(): { tariffs: Tariff[]; readable: boolean } {
+  if (typeof window === "undefined") return { tariffs: [], readable: false };
+  const selected = selectedReadStorages(availableStorages());
+  let readable = selected.length > 0;
+  for (const { storage } of selected) {
+    try {
+      const raw = storage.getItem(TARIFF_STORAGE_KEY);
+      if (raw === null) continue;
+      const parsed: unknown = JSON.parse(raw);
+      if (!Array.isArray(parsed) || parsed.some((value) => !normalizeTariff(value))) readable = false;
+    } catch { readable = false; }
+  }
+  return { tariffs: loadTariffs(), readable };
 }
 
 export function saveTariffs(tariffs: Tariff[]): boolean {
@@ -134,7 +153,7 @@ export function nextTariffCode(tariffs: Tariff[]) {
   return `T${index}`;
 }
 
-function normalizeTariff(value: unknown): Tariff | null {
+export function normalizeTariff(value: unknown): Tariff | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const record = value as Record<string, unknown>;
 

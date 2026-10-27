@@ -313,6 +313,12 @@ export function loadStoredStudents(): StudentRecord[] {
   return recoverNarratives(readStudentArchive()).students;
 }
 
+/** Same normalized archive used by the app, without the legacy recovery write. */
+export function inspectStoredStudentsReadOnly(): { students: StudentRecord[]; readable: boolean } {
+  const archive = readStudentArchive();
+  return { students: archive.students, readable: archive.safeToWrite };
+}
+
 export function getStoredStudentById(id: string) {
   return loadStoredStudents().find((student) => student.id === id);
 }

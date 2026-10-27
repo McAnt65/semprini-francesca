@@ -53,6 +53,18 @@ export function loadTravelMarginMinutes(): number {
     ? value : DEFAULT_TRAVEL_MARGIN_MINUTES;
 }
 
+/** A displayed default address is not evidence that preferences were saved. */
+export function inspectSavedLessonLocation(): { configured: boolean; readable: boolean } {
+  const preferences = readPreferences();
+  if (!preferences) return { configured: false, readable: false };
+  if (preferences.lessonLocation === undefined) return { configured: false, readable: true };
+  const saved = asObject(preferences.lessonLocation);
+  if (!saved) return { configured: false, readable: false };
+  const configured = (["street", "streetNumber", "city", "province", "country"] as const)
+    .every((key) => typeof saved[key] === "string" && saved[key].trim().length > 0);
+  return { configured, readable: true };
+}
+
 /** Updates the lesson location and, when provided, the travel margin atomically. */
 export function saveLessonPreferences(location: LessonLocation, travelMarginMinutes?: number): boolean {
   const preferences = readPreferences();
