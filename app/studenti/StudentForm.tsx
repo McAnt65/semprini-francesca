@@ -1,14 +1,11 @@
 "use client";
 
-import StudentPhoto from "../components/StudentPhoto";
 import Link from "next/link";
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { saveStudentWithPhotoResult, PHOTO_SAVE_ERROR } from "../data/save-student-photo";
 import { TEMPORARY_SAVE_WARNING } from "../data/save-result";
-import { readPhotoFile } from "../data/student-photos";
 import type { StudentRecord } from "../data/students";
-import { getStoredStudentById } from "../data/student-storage";
+import { getStoredStudentById, saveStoredStudentResult } from "../data/student-storage";
 import { loadTariffs } from "../data/tariffario/tariff-storage";
 import type { Tariff } from "../data/tariffario/tariff-types";
 import StudentSurface from "./StudentSurface";
@@ -57,10 +54,9 @@ const EMPTY: StudentRecord = {
 
 export default function StudentForm({ studentId, tabbed = false }: { studentId?: string; tabbed?: boolean }) {
   const router = useRouter();
-  const photoOperation = useRef(false);
-  const photoStudentId = useRef("");
+  const saveOperation = useRef(false);
+  const nextStudentId = useRef("");
   const editedFields = useRef(new Set<keyof StudentRecord>());
-  const fileInput = useRef<HTMLInputElement | null>(null);
   const [student, setStudent] = useState<StudentRecord>(EMPTY);
   const [tariffs, setTariffs] = useState<Tariff[]>([]);
   const [message, setMessage] = useState("");
@@ -109,18 +105,8 @@ export default function StudentForm({ studentId, tabbed = false }: { studentId?:
     return destination ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destination)}` : "";
   }
 
-  async function choosePhoto(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file || photoOperation.current) return;
-    photoOperation.current = true;
-    try { update("avatarUrl", await readPhotoFile(file)); }
-    catch (error) { setMessage(error instanceof Error ? error.message : "Fotografia non leggibile. Riprova."); }
-    finally { photoOperation.current = false; }
-  }
-
-  async function save() {
-    if (photoOperation.current) return;
+  function save() {
+    if (saveOperation.current) return;
     const now = Date.now().toString(36);
     const firstName = student.firstName.trim();
     const lastName = student.lastName.trim();
@@ -129,14 +115,14 @@ export default function StudentForm({ studentId, tabbed = false }: { studentId?:
       return;
     }
 
-    const id = student.id || (photoStudentId.current ||= `${[firstName, lastName].filter(Boolean).join("-").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "studente"}-${now}`);
+    const id = student.id || (nextStudentId.current ||= `${[firstName, lastName].filter(Boolean).join("-").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "studente"}-${now}`);
     const { record: next, replaceFields } = prepareStudentFormSave(student, id, editedFields.current);
 
-    photoOperation.current = true;
-    const result = await saveStudentWithPhotoResult(next, { replaceFields });
-    photoOperation.current = false;
+    saveOperation.current = true;
+    const result = saveStoredStudentResult(next, { replaceFields });
+    saveOperation.current = false;
     if (result.status === "failed") {
-      setMessage(PHOTO_SAVE_ERROR);
+      setMessage("Salvataggio non riuscito. Riprova.");
       return;
     }
     if (result.status === "temporary") { setMessage(TEMPORARY_SAVE_WARNING); return; }
@@ -159,14 +145,10 @@ export default function StudentForm({ studentId, tabbed = false }: { studentId?:
 
         <form className={styles.entryForm} onSubmit={(event) => { event.preventDefault(); save(); }}>
           <section className={styles.identity} aria-label="Identità studente">
-            <button type="button" className={styles.identityPhoto} onClick={() => fileInput.current?.click()} aria-label="Carica foto studente">
-              {student.avatarUrl ? <StudentPhoto src={student.avatarUrl} alt="Anteprima fotografia studente" fill unoptimized /> : <span>Foto</span>}
-            </button>
             <div className={styles.identityFields}>
               <Field label="Nome" value={student.firstName} onChange={(value) => update("firstName", value)} />
               <Field label="Cognome" value={student.lastName} onChange={(value) => update("lastName", value)} />
             </div>
-            <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" onChange={choosePhoto} className="sr-only" />
             <nav className={styles.quickContacts} aria-label="Contatti rapidi">
               <a href={student.phone ? `tel:${student.phone}` : undefined} aria-disabled={!student.phone}>Telefono</a>
               <a href={student.whatsapp ? `https://wa.me/${student.whatsapp.replace(/\D/g, "")}` : undefined} aria-disabled={!student.whatsapp}>WhatsApp</a>
@@ -236,17 +218,6 @@ export default function StudentForm({ studentId, tabbed = false }: { studentId?:
     <StudentSurface artwork={artwork} current="new" className={styles.tallSurface}>
       <h1 className="sr-only">{studentId ? "Modifica studente" : "Nuovo studente"}</h1>
       <form className={styles.formScroll} onSubmit={(event) => { event.preventDefault(); save(); }}>
-        <section className={`${styles.formSection} ${styles.photoSection}`} aria-labelledby="foto-title">
-          <h2 id="foto-title" className={styles.visualOnly}>FOTO</h2>
-          <button type="button" className={styles.photoPicker} onClick={() => fileInput.current?.click()}>
-            {student.avatarUrl ? <StudentPhoto src={student.avatarUrl} alt="Anteprima fotografia studente" fill unoptimized className="object-cover" /> : <span>FOTO</span>}
-          </button>
-          <button type="button" className={styles.photoReplace} onClick={() => fileInput.current?.click()}>
-            {student.avatarUrl ? "SOSTITUISCI IMMAGINE" : "CARICA IMMAGINE"}
-          </button>
-          <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" onChange={choosePhoto} className="sr-only" />
-        </section>
-
         <section className={styles.formSection} aria-labelledby="personal-title">
           <h2 id="personal-title" className={styles.visualOnly} style={{ top: "6.2%" }}>DATI PERSONALI</h2>
           <Field className={styles.fieldName} label="NOME" value={student.firstName} onChange={(value) => update("firstName", value)} />

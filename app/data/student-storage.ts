@@ -124,7 +124,7 @@ function normalizeStoredStudent(value: unknown): StudentRecord | null {
     id: text(student.id),
     status: text(student.status) === "archived" ? "archived" : "active",
     enrollmentDate: text(student.enrollmentDate),
-    avatarUrl: text(student.avatarUrl) || undefined,
+    avatarUrl: typeof student.avatarUrl === "string" ? student.avatarUrl : undefined,
     firstName: text(student.firstName),
     lastName: text(student.lastName),
     birthDate: text(student.birthDate),

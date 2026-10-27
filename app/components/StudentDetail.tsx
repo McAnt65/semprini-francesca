@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import StudentPhoto from "./StudentPhoto";
 import Link from "next/link";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -128,19 +127,6 @@ export default function StudentDetail({
             aria-label={`Nuova lezione per ${fullName}`}
             className="antique-clickable absolute left-[9%] top-[87.3%] z-40 h-[10.5%] w-[23%] bg-transparent"
           />
-
-          {/* FOTOGRAFIA */}
-          <div className="absolute left-[5.2%] top-[18.5%] z-30 h-[21.6%] w-[28.1%] overflow-hidden">
-            {student.avatarUrl && (
-              <StudentPhoto
-                src={student.avatarUrl}
-                alt={`Fotografia di ${fullName}`}
-                fill
-                unoptimized
-                className="object-cover opacity-95"
-              />
-            )}
-          </div>
 
           {/* TESTO NARRATIVO */}
           <div className="absolute left-[39.5%] top-[22.7%] z-30 flex h-[24.5%] w-[44.2%] flex-col items-center justify-center overflow-hidden px-[1%] text-center">

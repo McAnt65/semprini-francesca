@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import StudentPhoto from "./StudentPhoto";
 import Link from "next/link";
 import { useState } from "react";
 import type { StudentRecord } from "../data/students";
@@ -40,9 +39,6 @@ export default function StudentCard({ student }: { student: StudentRecord }) {
       <Link href="/studenti/elenco" aria-label="Elenco studenti" className="absolute left-[2%] top-[1%] z-30 h-[6%] w-[25%]" />
       <Link href="/menu" aria-label="Menu" className="absolute right-[2%] top-[1%] z-30 h-[6%] w-[25%]" />
 
-      <div className="absolute left-[4%] top-[8.5%] h-[20.5%] w-[32%] overflow-hidden -rotate-[4deg]">
-        {student.avatarUrl && <StudentPhoto src={student.avatarUrl} alt={`Fotografia di ${name}`} fill unoptimized className="object-cover" />}
-      </div>
       <div className={`absolute left-[39%] top-[19%] h-[10%] w-[49%] overflow-auto text-center ${ink}`}>
         <p className="text-[clamp(19px,5.1vw,26px)] leading-tight text-[#762b3b]">{name}</p>
         <p className="mt-1 text-[clamp(11px,3vw,15px)]">{student.subjects.join(" · ")}</p>

@@ -34,3 +34,14 @@ test("Card offers the narrated sheet without the old edit command", () => {
     assert(text.includes("/studenti/nuovo?id=${encodeURIComponent(student.id)}"), component);
   }
 });
+
+test("reachable student pages use no photo service or photo controls", () => {
+  for (const path of ["../app/studenti/nuovo/page.tsx", "../app/studenti/nuovo/diario/page.tsx",
+    "../app/components/StudentJourney.tsx", "../app/studenti/[id]/page.tsx",
+    "../app/studenti/elenco/page.tsx", "../app/studenti/archivio/page.tsx"]) {
+    const text = source(path);
+    assert(!/student-photos|save-student-photo|StudentPhoto|WatercolorPortrait|type="file"/.test(text), path);
+  }
+  assert(source("../app/studenti/nuovo/page.tsx").includes("saveStoredStudentResult"));
+  assert(source("../app/studenti/nuovo/diario/page.tsx").includes("saveStoredStudentResult"));
+});

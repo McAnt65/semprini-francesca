@@ -5,7 +5,7 @@ const editableFields: Array<keyof StudentRecord> = [
   "school", "city", "studyCourse", "phone", "whatsapp", "email", "subjects",
   "householdMembers", "address", "postalCode", "familyContacts", "primaryContactId",
   "books", "textbooks", "topicsToDeepen", "teachers", "firstImpressions", "interests",
-  "passions", "preferredActivities", "personalNotes", "learningStartDate", "learningGoals", "avatarUrl",
+  "passions", "preferredActivities", "personalNotes", "learningStartDate", "learningGoals",
   "lessonMode", "lessonDurationMinutes", "lessonRateCents",
 ];
 

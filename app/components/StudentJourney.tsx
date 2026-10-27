@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import StudentPhoto from "./StudentPhoto";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import journeyBackground from "../assets/student-journey-watercolor.webp";
@@ -71,9 +70,6 @@ export default function StudentJourney({ student }: { student: StudentRecord }) 
       <h1 className="sr-only">Percorso di {name} con Francesca</h1>
       <Link href={`/studenti/${encodeURIComponent(student.id)}`} aria-label="Torna alla scheda dello studente" className="absolute left-[2%] top-[1%] z-30 h-[6%] w-[25%]" />
       <Link href="/menu" aria-label="Menu" className="absolute right-[2%] top-[1%] z-30 h-[6%] w-[25%]" />
-      <div className="absolute left-[4%] top-[8.5%] h-[20.5%] w-[32%] overflow-hidden -rotate-[4deg]">
-        {student.avatarUrl && <StudentPhoto src={student.avatarUrl} alt={`Fotografia di ${name}`} fill unoptimized className="object-cover" />}
-      </div>
       <div className="absolute left-[38%] top-[22%] h-[12%] w-[52%] overflow-auto text-center font-entry-elegant">
         <p className="text-[clamp(18px,5vw,27px)] leading-tight text-[#762b3b]">{name}</p>
         <p className="mt-1 text-[clamp(11px,3vw,15px)]">{student.subjects.join(" · ")}</p>

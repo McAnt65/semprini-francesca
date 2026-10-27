@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import {
   buildStudentFromSavedDrafts,
   clearNewStudentDrafts,
+  saveStoredStudentResult,
 } from "../../../data/student-storage";
 
-import { saveStudentWithPhotoResult, PHOTO_SAVE_ERROR } from "../../../data/save-student-photo";
 import { TEMPORARY_SAVE_WARNING } from "../../../data/save-result";
 
 type AnyRecord = Record<string, unknown>;
@@ -22,7 +22,6 @@ type DiaryData = {
   phone: string;
   email: string;
 
-  photo: string;
 
   schoolType: string;
   school: string;
@@ -53,7 +52,6 @@ const EMPTY_DATA: DiaryData = {
   phone: "",
   email: "",
 
-  photo: "",
 
   schoolType: "",
   school: "",
@@ -78,7 +76,7 @@ const EMPTY_DATA: DiaryData = {
 export default function StudentDiaryPage() {
   const router = useRouter();
   const hasConsolidated = useRef(false);
-  const [photoError, setPhotoError] = useState("");
+  const [saveError, setSaveError] = useState("");
 
   const [data] =
     useState<DiaryData>(() => readAllDrafts());
@@ -90,9 +88,10 @@ export default function StudentDiaryPage() {
     const student = buildStudentFromSavedDrafts();
 
     if (!student.firstName && !student.lastName) return;
-    void saveStudentWithPhotoResult(student).then((result) => {
-      if (result.status === "failed") { hasConsolidated.current = false; setPhotoError(PHOTO_SAVE_ERROR + " Ricarica la pagina per riprovare."); return; }
-      if (result.status === "temporary") { hasConsolidated.current = false; setPhotoError(TEMPORARY_SAVE_WARNING); return; }
+    queueMicrotask(() => {
+      const result = saveStoredStudentResult(student);
+      if (result.status === "failed") { hasConsolidated.current = false; setSaveError("Salvataggio non riuscito. Ricarica la pagina per riprovare."); return; }
+      if (result.status === "temporary") { hasConsolidated.current = false; setSaveError(TEMPORARY_SAVE_WARNING); return; }
       clearNewStudentDrafts();
       router.replace(`/studenti/${student.id}`);
     });
@@ -181,7 +180,7 @@ export default function StudentDiaryPage() {
 
   return (
     <main className="min-h-dvh w-full overflow-x-hidden bg-[#efe3ce] text-[#4b3024]">
-      {photoError && <p role="alert">{photoError}</p>}
+      {saveError && <p role="alert">{saveError}</p>}
 
       <div className="mx-auto w-full max-w-[430px] py-0 sm:py-3">
 
@@ -223,21 +222,6 @@ export default function StudentDiaryPage() {
             <h1 className="font-handwritten text-[clamp(25px,7vw,38px)] leading-none text-[#6f2638]">
               {fullName}
             </h1>
-          </div>
-
-          {/* FOTO */}
-
-          <div className="absolute left-[4.8%] top-[18.2%] z-30 h-[22.2%] w-[28.5%] overflow-hidden">
-            {data.photo ? (
-              <Image
-                src={data.photo}
-                alt={`Fotografia di ${fullName}`}
-                fill
-                unoptimized
-                sizes="123px"
-                className="object-cover"
-              />
-            ) : null}
           </div>
 
           {/* TESTO NARRATIVO */}
@@ -494,18 +478,6 @@ function readAllDrafts(): DiaryData {
         "email",
         "mail",
         "studentEmail",
-      ]
-    ),
-
-    photo: getString(
-      merged,
-      [
-        "watercolorPreview",
-        "watercolorPhoto",
-        "photoPreview",
-        "photo",
-        "photoOriginal",
-        "image",
       ]
     ),
 

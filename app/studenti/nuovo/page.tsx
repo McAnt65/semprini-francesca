@@ -4,8 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type KeyboardEventHandler, type Ref } from "react";
 import type { StudentFamilyContact, StudentRecord, StudentTeacher } from "../../data/students";
-import { getStoredStudentById } from "../../data/student-storage";
-import { saveStudentWithPhotoResult } from "../../data/save-student-photo";
+import { getStoredStudentById, saveStoredStudentResult } from "../../data/student-storage";
 import { TEMPORARY_SAVE_WARNING, type SaveResult } from "../../data/save-result";
 import { addStudentBook, booksForEditing, changeBookField, removeStudentBook } from "../student-edit";
 import { loadTariffs } from "../../data/tariffario/tariff-storage";
@@ -489,7 +488,7 @@ export default function NewStudentPage() {
     saveOperation.current = true;
     setSaving(true);
     let result: SaveResult = { status: "failed" };
-    try { result = await saveStudentWithPhotoResult(record, { replaceFields }); }
+    try { result = saveStoredStudentResult(record, { replaceFields }); }
     finally { saveOperation.current = false; setSaving(false); }
     if (result.status === "failed") { setMessage("Salvataggio non riuscito: verifica lo spazio disponibile e l'archiviazione locale del browser."); return; }
     if (result.status === "temporary") { setMessage(TEMPORARY_SAVE_WARNING); return; }

@@ -33,3 +33,39 @@ test("family contacts and primary contact survive unrelated changes", () => { co
 test("lesson preferences update without changing appointments", () => { const c = setup(); c.save(c.base); c.local.setItem("semprini:calendar:appointments:v1", "[{\"id\":\"lesson\",\"amountCents\":2000}]"); const before = c.storage.getStoredStudentById(c.base.id); c.save({ ...before, lessonMode: "domicilio", lessonDurationMinutes: 90, lessonRateCents: 2500 }, before); const after = c.storage.getStoredStudentById(c.base.id); assert.equal(after.lessonMode, "domicilio"); assert.equal(after.lessonDurationMinutes, 90); assert.equal(after.lessonRateCents, 2500); assert.match(c.local.getItem("semprini:calendar:appointments:v1"), /2000/); });
 test("temporary save and failure leave the draft available", () => { const c = setup(); const draft = { ...c.base, firstName: "Bozza" }; c.local.blocked = true; assert.equal(c.save(draft).status, "temporary"); assert.equal(draft.firstName, "Bozza"); c.session.blocked = true; assert.equal(c.save({ ...draft, firstName: "Seconda bozza" }).status, "failed"); assert.equal(draft.firstName, "Bozza"); });
 test("unexposed historical fields survive a narrated edit", () => { const c = setup(); const original = { ...c.base, postalCode: "47800", province: "RN", familyNotes: "Nota storica", usefulReferences: "Riferimento storico" }; c.save(original); const before = c.storage.getStoredStudentById(original.id); const { record, replaceFields } = c.prepare({ ...before, personalNotes: "Nota aggiornata" }, before, before.id, "2026-10-18"); for (const key of ["postalCode", "province", "familyNotes", "usefulReferences"]) assert(!replaceFields.includes(key)); assert.equal(c.storage.saveStoredStudentResult(record, { replaceFields }).status, "saved"); const after = c.storage.getStoredStudentById(original.id); for (const key of ["postalCode", "province", "familyNotes", "usefulReferences"]) assert.equal(after[key], original[key]); assert.equal(after.personalNotes, "Nota aggiornata"); });
+
+test("a missing legacy photo Blob never blocks editing, reloading or archiving", () => {
+  const c = setup();
+  const reference = "student-photo:v1:narrated-test:missing-blob";
+  c.local.setItem("semprini:students", JSON.stringify([{ ...c.base, avatarUrl: reference }]));
+  const before = c.storage.getStoredStudentById(c.base.id);
+  const { record, replaceFields } = c.prepare({ ...before, personalNotes: "Appunto fittizio aggiornato" }, before, before.id, "2026-10-18");
+  assert(!replaceFields.includes("avatarUrl"));
+  assert.equal(c.storage.saveStoredStudentResult(record, { replaceFields }).status, "saved");
+  assert.equal(c.storage.getStoredStudentById(c.base.id).avatarUrl, reference);
+  assert.equal(c.storage.archiveStoredStudentResult(c.base.id).status, "saved");
+  assert.equal(c.storage.getStoredStudentById(c.base.id).avatarUrl, reference);
+  assert.equal(c.storage.getStoredStudentById(c.base.id).status, "archived");
+});
+
+test("historical data URL remains byte for byte unchanged after an ordinary edit", () => {
+  const c = setup();
+  const legacy = "  data:image/png;base64,VEVTVA==  ";
+  c.local.setItem("semprini:students", JSON.stringify([{ ...c.base, avatarUrl: legacy }]));
+  const before = c.storage.getStoredStudentById(c.base.id);
+  assert.equal(c.save({ ...before, phone: "999" }, before).status, "saved");
+  assert.equal(c.storage.getStoredStudentById(c.base.id).avatarUrl, legacy);
+});
+
+test("a legacy photo reference does not change the temporary or failed save result", () => {
+  const c = setup();
+  const legacy = "student-photo:v1:narrated-test:unreadable";
+  c.local.setItem("semprini:students", JSON.stringify([{ ...c.base, avatarUrl: legacy }]));
+  const before = c.storage.getStoredStudentById(c.base.id);
+  c.local.blocked = true;
+  assert.equal(c.save({ ...before, phone: "999" }, before).status, "temporary");
+  assert.equal(c.storage.getStoredStudentById(c.base.id).avatarUrl, legacy);
+  c.session.blocked = true;
+  assert.equal(c.save({ ...before, phone: "888" }, before).status, "failed");
+  assert.equal(c.local.getItem("semprini:students"), JSON.stringify([{ ...c.base, avatarUrl: legacy }]));
+});
