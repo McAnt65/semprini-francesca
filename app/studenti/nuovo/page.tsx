@@ -102,8 +102,8 @@ function fieldPrompt(label: string) {
   if (label.startsWith("email ")) return "Email";
   return label.charAt(0).toUpperCase() + label.slice(1).split(" ")[0];
 }
-function InlineValue({ value, label, editing, onChange, kind = "text", long = false, inputRef, onKeyDown, textareaId, onTextareaKeyDown }: {
-  value: string; label: string; editing: boolean; onChange: (value: string) => void;
+function InlineValue({ value, label, editing, onChange, invalid = false, kind = "text", long = false, inputRef, onKeyDown, textareaId, onTextareaKeyDown }: {
+  value: string; label: string; editing: boolean; onChange: (value: string) => void; invalid?: boolean;
   kind?: "text" | "date" | "tel" | "email"; long?: boolean;
   inputRef?: Ref<HTMLInputElement>; onKeyDown?: KeyboardEventHandler<HTMLInputElement>;
   textareaId?: string; onTextareaKeyDown?: KeyboardEventHandler<HTMLTextAreaElement>;
@@ -124,13 +124,13 @@ function InlineValue({ value, label, editing, onChange, kind = "text", long = fa
     {kind === "date"
       ? <span className={styles.dateField}>
         <span className={styles.dateValue}>{value ? italianDate(value) : "Data"}</span>
-        <input ref={inputRef} onKeyDown={onKeyDown} className={styles.datePicker} type="date" aria-label={fieldHint(label)} aria-describedby={hintId}
+        <input ref={inputRef} onKeyDown={onKeyDown} className={styles.datePicker} type="date" aria-label={fieldHint(label)} aria-describedby={hintId} aria-invalid={invalid || undefined}
           value={value} onChange={(event) => onChange(event.target.value)} />
       </span>
       : long
-      ? <textarea ref={ref} id={textareaId} onKeyDown={onTextareaKeyDown} rows={1} className={styles.longField} aria-label={fieldHint(label)} aria-describedby={hintId} placeholder={value ? prompt : undefined}
+      ? <textarea ref={ref} id={textareaId} onKeyDown={onTextareaKeyDown} rows={1} className={styles.longField} aria-label={fieldHint(label)} aria-describedby={hintId} aria-invalid={invalid || undefined} placeholder={value ? prompt : undefined}
         style={{ width }} value={value} onChange={(event) => onChange(event.target.value)} />
-      : <input ref={inputRef} onKeyDown={onKeyDown} className={styles.inlineField} type={kind} aria-label={fieldHint(label)} aria-describedby={hintId} placeholder={value ? prompt : undefined}
+      : <input ref={inputRef} onKeyDown={onKeyDown} className={styles.inlineField} type={kind} aria-label={fieldHint(label)} aria-describedby={hintId} aria-invalid={invalid || undefined} placeholder={value ? prompt : undefined}
         style={{ width }} value={value} onChange={(event) => onChange(event.target.value)} />}
     <span id={hintId} role="tooltip" className={styles.fieldHint}>{fieldHint(label)}</span>
   </span>;
@@ -172,10 +172,12 @@ export default function NewStudentPage() {
   const [birthDateDraft, setBirthDateDraft] = useState("");
   const [today, setToday] = useState("");
   const [message, setMessage] = useState("");
+  const [saveAttempted, setSaveAttempted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [tariffs, setTariffs] = useState<Tariff[]>([]);
   const primaryHintId = useId();
   const narrativeScroll = useRef<HTMLDivElement>(null);
+  const pageRef = useRef<HTMLElement>(null);
   const firstNameInput = useRef<HTMLInputElement>(null);
   const surnameInput = useRef<HTMLInputElement>(null);
   const birthDateInput = useRef<HTMLInputElement>(null);
@@ -208,6 +210,29 @@ export default function NewStudentPage() {
       const existing = id ? getStoredStudentById(id) : null;
       if (existing) { setStudent(existing); setSaved(existing); setEditing(false); nextId.current = existing.id; }
     });
+  }, []);
+  useEffect(() => {
+    const page = pageRef.current;
+    if (!page) return;
+    const revealFocused = () => {
+      const focused = document.activeElement;
+      if (focused instanceof HTMLElement && page.contains(focused) && focused.matches("input, textarea, select")) {
+        requestAnimationFrame(() => focused.scrollIntoView({ block: "center", inline: "nearest" }));
+      }
+    };
+    const resize = () => {
+      page.style.setProperty("--student-visible-height", `${window.visualViewport?.height || window.innerHeight}px`);
+      revealFocused();
+    };
+    resize();
+    page.addEventListener("focusin", revealFocused);
+    window.visualViewport?.addEventListener("resize", resize);
+    window.addEventListener("resize", resize);
+    return () => {
+      page.removeEventListener("focusin", revealFocused);
+      window.visualViewport?.removeEventListener("resize", resize);
+      window.removeEventListener("resize", resize);
+    };
   }, []);
   function activeNarrativeField(): NarrativeField | undefined {
     if (openingEdit) return openingEdit;
@@ -259,8 +284,8 @@ export default function NewStudentPage() {
     if (field === "firstName" && !student.firstName.trim()) { setMessage("Inserisci il nome prima di continuare."); return; }
     if (field === "lastName" && !student.lastName.trim()) { setMessage("Inserisci il cognome prima di continuare."); return; }
     if (field === "birthDate") {
-      const parsedDate = parseItalianBirthDate(birthDateDraft);
-      if (!parsedDate || ageFrom(parsedDate, today) === null) { setMessage("Inserisci una data di nascita valida."); return; }
+      const parsedDate = birthDateDraft.trim() ? parseItalianBirthDate(birthDateDraft) : "";
+      if (parsedDate === null || (parsedDate && ageFrom(parsedDate, today) === null)) { setMessage("Inserisci una data di nascita valida oppure lasciala vuota."); return; }
       update("birthDate", parsedDate);
     }
     if (field === "books" && bookEditIndex !== null) {
@@ -301,7 +326,7 @@ export default function NewStudentPage() {
     if (key === "birthDate") return <><BirthDateEntry value={birthDateDraft} inputRef={inputRef} onChange={setBirthDateDraft}
       onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); advanceOpening(); } }} />
       {(!openingEdit || openingEdit === key) && <button type="button" className={styles.narrativeNext} onClick={advanceOpening}>AVANTI</button>}</>;
-    return <><InlineValue value={value} label={label} kind={key === "phone" || key === "whatsapp" ? "tel" : key === "email" ? "email" : "text"} editing={editing} inputRef={inputRef}
+    return <><InlineValue value={value} label={label} kind={key === "phone" || key === "whatsapp" ? "tel" : key === "email" ? "email" : "text"} editing={editing} invalid={saveAttempted && (key === "firstName" || key === "lastName") && !value.trim()} inputRef={inputRef}
       onChange={(next) => { if (key === "subjects") update("subjects", next.split(",")); else update(key, next); }} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); advanceOpening(); } }} />
       {(!openingEdit || openingEdit === key) && <button type="button" className={styles.narrativeNext} onClick={advanceOpening}>AVANTI</button>}</>;
   }
@@ -317,8 +342,8 @@ export default function NewStudentPage() {
       onChange={(value) => update(key, value)} />;
   }
   function nameFields(person: { firstName: string; lastName: string }, first: (value: string) => void, last: (value: string) => void, label: string) {
-    return <><InlineValue value={person.firstName} label={`nome ${label}`} editing={editing} onChange={first} />{" "}
-      <InlineValue value={person.lastName} label={`cognome ${label}`} editing={editing} onChange={last} /></>;
+    return <><InlineValue value={person.firstName} label={`nome ${label}`} editing={editing} invalid={label === "studente" && saveAttempted && !person.firstName.trim()} onChange={first} />{" "}
+      <InlineValue value={person.lastName} label={`cognome ${label}`} editing={editing} invalid={label === "studente" && saveAttempted && !person.lastName.trim()} onChange={last} /></>;
   }
   function updateContact(id: string, relation: string, key: keyof StudentFamilyContact, value: string) {
     setStudent((current) => {
@@ -480,10 +505,20 @@ export default function NewStudentPage() {
   }
   async function save() {
     if (saveOperation.current) return;
-    if (!student.firstName.trim() || !student.lastName.trim()) { setMessage("Inserisci nome e cognome nel primo capitolo."); return; }
+    setSaveAttempted(true);
+    if (!student.firstName.trim() || !student.lastName.trim()) {
+      setMessage("Nome e cognome sono obbligatori: completa i campi evidenziati nel primo capitolo.");
+      if (!saved) { setOpeningEdit(null); setOpeningStep(student.firstName.trim() ? 1 : 0); }
+      return;
+    }
     if (student.birthDate && ageFrom(student.birthDate, today) === null) { setMessage("Controlla la data di nascita."); return; }
+    if (bookEditIndex !== null && !bookDraft.trim() && !bookPublisherDraft.trim()) { setMessage("Completa il libro in modifica oppure usa ELIMINA."); bookEntryInput.current?.focus(); return; }
+    const studentToSave = bookEditIndex === null ? student : (() => {
+      const withBook = bookEditIndex === booksForEditing(student).length ? addStudentBook(student) : student;
+      return changeBookField(changeBookField(withBook, bookEditIndex, "title", bookDraft.trim()), bookEditIndex, "publisher", bookPublisherDraft.trim());
+    })();
     nextId.current ||= `studente-${crypto.randomUUID()}`;
-    const { record, replaceFields } = prepareNarratedStudentSave(student, saved, nextId.current, today);
+    const { record, replaceFields } = prepareNarratedStudentSave(studentToSave, saved, nextId.current, today);
     // The existing archive keeps IDs and enrollment dates. Explicit replacement permits intentional removals.
     saveOperation.current = true;
     setSaving(true);
@@ -497,12 +532,16 @@ export default function NewStudentPage() {
     setStudent(persisted);
     setSaved(persisted);
     setEditing(false);
+    setBookEditIndex(null);
+    setOpeningEdit(null);
+    setSaveAttempted(false);
     setMessage("Studente custodito nel registro.");
   }
   function cancel() {
     setStudent(saved || EMPTY);
     setEditing(false);
     setMessage("");
+    setSaveAttempted(false);
   }
   const age = ageFrom(student.birthDate, today);
   const bookEntries = booksForEditing(student);
@@ -565,7 +604,7 @@ export default function NewStudentPage() {
   const contactDetailsVisible = phoneVisible || whatsappVisible || emailVisible;
   const subjectsVisible = showChapterField("subjects", 11, student.subjects.join(", "));
   return (
-    <main className={styles.page}>
+    <main ref={pageRef} className={styles.page}>
       <div className={styles.sheet}>
         <Image src="/SfondoNuovoStudente.png" alt="" fill preload unoptimized sizes="(max-width: 560px) 100vw, 560px" className={styles.artwork} />
         <h1 className="sr-only">Nuovo studente</h1>
@@ -584,8 +623,8 @@ export default function NewStudentPage() {
                   : <>
                     {openingValue("firstName", 0, "nome studente", firstNameInput)}
                     {openingStep >= 1 && <span className={styles.openingReveal}> {openingValue("lastName", 1, "cognome studente", surnameInput)}</span>}
-                    {openingStep >= 2 && <span className={styles.openingReveal}>. È nato/a il {openingValue("birthDate", 2, "data di nascita", birthDateInput)}</span>}
-                    {openingStep >= 3 && <span className={styles.openingReveal}> e ha <span className={styles.value}>{age ?? "…"}</span> anni.</span>}
+                    {(openingStep === 2 || (openingStep > 2 && student.birthDate)) && <span className={styles.openingReveal}>. È nato/a il {openingValue("birthDate", 2, "data di nascita", birthDateInput)}</span>}
+                    {openingStep >= 3 && <span className={styles.openingReveal}>{age !== null && <> e ha <span className={styles.value}>{age}</span> anni</>}.</span>}
                   </>}</p>
                 {!saved && openingStep >= 3 && (openingStep < 8 || schoolDetailsVisible) && <p>
                   {gradeVisible && <>Frequenta il {openingValue("gradeClass", 3, "anno scolastico", gradeInput)}</>}
@@ -714,8 +753,9 @@ export default function NewStudentPage() {
             </div>
           </div>
           <div className={styles.footer}>
+            <span className={styles.status} role="status" aria-live="polite">{message}</span>
             <div className={styles.actions}>
-              <button type="button" onClick={save} disabled={!editing || saving || Boolean(openingEdit) || bookEditIndex !== null || (!saved && openingStep < pathEnd)}>SALVA</button>
+              <button type="button" onClick={save} disabled={!editing || saving}>SALVA</button>
               <button type="button" disabled={editing && !saved} aria-pressed={editing} aria-label={editing ? "Ripristina l'ultima versione salvata" : "Modifica i dati dello studente"}
                 title={editing ? "Ripristina l'ultima versione salvata" : "Modifica i dati dello studente"}
                 onClick={() => {
@@ -723,7 +763,6 @@ export default function NewStudentPage() {
                   if (saved && window.confirm("Ripristinare l'ultima versione salvata? Le modifiche non salvate andranno perse.")) cancel();
                 }}>MODIFICA</button>
             </div>
-            <span className={styles.status} role="status" aria-live="polite">{message}</span>
           </div>
         </div>
       </div>

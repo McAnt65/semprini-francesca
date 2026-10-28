@@ -2,13 +2,15 @@
   --narrative-value-color: #9b2747;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: safe center;
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  height: 100dvh;
+  height: var(--student-visible-height, 100dvh);
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-padding-block: 16px;
   background: #f3e4ce;
   color: #70513e;
   font-family: var(--font-entry-elegant), Georgia, serif;
@@ -16,8 +18,8 @@
 .sheet {
   position: relative;
   container-type: inline-size;
-  width: min(100%, 560px, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 941 / 1672));
-  max-height: 100%;
+  width: min(100%, 560px, calc((max(100dvh, 764px) - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 941 / 1672));
+  flex: none;
   aspect-ratio: 941 / 1672;
   overflow: hidden;
   margin-inline: auto;
@@ -39,11 +41,12 @@
 .actions { display: grid; grid-template-columns: 6em 6em; justify-content: center; align-items: center; gap: 9cqw; min-height: 44px; }
 .actions button { width: 6em; min-height: 44px; cursor: pointer; font-size: clamp(13px, 3.6vw, 18px); }
 .actions button:disabled { opacity: .55; }
-.status { position: absolute; right: 0; bottom: calc(100% + 3px); left: 0; min-height: 0; color: #70513e; font-size: 14px; font-style: italic; text-align: center; }
+.status { min-height: 0; color: #70513e; font-size: 14px; font-style: italic; text-align: center; }
 .status:empty { display: none; }
 .scroll {
   min-height: 0; flex: 1; overflow-y: auto; overflow-x: hidden;
-  overscroll-behavior: contain; scrollbar-width: none; -ms-overflow-style: none;
+  overscroll-behavior-y: auto; scrollbar-width: none; -ms-overflow-style: none;
+  scroll-padding-block: 16px;
   padding: 0 3px max(28px, env(safe-area-inset-bottom));
   font-size: clamp(14px, calc(3.8vw - 2px), 16px); line-height: 1.5; font-style: italic;
 }
@@ -86,6 +89,7 @@
 .longField { min-height: 1.5em; resize: none; overflow: hidden; white-space: pre-wrap; overflow-wrap: anywhere; }
 .inlineField::placeholder, .longField::placeholder { color: #947165; opacity: 1; font-style: italic; }
 .inlineField:focus-visible, .longField:focus-visible, .inlineSelect:focus-visible { outline: 1px solid rgb(116 29 50 / 65%); outline-offset: 2px; background: rgb(116 29 50 / 5%); }
+.inlineField[aria-invalid="true"] { outline: 2px solid #9b2747; outline-offset: 2px; background: rgb(155 39 71 / 9%); }
 .inlineSelect { width: auto; min-height: 32px; cursor: pointer; }
 .bookList { margin: 0 0 10px 2.7em; padding: 0; }
 .bookList li { margin: 0 0 3px; padding: 0; }
