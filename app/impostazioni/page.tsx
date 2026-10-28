@@ -80,6 +80,11 @@ export default function SettingsPage() {
           <p>Manuale ricercabile, tour di primo utilizzo e percorsi per ogni sezione.</p>
           <Link className={styles.helpLink} href="/impostazioni/guida">APRI MANUALE E TOUR →</Link>
         </section>
+        <section className={styles.helpSection} aria-labelledby="backup-title">
+          <h2 id="backup-title">SALVATAGGIO E RIPRISTINO</h2>
+          <p>Scarica una copia cifrata dei dati e ripristinala quando cambi dispositivo.</p>
+          <Link className={styles.helpLink} href="/impostazioni/salvataggio">APRI SALVATAGGIO E RIPRISTINO →</Link>
+        </section>
         <SetupChecklist />
       </div>
     </main>
