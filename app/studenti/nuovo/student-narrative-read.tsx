@@ -1,10 +1,20 @@
 import type { StudentFamilyContact, StudentRecord, StudentTeacher } from "../../data/students";
 import type { ReactNode } from "react";
+import { contactPhone, whatsappNumber } from "./contact-links";
 import styles from "./nuovo.module.css";
 
 const filled = (value?: string) => value?.trim() || "";
 const personName = (person: { firstName: string; lastName: string }) => [filled(person.firstName), filled(person.lastName)].filter(Boolean).join(" ");
 const Value = ({ children }: { children: ReactNode }) => <span className={styles.value}>{children}</span>;
+
+export function WhatsAppLink({ phone, enabled }: { phone?: string; enabled?: string }) {
+  const number = enabled?.trim() && whatsappNumber(phone);
+  return number ? <a className={styles.contactLink} href={`https://wa.me/${number}`} target="_blank" rel="noopener noreferrer">WhatsApp</a> : null;
+}
+
+export function EmailLink({ email }: { email: string }) {
+  return <a className={styles.contactLink} href={`mailto:${email.trim()}`}>{email.trim()}</a>;
+}
 
 function dateLabel(value?: string) {
   if (!value) return "";
@@ -28,7 +38,7 @@ export function StudentReadChapter({ student, today }: { student: StudentRecord;
   const school = filled(student.schoolName || student.school);
   const city = filled(student.city);
   const course = filled(student.studyCourse);
-  const phone = filled(student.phone);
+  const phone = contactPhone(student.phone, student.whatsapp);
   const whatsapp = filled(student.whatsapp);
   const email = filled(student.email);
   const subjects = student.subjects.map(filled).filter(Boolean);
@@ -41,10 +51,10 @@ export function StudentReadChapter({ student, today }: { student: StudentRecord;
       {city && <>Studia a <Value>{city}</Value>. </>}
       {course && <>Segue l&apos;indirizzo di studi <Value>{course}</Value>.</>}
     </p>}
-    {(phone || whatsapp || email) && <p>
+    {(phone || email) && <p>
       {phone && <>Il suo numero di cellulare è <Value>{phone}</Value>. </>}
-      {whatsapp && (phone && whatsapp === phone ? <>Il numero di cellulare è utilizzabile anche per WhatsApp. </> : <>Il suo numero WhatsApp è <Value>{whatsapp}</Value>. </>)}
-      {email && <>Il suo indirizzo di posta elettronica è <Value>{email}</Value>.</>}
+      {whatsapp && whatsappNumber(phone) && <>Utilizzabile anche per <WhatsAppLink phone={phone} enabled={whatsapp} />. </>}
+      {email && <>Il suo indirizzo di posta elettronica è <EmailLink email={email} />.</>}
     </p>}
     {subjects.length > 0 && <p>Ci dedicheremo insieme allo studio di <Value>{subjects.join(", ")}</Value>, cercando, con pazienza e buona volontà, di rendere più chiaro ciò che oggi gli/le appare difficile.</p>}
   </>;
@@ -52,7 +62,7 @@ export function StudentReadChapter({ student, today }: { student: StudentRecord;
 
 function FamilyPerson({ person, role }: { person: StudentFamilyContact; role: "mamma" | "padre" }) {
   const name = personName(person);
-  const phone = filled(person.phone);
+  const phone = contactPhone(person.phone, person.whatsapp);
   const whatsapp = filled(person.whatsapp);
   const email = filled(person.email);
   if (!name && !phone && !whatsapp && !email) return null;
@@ -61,23 +71,23 @@ function FamilyPerson({ person, role }: { person: StudentFamilyContact; role: "m
   return <p>
     {name && <>{prefix} si chiama <Value>{name}</Value>. </>}
     {phone && <>Il cellulare {article} è <Value>{phone}</Value>. </>}
-    {whatsapp && <>Il numero WhatsApp {article} è <Value>{whatsapp}</Value>. </>}
-    {email && <>L&apos;email {article} è <Value>{email}</Value>.</>}
+    {whatsapp && whatsappNumber(phone) && <>Utilizzabile anche per <WhatsAppLink phone={phone} enabled={whatsapp} />. </>}
+    {email && <>L&apos;email {article} è <EmailLink email={email} />.</>}
   </p>;
 }
 
 function OtherContact({ person }: { person: StudentFamilyContact }) {
   const name = personName(person);
   const relation = filled(person.relationship);
-  const phone = filled(person.phone);
+  const phone = contactPhone(person.phone, person.whatsapp);
   const whatsapp = filled(person.whatsapp);
   const email = filled(person.email);
   if (!name && !phone && !whatsapp && !email) return null;
   return <div className={styles.familyContact}>
     {name && <p>Fra i contatti familiari c&apos;è <Value>{name}</Value>{relation && <> (<Value>{relation}</Value>)</>}.</p>}
     {phone && <p>{name ? "Il suo cellulare è " : "Un contatto familiare è raggiungibile al numero "}<Value>{phone}</Value>.</p>}
-    {whatsapp && <p>Il suo numero WhatsApp è <Value>{whatsapp}</Value>.</p>}
-    {email && <p>La sua email è <Value>{email}</Value>.</p>}
+    {whatsapp && whatsappNumber(phone) && <p>Utilizzabile anche per <WhatsAppLink phone={phone} enabled={whatsapp} />.</p>}
+    {email && <p>La sua email è <EmailLink email={email} />.</p>}
   </div>;
 }
 

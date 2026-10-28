@@ -10,7 +10,8 @@ import { addStudentBook, booksForEditing, changeBookField, removeStudentBook } f
 import { loadTariffs } from "../../data/tariffario/tariff-storage";
 import type { Tariff } from "../../data/tariffario/tariff-types";
 import { prepareNarratedStudentSave } from "./narrated-student-save";
-import { StudentReadChapter, StudentReadSections } from "./student-narrative-read";
+import { StudentReadChapter, StudentReadSections, WhatsAppLink } from "./student-narrative-read";
+import { contactPhone, whatsappNumber } from "./contact-links";
 import styles from "./nuovo.module.css";
 
 const EMPTY: StudentRecord = {
@@ -135,6 +136,11 @@ function InlineValue({ value, label, editing, onChange, invalid = false, kind = 
         style={{ width }} value={value} onChange={(event) => onChange(event.target.value)} />}
     <span id={hintId} role="tooltip" className={styles.fieldHint}>{fieldHint(label)}</span>
   </span>;
+}
+
+function WhatsAppChoice({ phone, enabled, onChange, inputRef }: { phone: string; enabled: boolean; onChange: (enabled: boolean) => void; inputRef?: Ref<HTMLInputElement> }) {
+  return <label className={styles.whatsappChoice}><input ref={inputRef} type="checkbox" aria-label="Usa anche WhatsApp" checked={enabled}
+    disabled={!whatsappNumber(phone) && !enabled} onChange={(event) => onChange(event.target.checked)} /> WhatsApp</label>;
 }
 
 function BirthDateEntry({ value, onChange, inputRef, onKeyDown }: {
@@ -316,7 +322,7 @@ export default function NewStudentPage() {
     setOpeningStep((step) => Math.min(step + 1, pathEnd));
   }
   function openingValue(key: ChapterField, step: number, label: string, inputRef: Ref<HTMLInputElement>) {
-    const value = key === "birthDate" ? student.birthDate : key === "subjects" ? student.subjects.join(", ") : key === "schoolName" ? student.schoolName || student.school : student[key] || "";
+    const value = key === "birthDate" ? student.birthDate : key === "subjects" ? student.subjects.join(", ") : key === "schoolName" ? student.schoolName || student.school : key === "phone" ? contactPhone(student.phone, student.whatsapp) : student[key] || "";
     if (openingStep > step && openingEdit !== key) {
       if (!value.trim()) return null;
       return <ConfirmedOpeningValue value={key === "birthDate" ? italianDate(value) : value.trim()} label={fieldHint(label)} onEdit={() => {
@@ -335,11 +341,14 @@ export default function NewStudentPage() {
     return openingStep >= step && (openingStep === step || openingEdit === key || Boolean(value.trim()));
   }
   function update<K extends keyof StudentRecord>(key: K, value: StudentRecord[K]) {
-    setStudent((current) => ({ ...current, [key]: value }));
+    setStudent((current) => ({ ...current, [key]: value,
+      ...(key === "phone" && current.whatsapp ? { whatsapp: String(value) } : {}),
+      ...(key === "whatsapp" && !value && !current.phone && current.whatsapp ? { phone: current.whatsapp } : {}),
+    }));
     setMessage("");
   }
   function field(key: keyof StudentRecord, label: string, kind: "text" | "date" | "tel" | "email" = "text", long = false) {
-    return <InlineValue value={String(key === "schoolName" ? (student.schoolName || student.school) : (student[key] ?? ""))} label={label} kind={kind} long={long} editing={editing}
+    return <InlineValue value={String(key === "schoolName" ? (student.schoolName || student.school) : key === "phone" ? contactPhone(student.phone, student.whatsapp) : (student[key] ?? ""))} label={label} kind={kind} long={long} editing={editing}
       onChange={(value) => update(key, value)} />;
   }
   function nameFields(person: { firstName: string; lastName: string }, first: (value: string) => void, last: (value: string) => void, label: string) {
@@ -351,7 +360,10 @@ export default function NewStudentPage() {
       const contacts = [...(current.familyContacts || [])];
       const index = contacts.findIndex((contact) => contact.id === id);
       const original = index >= 0 ? contacts[index] : { id, firstName: "", lastName: "", relationship: relation };
-      const contact = { ...original, [key]: value };
+      const contact = { ...original, [key]: value,
+        ...(key === "phone" && original.whatsapp ? { whatsapp: value } : {}),
+        ...(key === "whatsapp" && !value && !original.phone && original.whatsapp ? { phone: original.whatsapp } : {}),
+      };
       if (index >= 0) contacts[index] = contact;
       else contacts.push(contact);
       return { ...current, familyContacts: contacts };
@@ -373,8 +385,9 @@ export default function NewStudentPage() {
     if (!saved && openingStep < FAMILY_END) return null;
     return <div className={styles.familyExtras}>
       {otherContacts.map((person) => <div key={person.id} className={styles.familyContact}>
-        {(["firstName", "lastName", "relationship", "phone", "whatsapp", "email"] as const).map((key) => <label key={key}>{({ firstName: "Nome", lastName: "Cognome", relationship: "Parentela", phone: "Telefono", whatsapp: "WhatsApp", email: "Email" })[key]}
-          {editing ? <input className={styles.inlineField} type={key === "email" ? "email" : key === "phone" || key === "whatsapp" ? "tel" : "text"} value={person[key] || ""} onChange={(event) => updateContact(person.id, person.relationship || "", key, event.target.value)} /> : <span className={styles.value}>{person[key] || "—"}</span>}</label>)}
+        {(["firstName", "lastName", "relationship", "phone", "email"] as const).map((key) => <label key={key}>{({ firstName: "Nome", lastName: "Cognome", relationship: "Parentela", phone: "Telefono", email: "Email" })[key]}
+          {editing ? <input className={styles.inlineField} type={key === "email" ? "email" : key === "phone" ? "tel" : "text"} value={key === "phone" ? contactPhone(person.phone, person.whatsapp) : person[key] || ""} onChange={(event) => updateContact(person.id, person.relationship || "", key, event.target.value)} /> : <span className={styles.value}>{person[key] || "—"}</span>}</label>)}
+        {editing && <WhatsAppChoice phone={contactPhone(person.phone, person.whatsapp)} enabled={Boolean(person.whatsapp)} onChange={(enabled) => updateContact(person.id, person.relationship || "", "whatsapp", enabled ? contactPhone(person.phone, person.whatsapp) : "")} />}
         {editing && <button type="button" className={styles.narrativeNext} onClick={() => removeFamilyContact(person.id)}>ELIMINA CONTATTO</button>}
       </div>)}
       {editing && <button type="button" className={styles.narrativeNext} onClick={addFamilyContact}>+ UN CONTATTO</button>}
@@ -386,7 +399,13 @@ export default function NewStudentPage() {
     const person = motherField ? mother : father;
     const contactKey = key.endsWith("Name") ? "firstName" : key.endsWith("Phone") ? "phone" : key.endsWith("Whatsapp") ? "whatsapp" : "email";
     const value = key === "familyCity" ? student.city : key === "address" ? student.address
-      : key === "primaryContactId" ? primary?.firstName || "" : person[contactKey] || "";
+      : key === "primaryContactId" ? primary?.firstName || "" : contactKey === "phone" ? contactPhone(person.phone, person.whatsapp) : person[contactKey] || "";
+    if (key.endsWith("Whatsapp")) return openingStep > step && openingEdit !== key
+      ? <WhatsAppLink phone={contactPhone(person.phone, person.whatsapp)} enabled={person.whatsapp} />
+      : <><WhatsAppChoice phone={contactPhone(person.phone, person.whatsapp)} enabled={Boolean(person.whatsapp)}
+      inputRef={(node) => { if (openingEdit === key || openingStep === step) familyInput.current = node; }}
+      onChange={(enabled) => updateContact(person.id, motherField ? "madre" : "padre", "whatsapp", enabled ? contactPhone(person.phone, person.whatsapp) : "")} />
+      <button type="button" className={styles.narrativeNext} onClick={advanceOpening}>AVANTI</button></>;
     const confirmed = openingStep > step && openingEdit !== key;
     if (confirmed) return value.trim() ? <ConfirmedOpeningValue value={value.trim()} label={fieldHint(label)} onEdit={() => setOpeningEdit(key)} /> : null;
     if (key === "primaryContactId") return <><span className={styles.fieldWrap}>
@@ -409,11 +428,11 @@ export default function NewStudentPage() {
   const homeCityVisible = showFamilyField("familyCity", student.city);
   const addressVisible = showFamilyField("address", student.address);
   const motherNameVisible = showFamilyField("motherName", mother.firstName);
-  const motherPhoneVisible = showFamilyField("motherPhone", mother.phone || "");
+  const motherPhoneVisible = showFamilyField("motherPhone", contactPhone(mother.phone, mother.whatsapp));
   const motherWhatsappVisible = showFamilyField("motherWhatsapp", mother.whatsapp || "");
   const motherEmailVisible = showFamilyField("motherEmail", mother.email || "");
   const fatherNameVisible = showFamilyField("fatherName", father.firstName);
-  const fatherPhoneVisible = showFamilyField("fatherPhone", father.phone || "");
+  const fatherPhoneVisible = showFamilyField("fatherPhone", contactPhone(father.phone, father.whatsapp));
   const fatherWhatsappVisible = showFamilyField("fatherWhatsapp", father.whatsapp || "");
   const fatherEmailVisible = showFamilyField("fatherEmail", father.email || "");
   const primaryVisible = showFamilyField("primaryContactId", primary?.firstName || "");
@@ -599,7 +618,7 @@ export default function NewStudentPage() {
   const cityVisible = showChapterField("city", 6, student.city);
   const courseVisible = showChapterField("studyCourse", 7, student.studyCourse || "");
   const schoolDetailsVisible = gradeVisible || sectionVisible || schoolVisible || cityVisible || courseVisible;
-  const phoneVisible = showChapterField("phone", 8, student.phone);
+  const phoneVisible = showChapterField("phone", 8, contactPhone(student.phone, student.whatsapp));
   const whatsappVisible = showChapterField("whatsapp", 9, student.whatsapp);
   const emailVisible = showChapterField("email", 10, student.email);
   const contactDetailsVisible = phoneVisible || whatsappVisible || emailVisible;
@@ -637,7 +656,11 @@ export default function NewStudentPage() {
                 </p>}
                 {!saved && openingStep >= 8 && (openingStep < 11 || contactDetailsVisible) && <p>
                   {phoneVisible && <>Il suo numero di cellulare è {openingValue("phone", 8, "cellulare studente", phoneInput)}</>}
-                  {whatsappVisible && <>{phoneVisible ? ", utilizzabile anche per " : "Il suo numero WhatsApp è "}{openingValue("whatsapp", 9, "WhatsApp studente", whatsappInput)}</>}
+                  {whatsappVisible && (openingStep === 9 || openingEdit === "whatsapp"
+                    ? <> Utilizzabile anche per <WhatsAppChoice phone={contactPhone(student.phone, student.whatsapp)} enabled={Boolean(student.whatsapp)} inputRef={whatsappInput}
+                        onChange={(enabled) => update("whatsapp", enabled ? contactPhone(student.phone, student.whatsapp) : "")} /><button type="button" className={styles.narrativeNext} onClick={advanceOpening}>AVANTI</button></>
+                    : whatsappNumber(contactPhone(student.phone, student.whatsapp)) && student.whatsapp
+                      ? <> Utilizzabile anche per <WhatsAppLink phone={contactPhone(student.phone, student.whatsapp)} enabled={student.whatsapp} /></> : null)}
                   {openingStep >= 10 && (phoneVisible || whatsappVisible) && "."}
                   {emailVisible && <>{phoneVisible || whatsappVisible ? " " : ""}Il suo indirizzo di posta elettronica è {openingValue("email", 10, "email studente", emailInput)}</>}
                   {openingStep >= 11 && emailVisible && "."}
@@ -649,7 +672,7 @@ export default function NewStudentPage() {
                 <p>{saved && (editing || student.birthDate) && <>È nato/a il {field("birthDate", "data di nascita", "date")} e ha <span className={styles.value}>{age ?? "…"}</span> anni.</>}
                   {(editing || student.gradeClass || student.schoolName || student.school) && <> Frequenta il {field("gradeClass", "anno scolastico")}{(editing || student.section) && <> — sezione {field("section", "sezione")}</>}, presso {field("schoolName", "nome della scuola")}{(editing || student.city) && <>, a {field("city", "città")}</>}{(editing || student.studyCourse) && <>, dove segue l&apos;indirizzo di studi {field("studyCourse", "indirizzo scolastico")}</>}.</>}
                 </p>
-                {(editing || student.phone || student.whatsapp || student.email) && <p>{(editing || student.phone) && <>Il suo numero di cellulare è {field("phone", "cellulare studente", "tel")}{(editing || student.whatsapp || student.phone) && <>, utilizzabile anche per {editing ? <><InlineValue value={student.whatsapp} label="WhatsApp studente" kind="tel" editing onChange={(value) => update("whatsapp", value)} /></> : student.whatsapp && student.whatsapp !== student.phone ? <span className={styles.value}>{student.whatsapp}</span> : <span className={styles.value}>WhatsApp</span>}</>}.</>}{(editing || student.email) && <> Il suo indirizzo di posta elettronica è {field("email", "email studente", "email")}.</>}</p>}
+                {(editing || student.phone || student.whatsapp || student.email) && <p>Il suo numero di cellulare è {field("phone", "cellulare studente", "tel")}, utilizzabile anche per <WhatsAppChoice phone={contactPhone(student.phone, student.whatsapp)} enabled={Boolean(student.whatsapp)} onChange={(enabled) => update("whatsapp", enabled ? contactPhone(student.phone, student.whatsapp) : "")} />. Il suo indirizzo di posta elettronica è {field("email", "email studente", "email")}.</p>}
                 <p>Ci dedicheremo insieme allo studio di <InlineValue value={student.subjects.join(", ")} label="materie" editing={editing} onChange={(value) => update("subjects", value.split(","))} />, cercando, con pazienza e buona volontà, di rendere più chiaro ciò che oggi gli/le appare difficile.</p>
                 </div>}
               </section>
@@ -659,14 +682,14 @@ export default function NewStudentPage() {
                 {(motherNameVisible || motherPhoneVisible || motherWhatsappVisible || motherEmailVisible) && <p>
                   {motherNameVisible && <>Sua mamma si chiama {familyValue("motherName", FAMILY_START + 2, "nome madre")}</>}
                   {motherPhoneVisible && <>{motherNameVisible ? ", il suo cellulare è " : "Il cellulare della mamma è "}{familyValue("motherPhone", FAMILY_START + 3, "cellulare madre")}</>}
-                  {motherWhatsappVisible && <>{motherNameVisible || motherPhoneVisible ? ", il suo WhatsApp è " : "Il WhatsApp della mamma è "}{familyValue("motherWhatsapp", FAMILY_START + 4, "WhatsApp mamma")}</>}
+                  {motherWhatsappVisible && <>{openingStep === FAMILY_START + 4 || openingEdit === "motherWhatsapp" || whatsappNumber(contactPhone(mother.phone, mother.whatsapp)) ? ", utilizzabile anche per " : ""}{familyValue("motherWhatsapp", FAMILY_START + 4, "WhatsApp mamma")}</>}
                   {motherEmailVisible && <>{motherNameVisible || motherPhoneVisible || motherWhatsappVisible ? " e la sua email è " : "L'email della mamma è "}{familyValue("motherEmail", FAMILY_START + 5, "email madre")}</>}
                   {openingStep > FAMILY_START + 5 && "."}
                 </p>}
                 {(fatherNameVisible || fatherPhoneVisible || fatherWhatsappVisible || fatherEmailVisible) && <p>
                   {fatherNameVisible && <>Suo padre si chiama {familyValue("fatherName", FAMILY_START + 6, "nome padre")}</>}
                   {fatherPhoneVisible && <>{fatherNameVisible ? ", il suo cellulare è " : "Il cellulare del padre è "}{familyValue("fatherPhone", FAMILY_START + 7, "cellulare padre")}</>}
-                  {fatherWhatsappVisible && <>{fatherNameVisible || fatherPhoneVisible ? ", il suo WhatsApp è " : "Il WhatsApp del padre è "}{familyValue("fatherWhatsapp", FAMILY_START + 8, "WhatsApp papà")}</>}
+                  {fatherWhatsappVisible && <>{openingStep === FAMILY_START + 8 || openingEdit === "fatherWhatsapp" || whatsappNumber(contactPhone(father.phone, father.whatsapp)) ? ", utilizzabile anche per " : ""}{familyValue("fatherWhatsapp", FAMILY_START + 8, "WhatsApp papà")}</>}
                   {fatherEmailVisible && <>{fatherNameVisible || fatherPhoneVisible || fatherWhatsappVisible ? " e la sua email è " : "L'email del padre è "}{familyValue("fatherEmail", FAMILY_START + 9, "email padre")}</>}
                   {openingStep > FAMILY_START + 9 && "."}
                 </p>}
@@ -713,8 +736,8 @@ export default function NewStudentPage() {
               {saved && editing && <div>
               <section aria-labelledby="famiglia"><h2 id="famiglia">LA SUA FAMIGLIA E LA SUA CASA</h2>
                 <p>{field("firstName", "nome studente")} abita con i genitori a {field("city", "città")}, in {field("address", "via e numero civico")}.</p>
-                <p>Sua mamma si chiama <InlineValue value={mother.firstName} label="nome madre" editing={editing} onChange={(value) => updateContact(mother.id, "madre", "firstName", value)} />, il suo cellulare è <InlineValue value={mother.phone || ""} label="cellulare madre" kind="tel" editing={editing} onChange={(value) => updateContact(mother.id, "madre", "phone", value)} />, il suo WhatsApp è <InlineValue value={mother.whatsapp || ""} label="WhatsApp mamma" kind="tel" editing={editing} onChange={(value) => updateContact(mother.id, "madre", "whatsapp", value)} /> e la sua email è <InlineValue value={mother.email || ""} label="email madre" kind="email" editing={editing} onChange={(value) => updateContact(mother.id, "madre", "email", value)} />.</p>
-                <p>Suo padre si chiama <InlineValue value={father.firstName} label="nome padre" editing={editing} onChange={(value) => updateContact(father.id, "padre", "firstName", value)} />, il suo cellulare è <InlineValue value={father.phone || ""} label="cellulare padre" kind="tel" editing={editing} onChange={(value) => updateContact(father.id, "padre", "phone", value)} />, il suo WhatsApp è <InlineValue value={father.whatsapp || ""} label="WhatsApp papà" kind="tel" editing={editing} onChange={(value) => updateContact(father.id, "padre", "whatsapp", value)} /> e la sua email è <InlineValue value={father.email || ""} label="email padre" kind="email" editing={editing} onChange={(value) => updateContact(father.id, "padre", "email", value)} />.</p>
+                <p>Sua mamma si chiama <InlineValue value={mother.firstName} label="nome madre" editing={editing} onChange={(value) => updateContact(mother.id, "madre", "firstName", value)} />, il suo cellulare è <InlineValue value={contactPhone(mother.phone, mother.whatsapp)} label="cellulare madre" kind="tel" editing={editing} onChange={(value) => updateContact(mother.id, "madre", "phone", value)} />, utilizzabile anche per <WhatsAppChoice phone={contactPhone(mother.phone, mother.whatsapp)} enabled={Boolean(mother.whatsapp)} onChange={(enabled) => updateContact(mother.id, "madre", "whatsapp", enabled ? contactPhone(mother.phone, mother.whatsapp) : "")} /> e la sua email è <InlineValue value={mother.email || ""} label="email madre" kind="email" editing={editing} onChange={(value) => updateContact(mother.id, "madre", "email", value)} />.</p>
+                <p>Suo padre si chiama <InlineValue value={father.firstName} label="nome padre" editing={editing} onChange={(value) => updateContact(father.id, "padre", "firstName", value)} />, il suo cellulare è <InlineValue value={contactPhone(father.phone, father.whatsapp)} label="cellulare padre" kind="tel" editing={editing} onChange={(value) => updateContact(father.id, "padre", "phone", value)} />, utilizzabile anche per <WhatsAppChoice phone={contactPhone(father.phone, father.whatsapp)} enabled={Boolean(father.whatsapp)} onChange={(enabled) => updateContact(father.id, "padre", "whatsapp", enabled ? contactPhone(father.phone, father.whatsapp) : "")} /> e la sua email è <InlineValue value={father.email || ""} label="email padre" kind="email" editing={editing} onChange={(value) => updateContact(father.id, "padre", "email", value)} />.</p>
                 {(editing || primary || student.primaryParent) && <p>Per le comunicazioni riguardanti le lezioni potrò fare riferimento principalmente a {editing ? <span className={styles.fieldWrap}><select className={styles.inlineSelect} aria-label="referente principale" aria-describedby={primaryHintId} value={student.primaryContactId || ""} onChange={(event) => update("primaryContactId", event.target.value)}><option value="">da scegliere</option>{contacts.filter((person) => fullName(person)).map((person) => <option key={person.id} value={person.id}>{fullName(person)}</option>)}</select><span id={primaryHintId} role="tooltip" className={styles.fieldHint}>Referente per le comunicazioni</span></span> : <span className={styles.value}>{primary ? fullName(primary) : student.primaryParent}</span>}.</p>}
                 {otherFamilyContacts()}
               </section>

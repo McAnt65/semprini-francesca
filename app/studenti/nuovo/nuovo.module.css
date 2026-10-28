@@ -68,6 +68,10 @@
 .confirmedOpeningValue { color: var(--narrative-value-color); font-size: calc(1em + 1px); white-space: normal; overflow-wrap: anywhere; cursor: pointer; }
 .confirmedOpeningValue:focus-visible { outline: 1px solid #741d32; outline-offset: 2px; border-radius: 2px; }
 .value { color: var(--narrative-value-color); font-size: calc(1em + 1px); white-space: pre-wrap; overflow-wrap: anywhere; }
+.contactLink { color: var(--narrative-value-color); background: transparent; text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; -webkit-tap-highlight-color: transparent; }
+.whatsappChoice { display: inline-flex; align-items: baseline; gap: 2px; color: var(--narrative-value-color); white-space: nowrap; cursor: pointer; }
+.whatsappChoice input { accent-color: #741d32; }
+.whatsappChoice:has(input:disabled) { opacity: .7; cursor: default; }
 .fieldWrap { position: relative; display: inline-block; max-width: 100%; vertical-align: baseline; }
 .fieldHint { position: absolute; z-index: 2; bottom: calc(100% + 3px); left: 0; width: max-content; max-width: min(24ch, 75vw); padding: 2px 5px; background: rgb(251 244 231 / 96%); color: #70513e; font-size: 12px; line-height: 1.25; white-space: normal; pointer-events: none; opacity: 0; visibility: hidden; }
 .fieldWrap:hover .fieldHint, .fieldWrap:focus-within .fieldHint { opacity: 1; visibility: visible; }
@@ -88,6 +92,7 @@
 .birthDateCalendarPicker { position: absolute; right: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; clip-path: inset(50%); pointer-events: none; }
 .longField { min-height: 1.5em; resize: none; overflow: hidden; white-space: pre-wrap; overflow-wrap: anywhere; }
 .inlineField::placeholder, .longField::placeholder { color: #947165; opacity: 1; font-style: italic; }
+.inlineField:-webkit-autofill, .inlineField:-webkit-autofill:hover, .inlineField:-webkit-autofill:focus { -webkit-text-fill-color: var(--narrative-value-color); box-shadow: 0 0 0 1000px #f3e4ce inset; }
 .inlineField:focus-visible, .longField:focus-visible, .inlineSelect:focus-visible { outline: 1px solid rgb(116 29 50 / 65%); outline-offset: 2px; background: rgb(116 29 50 / 5%); }
 .inlineField[aria-invalid="true"] { outline: 2px solid #9b2747; outline-offset: 2px; background: rgb(155 39 71 / 9%); }
 .inlineSelect { width: auto; min-height: 32px; cursor: pointer; }

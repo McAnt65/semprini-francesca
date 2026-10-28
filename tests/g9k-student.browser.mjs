@@ -111,7 +111,7 @@ test("G9K: sparse and complete student narratives read cleanly on Android viewpo
 
     const sparseRecord = await evaluate(`JSON.parse(localStorage.getItem('semprini:students')).find(x => x.firstName === 'G9K Pochi')`);
     const partialRecord = { ...sparseRecord, address: "Via Breve 2", familyContacts: [
-      { id: "madre", relationship: "madre", firstName: "", lastName: "", phone: "3330001111" },
+      { id: "madre", relationship: "madre", firstName: "", lastName: "", whatsapp: "3330001111" },
     ], teachers: [{ id: "solo-materia", subject: "Fisica", firstName: "", lastName: "" }] };
     await evaluate(`localStorage.setItem('semprini:students', JSON.stringify(JSON.parse(localStorage.getItem('semprini:students')).map(x => x.id === ${JSON.stringify(sparseRecord.id)} ? ${JSON.stringify(partialRecord)} : x)))`);
     await send("Page.navigate", { url: new URL(`/studenti/nuovo?id=${encodeURIComponent(sparseRecord.id)}`, baseUrl).href });
@@ -119,15 +119,22 @@ test("G9K: sparse and complete student narratives read cleanly on Android viewpo
     const partialSections = await evaluate(visibleText);
     assert.match(partialSections, /Abita in Via Breve 2\./);
     assert.match(partialSections, /Il cellulare della mamma è 3330001111\./);
+    assert.equal(await evaluate(`document.querySelector('[aria-label="Diario dello studente"] a[href="https://wa.me/393330001111"]')?.textContent`), "WhatsApp");
     assert.match(partialSections, /La materia di riferimento a scuola è Fisica\./);
     assert.doesNotMatch(partialSections, /\.\.\.|…|si chiama \.|insegnante di  è/);
+    await evaluate(`document.querySelector('button[aria-label="Modifica i dati dello studente"]').click()`);
+    await until(`!!document.querySelector('input[aria-label="Numero di cellulare della madre"]')`);
+    await evaluate(`document.querySelectorAll('input[type="checkbox"][aria-label="Usa anche WhatsApp"]')[1].click()`);
+    await evaluate(`${action("SALVA")}.click()`);
+    await until(`!!document.querySelector('button[aria-label="Modifica i dati dello studente"]')`);
+    assert.deepEqual(await evaluate(`(() => { const p = JSON.parse(localStorage.getItem('semprini:students')).find(x => x.id === ${JSON.stringify(sparseRecord.id)}).familyContacts[0]; return [p.phone, p.whatsapp]; })()`), ["3330001111", ""]);
 
     const complete = { ...sparseRecord, id: "g9k-completo", firstName: "G9K Completo", lastName: "Profilo", birthDate: "2010-04-12",
       gradeClass: "3° anno", section: "B", schoolName: "Liceo Aurora", city: "Rimini", studyCourse: "scientifico",
-      phone: "3331112222", whatsapp: "3331112222", email: "completo@example.invalid", subjects: ["Matematica", "Fisica"],
+      phone: "+39 333 111 2222", whatsapp: "3339998888", email: "completo@example.invalid", subjects: ["Matematica", "Fisica"],
       address: "Via delle Rose 4", familyContacts: [
-        { id: "madre", relationship: "madre", firstName: "Maria", lastName: "Rossi", phone: "3332223333", whatsapp: "3332223333", email: "maria@example.invalid" },
-        { id: "padre", relationship: "padre", firstName: "Luca", lastName: "Rossi", phone: "3334445555", email: "luca@example.invalid" },
+        { id: "madre", relationship: "madre", firstName: "Maria", lastName: "Rossi", phone: "0039 333 222 3333", whatsapp: "3332223333", email: "maria@example.invalid" },
+        { id: "padre", relationship: "padre", firstName: "Luca", lastName: "Rossi", phone: "12345", email: "luca@example.invalid" },
       ], primaryContactId: "madre", books: [{ title: "Algebra", publisher: "Editore Uno" }], topicsToDeepen: "equazioni",
       teachers: [{ id: "prof", subject: "Matematica", firstName: "Anna", lastName: "Bianchi", phone: "0541123456" }],
       firstImpressions: "curioso/a", interests: "scienza", passions: "musica", preferredActivities: "leggere", personalNotes: "ama gli esempi",
@@ -137,18 +144,41 @@ test("G9K: sparse and complete student narratives read cleanly on Android viewpo
     await until(`document.querySelector('[aria-label="Diario dello studente"]')?.innerText.includes('G9K Completo')`);
     const completeText = await evaluate(visibleText);
     for (const value of ["Liceo Aurora", "scientifico", "Via delle Rose 4", "Maria Rossi", "Luca Rossi", "Algebra", "equazioni", "Anna Bianchi", "scienza", "le frazioni"]) assert.ok(completeText.includes(value), value);
+    assert.doesNotMatch(completeText, /3339998888|numero WhatsApp|12345.*WhatsApp/);
+    assert.deepEqual(await evaluate(`[...document.querySelectorAll('[aria-label="Diario dello studente"] a[href^="https://wa.me/"]')].map(x => x.href)`),
+      ["https://wa.me/393331112222", "https://wa.me/393332223333"]);
+    assert.equal(await evaluate(`document.querySelector('[aria-label="Diario dello studente"] a[href="mailto:completo@example.invalid"]')?.textContent`), "completo@example.invalid");
+    assert.equal(await evaluate(`(() => { const area = document.querySelector('[aria-label="Diario dello studente"]');
+      const email = area.querySelector('a[href="mailto:completo@example.invalid"]');
+      const value = area.querySelector('span[class*="value"]');
+      return getComputedStyle(email).color === getComputedStyle(value).color; })()`), true, "email keeps the narrative text color");
     assert.doesNotMatch(completeText, /\.\.\.|…/);
     assert.equal(await evaluate(`!!${action("SALVA")}`), false);
     assert.deepEqual(await evaluate(`JSON.parse(localStorage.getItem('semprini:students')).find(x => x.id === 'g9k-completo')`), complete);
     await evaluate(`document.querySelector('button[aria-label="Modifica i dati dello studente"]').click()`);
     await until(`!!document.querySelector('input[aria-label="Indirizzo email"]')`);
+    assert.equal(await evaluate(`document.querySelectorAll('input[type="tel"][aria-label*="WhatsApp"]').length`), 0);
+    assert.equal(await evaluate(`document.querySelectorAll('input[type="checkbox"][aria-label="Usa anche WhatsApp"]').length`), 3);
+    assert.equal(await evaluate(`document.querySelectorAll('input[type="checkbox"][aria-label="Usa anche WhatsApp"]')[2].disabled`), true);
+    await fill("Numero di cellulare", "3335556666");
+    await fill("Numero di cellulare del padre", "3334445555");
+    await evaluate(`document.querySelectorAll('input[type="checkbox"][aria-label="Usa anche WhatsApp"]')[2].click()`);
     await fill("Indirizzo email", "aggiornato@example.invalid");
+    await send("Emulation.setDeviceMetricsOverride", { width: 390, height: 520, deviceScaleFactor: 1, mobile: true });
+    await evaluate(`document.querySelector('input[aria-label="Indirizzo email"]').focus()`);
+    await until(`(() => { const r = document.querySelector('input[aria-label="Indirizzo email"]').getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight; })()`);
+    assert.equal(await evaluate(`document.documentElement.scrollWidth <= innerWidth`), true);
+    await send("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
     await evaluate(`${action("SALVA")}.click()`);
     await until(`!!document.querySelector('button[aria-label="Modifica i dati dello studente"]')`);
     const completeAfterSave = await evaluate(visibleText);
     for (const value of ["aggiornato@example.invalid", "Liceo Aurora", "Via delle Rose 4", "Maria Rossi", "Algebra", "Anna Bianchi", "le frazioni"]) assert.ok(completeAfterSave.includes(value), value);
     assert.doesNotMatch(completeAfterSave, /\.\.\.|…/);
     assert.equal(await evaluate(`JSON.parse(localStorage.getItem('semprini:students')).find(x => x.id === 'g9k-completo').email`), "aggiornato@example.invalid");
+    assert.equal(await evaluate(`JSON.parse(localStorage.getItem('semprini:students')).find(x => x.id === 'g9k-completo').whatsapp`), "3335556666");
+    assert.equal(await evaluate(`JSON.parse(localStorage.getItem('semprini:students')).find(x => x.id === 'g9k-completo').familyContacts.find(x => x.id === 'padre').whatsapp`), "3334445555");
+    assert.equal(await evaluate(`document.querySelector('[aria-label="Diario dello studente"] a[href="https://wa.me/393335556666"]')?.textContent`), "WhatsApp");
+    assert.equal(await evaluate(`document.querySelector('[aria-label="Diario dello studente"] a[href="https://wa.me/393334445555"]')?.textContent`), "WhatsApp");
     await viewport(390, 844, "complete-390x844.png");
     await viewport(430, 764, "complete-430x764.png");
     await evaluate(`document.querySelector('[aria-label="Diario dello studente"]').scrollTop = document.querySelector('[aria-label="Diario dello studente"]').scrollHeight`);
@@ -157,6 +187,22 @@ test("G9K: sparse and complete student narratives read cleanly on Android viewpo
       return last.bottom <= area.bottom + 1 && last.top >= area.top - 1; })()`);
     assert.equal(await evaluate(`document.querySelector('section[aria-labelledby="percorso"]').innerText.includes('le frazioni')`), true);
     await viewport(430, 764, "complete-bottom-430x764.png");
+    await send("Page.navigate", { url: new URL("/studenti/nuovo", baseUrl).href });
+    await until(`!!document.querySelector('input[aria-label="Nome dello studente"]')`);
+    await fill("Nome dello studente", "G9K Nuovo");
+    await evaluate(`${action("AVANTI")}.click()`);
+    await until(`!!document.querySelector('input[aria-label="Cognome dello studente"]')`);
+    await fill("Cognome dello studente", "Contatto");
+    for (let i = 0; i < 7; i++) { await evaluate(`${action("AVANTI")}.click()`); await delay(30); }
+    await until(`!!document.querySelector('input[aria-label="Numero di cellulare"]')`);
+    await fill("Numero di cellulare", "+39 333 777 8888");
+    await evaluate(`${action("AVANTI")}.click()`);
+    await until(`!!document.querySelector('input[type="checkbox"][aria-label="Usa anche WhatsApp"]')`);
+    assert.equal(await evaluate(`document.querySelectorAll('input[type="tel"][aria-label*="WhatsApp"]').length`), 0);
+    await evaluate(`document.querySelector('input[type="checkbox"][aria-label="Usa anche WhatsApp"]').click()`);
+    await evaluate(`${action("SALVA")}.click()`);
+    await until(`!!document.querySelector('button[aria-label="Modifica i dati dello studente"]')`);
+    assert.equal(await evaluate(`document.querySelector('[aria-label="Diario dello studente"] a[href="https://wa.me/393337778888"]')?.textContent`), "WhatsApp");
     assert.deepEqual(errors, [], "no uncaught browser JavaScript errors");
   } finally {
     socket?.close();
