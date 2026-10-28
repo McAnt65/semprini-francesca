@@ -10,6 +10,7 @@ import { addStudentBook, booksForEditing, changeBookField, removeStudentBook } f
 import { loadTariffs } from "../../data/tariffario/tariff-storage";
 import type { Tariff } from "../../data/tariffario/tariff-types";
 import { prepareNarratedStudentSave } from "./narrated-student-save";
+import { StudentReadChapter, StudentReadSections } from "./student-narrative-read";
 import styles from "./nuovo.module.css";
 
 const EMPTY: StudentRecord = {
@@ -643,13 +644,14 @@ export default function NewStudentPage() {
                 </p>}
                 {!saved && subjectsVisible && <p>Ci dedicheremo insieme allo studio di {openingValue("subjects", 11, "materie", subjectsInput)}{openingStep >= 12 && ", cercando, con pazienza e buona volontà, di rendere più chiaro ciò che oggi gli/le appare difficile."}</p>}
                 {!saved && openingStep === CHAPTER_FIELDS.length && <button type="button" className={styles.narrativeNext} onClick={() => setOpeningStep(FAMILY_START)}>CONTINUA</button>}
-                <div hidden={!saved}>
+                {saved && !editing && <StudentReadChapter student={student} today={today} />}
+                {saved && editing && <div>
                 <p>{saved && (editing || student.birthDate) && <>È nato/a il {field("birthDate", "data di nascita", "date")} e ha <span className={styles.value}>{age ?? "…"}</span> anni.</>}
                   {(editing || student.gradeClass || student.schoolName || student.school) && <> Frequenta il {field("gradeClass", "anno scolastico")}{(editing || student.section) && <> — sezione {field("section", "sezione")}</>}, presso {field("schoolName", "nome della scuola")}{(editing || student.city) && <>, a {field("city", "città")}</>}{(editing || student.studyCourse) && <>, dove segue l&apos;indirizzo di studi {field("studyCourse", "indirizzo scolastico")}</>}.</>}
                 </p>
                 {(editing || student.phone || student.whatsapp || student.email) && <p>{(editing || student.phone) && <>Il suo numero di cellulare è {field("phone", "cellulare studente", "tel")}{(editing || student.whatsapp || student.phone) && <>, utilizzabile anche per {editing ? <><InlineValue value={student.whatsapp} label="WhatsApp studente" kind="tel" editing onChange={(value) => update("whatsapp", value)} /></> : student.whatsapp && student.whatsapp !== student.phone ? <span className={styles.value}>{student.whatsapp}</span> : <span className={styles.value}>WhatsApp</span>}</>}.</>}{(editing || student.email) && <> Il suo indirizzo di posta elettronica è {field("email", "email studente", "email")}.</>}</p>}
                 <p>Ci dedicheremo insieme allo studio di <InlineValue value={student.subjects.join(", ")} label="materie" editing={editing} onChange={(value) => update("subjects", value.split(","))} />, cercando, con pazienza e buona volontà, di rendere più chiaro ciò che oggi gli/le appare difficile.</p>
-                </div>
+                </div>}
               </section>
               {!saved && openingStep >= FAMILY_START && <section className={styles.openingReveal} aria-labelledby="famiglia-progressiva">
                 <h2 id="famiglia-progressiva">LA SUA FAMIGLIA E LA SUA CASA</h2>
@@ -707,7 +709,8 @@ export default function NewStudentPage() {
                 {openingStep >= pathEnd && <><p>Spero che le nostre lezioni possano essere, oltre che un aiuto nello studio, un&apos;occasione per scoprire il piacere di comprendere, di fare domande e di imparare qualcosa di nuovo.</p>
                   <p>Ogni piccolo progresso meriterà di essere riconosciuto.</p><p className={styles.signature}>Francesca</p></>}
               </section>}
-              <div hidden={!saved}>
+              {saved && !editing && <StudentReadSections student={student} />}
+              {saved && editing && <div>
               <section aria-labelledby="famiglia"><h2 id="famiglia">LA SUA FAMIGLIA E LA SUA CASA</h2>
                 <p>{field("firstName", "nome studente")} abita con i genitori a {field("city", "città")}, in {field("address", "via e numero civico")}.</p>
                 <p>Sua mamma si chiama <InlineValue value={mother.firstName} label="nome madre" editing={editing} onChange={(value) => updateContact(mother.id, "madre", "firstName", value)} />, il suo cellulare è <InlineValue value={mother.phone || ""} label="cellulare madre" kind="tel" editing={editing} onChange={(value) => updateContact(mother.id, "madre", "phone", value)} />, il suo WhatsApp è <InlineValue value={mother.whatsapp || ""} label="WhatsApp mamma" kind="tel" editing={editing} onChange={(value) => updateContact(mother.id, "madre", "whatsapp", value)} /> e la sua email è <InlineValue value={mother.email || ""} label="email madre" kind="email" editing={editing} onChange={(value) => updateContact(mother.id, "madre", "email", value)} />.</p>
@@ -741,13 +744,13 @@ export default function NewStudentPage() {
                 <p>Ogni piccolo progresso meriterà di essere riconosciuto.</p>
                 <p className={styles.signature}>Francesca</p>
               </section>
-              </div>
-              {(saved || openingStep >= pathEnd) && <details className={styles.lessonPreferences}>
+              </div>}
+              {(saved || openingStep >= pathEnd) && (editing || student.lessonMode || student.lessonDurationMinutes || student.lessonRateCents) && <details className={styles.lessonPreferences}>
                 <summary>Le mie lezioni con questo studente</summary>
                 <div className={styles.preferenceFields}>
-                  <label>Modalità abituale <select className={styles.inlineSelect} disabled={!editing} value={student.lessonMode || ""} onChange={(event) => update("lessonMode", event.target.value as StudentRecord["lessonMode"])}><option value="">Da scegliere</option><option value="casa">A casa</option><option value="domicilio">A domicilio</option><option value="online">Online</option></select></label>
-                  <label>Durata abituale <select className={styles.inlineSelect} disabled={!editing} value={student.lessonDurationMinutes || ""} onChange={(event) => update("lessonDurationMinutes", event.target.value ? Number(event.target.value) : undefined)}><option value="">Da scegliere</option><option value="60">60 minuti</option><option value="90">90 minuti</option><option value="120">120 minuti</option></select></label>
-                  <label>Tariffa abituale <select className={styles.inlineSelect} disabled={!editing} value={student.lessonRateCents || ""} onChange={(event) => update("lessonRateCents", event.target.value ? Number(event.target.value) : undefined)}><option value="">Da scegliere</option>{student.lessonRateCents && !tariffs.some((tariff) => tariff.hourlyRateCents === student.lessonRateCents) && <option value={student.lessonRateCents}>{(student.lessonRateCents / 100).toLocaleString("it-IT", { style: "currency", currency: "EUR" })}</option>}{tariffs.map((tariff) => <option key={tariff.id} value={tariff.hourlyRateCents}>{tariff.code} · {(tariff.hourlyRateCents / 100).toLocaleString("it-IT", { style: "currency", currency: "EUR" })}</option>)}</select></label>
+                  {(editing || student.lessonMode) && <label>Modalità abituale <select className={styles.inlineSelect} disabled={!editing} value={student.lessonMode || ""} onChange={(event) => update("lessonMode", event.target.value as StudentRecord["lessonMode"])}><option value="">Da scegliere</option><option value="casa">A casa</option><option value="domicilio">A domicilio</option><option value="online">Online</option></select></label>}
+                  {(editing || student.lessonDurationMinutes) && <label>Durata abituale <select className={styles.inlineSelect} disabled={!editing} value={student.lessonDurationMinutes || ""} onChange={(event) => update("lessonDurationMinutes", event.target.value ? Number(event.target.value) : undefined)}><option value="">Da scegliere</option><option value="60">60 minuti</option><option value="90">90 minuti</option><option value="120">120 minuti</option></select></label>}
+                  {(editing || student.lessonRateCents) && <label>Tariffa abituale <select className={styles.inlineSelect} disabled={!editing} value={student.lessonRateCents || ""} onChange={(event) => update("lessonRateCents", event.target.value ? Number(event.target.value) : undefined)}><option value="">Da scegliere</option>{student.lessonRateCents && !tariffs.some((tariff) => tariff.hourlyRateCents === student.lessonRateCents) && <option value={student.lessonRateCents}>{(student.lessonRateCents / 100).toLocaleString("it-IT", { style: "currency", currency: "EUR" })}</option>}{tariffs.map((tariff) => <option key={tariff.id} value={tariff.hourlyRateCents}>{tariff.code} · {(tariff.hourlyRateCents / 100).toLocaleString("it-IT", { style: "currency", currency: "EUR" })}</option>)}</select></label>}
                 </div>
               </details>}
             </div>
@@ -755,13 +758,11 @@ export default function NewStudentPage() {
           <div className={styles.footer}>
             <span className={styles.status} role="status" aria-live="polite">{message}</span>
             <div className={styles.actions}>
-              <button type="button" onClick={save} disabled={!editing || saving}>SALVA</button>
-              <button type="button" disabled={editing && !saved} aria-pressed={editing} aria-label={editing ? "Ripristina l'ultima versione salvata" : "Modifica i dati dello studente"}
-                title={editing ? "Ripristina l'ultima versione salvata" : "Modifica i dati dello studente"}
-                onClick={() => {
-                  if (!editing) { setEditing(true); setMessage(""); return; }
-                  if (saved && window.confirm("Ripristinare l'ultima versione salvata? Le modifiche non salvate andranno perse.")) cancel();
-                }}>MODIFICA</button>
+              {editing ? <button type="button" onClick={save} disabled={saving}>SALVA</button> : <span aria-hidden="true" />}
+              {editing ? saved && <button type="button" aria-label="Annulla le modifiche" onClick={() => {
+                if (window.confirm("Ripristinare l'ultima versione salvata? Le modifiche non salvate andranno perse.")) cancel();
+              }}>ANNULLA</button> : <button type="button" aria-label="Modifica i dati dello studente"
+                title="Modifica i dati dello studente" onClick={() => { setEditing(true); setMessage(""); }}>MODIFICA</button>}
             </div>
           </div>
         </div>
