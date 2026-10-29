@@ -12,6 +12,7 @@ import type { Tariff } from "../../data/tariffario/tariff-types";
 import { prepareNarratedStudentSave } from "./narrated-student-save";
 import { StudentReadChapter, StudentReadSections, WhatsAppLink } from "./student-narrative-read";
 import { contactPhone, whatsappNumber } from "./contact-links";
+import GuidedNewStudent from "./guided-new-student";
 import styles from "./nuovo.module.css";
 
 const EMPTY: StudentRecord = {
@@ -169,6 +170,7 @@ function ConfirmedOpeningValue({ value, label, onEdit }: { value: string; label:
 
 export default function NewStudentPage() {
   const [student, setStudent] = useState<StudentRecord>(EMPTY);
+  const [routeMode, setRouteMode] = useState<"loading" | "new" | "existing">("loading");
   const [saved, setSaved] = useState<StudentRecord | null>(null);
   const [editing, setEditing] = useState(true);
   const [openingStep, setOpeningStep] = useState(0);
@@ -216,6 +218,7 @@ export default function NewStudentPage() {
       const id = new URLSearchParams(window.location.search).get("id");
       const existing = id ? getStoredStudentById(id) : null;
       if (existing) { setStudent(existing); setSaved(existing); setEditing(false); nextId.current = existing.id; }
+      setRouteMode(id ? "existing" : "new");
     });
   }, []);
   useEffect(() => {
@@ -623,6 +626,8 @@ export default function NewStudentPage() {
   const emailVisible = showChapterField("email", 10, student.email);
   const contactDetailsVisible = phoneVisible || whatsappVisible || emailVisible;
   const subjectsVisible = showChapterField("subjects", 11, student.subjects.join(", "));
+  if (routeMode === "loading") return null;
+  if (routeMode === "new") return <GuidedNewStudent onSaved={(record) => { setStudent(record); setSaved(record); setEditing(false); setMessage("Studente custodito nel registro."); setRouteMode("existing"); }} />;
   return (
     <main ref={pageRef} className={styles.page}>
       <div className={styles.sheet}>

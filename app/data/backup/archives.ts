@@ -25,6 +25,7 @@ const exactKeys = new Set([
   "semprini:tariffs:v1", "semprini:tariffs:v1:temporary-snapshot",
   "semprini:materie:programmi:v1", "semprini:materie:argomenti:v1",
   "semprini:preferences:v1", "semprini:assistenza:v1",
+  "semprini:student-guided-draft:v1",
   "semprini:test-dati:manifest:v1", "semprini:test-dati:trasferimento:v1",
 ]);
 const prefixes = ["semprini:student-narrative:v1:", "semprini:new-student:",

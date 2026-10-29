@@ -103,6 +103,7 @@ test("all operational key families and temporary drafts are included", async () 
     "semprini:materie:v1:fisica:quick:Formule": "Formula TEST",
     "semprini:preferences:v1": json({ lessonLocation: { street: "Via TEST" } }),
     "semprini:assistenza:v1": json({ dismissedWelcome: true }),
+    "semprini:student-guided-draft:v1": json({ version: 1, student: { firstName: "Bozza", lastName: "" }, confirmed: [], stepId: "lastName", pending: {} }),
     "semprini:student-narrative:v1:test-1": json({ version: 1, studentId: "test-1" }),
     "semprini:test-dati:manifest:v1": json({ students: ["test-1"] }),
     "semprini:test-dati:trasferimento:v1": json({ test: true }) };
@@ -113,6 +114,7 @@ test("all operational key families and temporary drafts are included", async () 
   assert.deepEqual(Object.keys(payload.archives.local).sort(), Object.keys(local).sort());
   assert.deepEqual(Object.keys(payload.archives.session).sort(), Object.keys(session).sort());
   assert.equal(prepareRestore(payload).session["semprini:new-lesson-draft:abc"], session["semprini:new-lesson-draft:abc"]);
+  assert.equal(prepareRestore(payload).local["semprini:student-guided-draft:v1"], local["semprini:student-guided-draft:v1"]);
 });
 
 test("a program deletion marker wins over an older model during promotion", async () => {
