@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { collectArchives, type BrowserArchives } from "../../data/backup/archives";
 import { cryptoAvailable, decryptBackup, encryptBackup } from "../../data/backup/encryption";
 import { makePayload, summarize, type BackupPayload, type BackupSummary } from "../../data/backup/format";
-import { prepareRestore, restoreArchives } from "../../data/backup/restore";
+import { prepareRestore, restoreArchives, validateSafetyExport } from "../../data/backup/restore";
 import packageInfo from "../../../package.json";
 import styles from "./salvataggio.module.css";
 
@@ -73,14 +73,16 @@ export default function BackupPage() {
       if (backupPassword !== repeatPassword) throw new Error("Le due password non coincidono.");
       const archives = await collectArchives();
       const payload = makePayload(archives, APP_VERSION);
-      prepareRestore(payload); // A damaged known archive cannot be labelled a complete, restorable copy.
+      const validation = validateSafetyExport(payload);
       const content = await encryptBackup(payload, backupPassword);
       download(content, payload.createdAt);
       setCurrent(summarize(payload));
       setSafetyFingerprint(await fingerprint(archives));
       setSafetyConfirmed(false);
       setBackupPassword(""); setRepeatPassword("");
-      setMessage("Download avviato. Controlla che il file sia stato salvato e conserva la password.");
+      setMessage(validation.studentConflict
+        ? "Download avviato: il file cifrato conserva entrambe le copie discordanti. Controlla che sia stato salvato e conserva la password. Il ripristino automatico resta bloccato finché il conflitto non è risolto."
+        : "Download avviato. Controlla che il file sia stato salvato e conserva la password.");
     } catch (error) { setMessage(error instanceof Error ? error.message : "Copia non riuscita."); }
     finally { setBusy(false); }
   }

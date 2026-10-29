@@ -9,10 +9,20 @@ export function booksForEditing(student: StudentRecord): Book[] {
     .map((title) => ({ title, publisher: "" }));
 }
 
+export function lastBookRemovalIsAmbiguous(student: StudentRecord): boolean {
+  return booksForEditing(student).length === 1 &&
+    Object.values(student.textbooks).some((value) => typeof value === "string" && value.trim());
+}
+
 export function changeBookField(student: StudentRecord, index: number, field: "title" | "publisher", value: string): StudentRecord {
   const books = booksForEditing(student);
   if (!books[index]) return student;
-  return { ...student, books: books.map((book, position) => position === index ? { ...book, [field]: value } : book) };
+  return { ...student, books: books.map((book, position) => {
+    if (position !== index) return book;
+    const changed = { ...book, [field]: value };
+    // Clearing both visible fields is an explicit removal, including older metadata.
+    return changed.title.trim() || changed.publisher.trim() ? changed : { title: "", publisher: "" };
+  }) };
 }
 
 export function addStudentBook(student: StudentRecord): StudentRecord {
@@ -22,14 +32,15 @@ export function addStudentBook(student: StudentRecord): StudentRecord {
 export function removeStudentBook(student: StudentRecord, index: number): StudentRecord {
   const books = booksForEditing(student);
   if (!books[index]) return student;
+  if (lastBookRemovalIsAmbiguous(student)) return student;
   const remaining = books.filter((_, position) => position !== index);
-  return { ...student, books: remaining, ...(remaining.length ? {} : { textbooks: {} }) };
+  return { ...student, books: remaining };
 }
 
 export function prepareStudentFormSave(student: StudentRecord, id: string, editedFields: ReadonlySet<keyof StudentRecord>) {
   const existing = Boolean(student.id);
-  const books = student.books?.filter((book) => book.title.trim() || book.publisher.trim());
-  const clearedBooks = editedFields.has("books") && books?.length === 0;
+  const books = student.books?.filter((book) => book.title.trim() || book.publisher.trim() ||
+    Object.keys(book).some((key) => key !== "title" && key !== "publisher"));
   const record: StudentRecord = {
     ...student,
     id,
@@ -43,10 +54,10 @@ export function prepareStudentFormSave(student: StudentRecord, id: string, edite
       secondaryParentWhatsapp: student.secondaryParentWhatsapp || student.secondaryParentPhone,
     }),
     books,
-    textbooks: clearedBooks ? {} : student.textbooks,
+    textbooks: student.textbooks,
     updatedAt: new Date().toISOString(),
   };
   return { record, replaceFields: existing ? [...new Set<keyof StudentRecord>([
-    ...editedFields, ...(clearedBooks ? ["textbooks" as const] : []),
+    ...editedFields,
   ])] : [] };
 }

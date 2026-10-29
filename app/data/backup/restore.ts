@@ -61,13 +61,21 @@ function mergeById(localRaw: string | undefined, sessionRaw: string | undefined,
   const byId = new Map<string, Record<string, unknown>>();
   for (const raw of [localRaw, sessionRaw]) {
     if (!raw) continue;
+    const seenInCopy = new Set<string>();
     for (const item of parse(raw) as Record<string, unknown>[]) {
       const id = String(item.id);
+      if (key === "semprini:students" && seenInCopy.has(id))
+        throw new Error("Archivio studenti con identificativi duplicati: ripristino interrotto.");
+      seenInCopy.add(id);
       const old = byId.get(id);
       if (!old) byId.set(id, item);
       else {
         const newer = String(item.updatedAt ?? "") > String(old.updatedAt ?? "") ? item : old;
-        byId.set(id, key === "semprini:students" ? { ...(newer === item ? old : item), ...newer } : newer);
+        if (key === "semprini:students" && newer.sempriniStudentSnapshotVersion !== 1 &&
+            JSON.stringify(item) !== JSON.stringify(old))
+          throw new Error("Due copie storiche dello stesso studente sono in conflitto: ripristino interrotto.");
+        byId.set(id, key === "semprini:students" && newer.sempriniStudentSnapshotVersion !== 1
+          ? { ...(newer === item ? old : item), ...newer } : newer);
       }
     }
   }
@@ -89,6 +97,18 @@ function mergePrograms(localRaw?: string, sessionRaw?: string): string | undefin
 }
 
 export type RestorePlan = { local: RawKeys; session: RawKeys; promotedKeys: string[] };
+/** Validate a safety export even when its two student copies need manual reconciliation. */
+export function validateSafetyExport(value: BackupPayload): { studentConflict: boolean } {
+  const payload = parsePayload(value);
+  validateMap(payload.archives.local);
+  validateMap(payload.archives.session);
+  try { prepareRestore(payload); return { studentConflict: false }; }
+  catch (error) {
+    if (error instanceof Error && error.message === "Due copie storiche dello stesso studente sono in conflitto: ripristino interrotto.")
+      return { studentConflict: true };
+    throw error;
+  }
+}
 /** The file retains both original copies; the operational winner is made persistent on the new device. */
 export function prepareRestore(value: BackupPayload): RestorePlan {
   const payload = parsePayload(value);

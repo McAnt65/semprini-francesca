@@ -83,6 +83,76 @@ test("all optional fields, family contacts and multiple teachers survive reload"
   assert.equal(api.loadStoredStudents().find((item) => item.id === "fictional-b").familyContacts, undefined);
 });
 
+test("historical nested attributes survive reading, unchanged saves and a one-field edit", () => {
+  const { local, api } = setup();
+  const historical = { ...student(), tariffId: "tariffa-test", customSchoolData: { campus: "TEST" },
+    familyContacts: [
+      { id: "madre", firstName: "M", lastName: "Test", relationship: "madre", phone: "111", whatsapp: "222", legacyAttribute: "preserve" },
+      { id: "zio", firstName: "Z", lastName: "Test", relationship: "zio", phone: "333", historicalRole: "tutore" },
+    ],
+    teachers: [{ id: "prof-1", firstName: "P", lastName: "Test", subject: "Fisica", historicalRoom: "A1" }],
+    books: [{ title: "", publisher: "", id: "book-legacy", edition: "storica" },
+      { title: "Fisica", publisher: "TEST", edition: "seconda" }],
+    textbooks: { math: "Matematica", latin: "Latino storico" },
+  };
+  const raw = JSON.stringify([historical]);
+  local.data.set(mainKey, raw);
+  const loaded = api.getStoredStudentById(historical.id);
+  assert.equal(local.getItem(mainKey), raw, "reading must not rewrite the archive");
+  assert.equal(loaded.familyContacts[0].legacyAttribute, "preserve");
+  assert.equal(loaded.teachers[0].historicalRoom, "A1");
+  assert.equal(loaded.textbooks.latin, "Latino storico");
+  assert.equal(loaded.books[0].id, "book-legacy");
+  assert.equal(api.saveStoredStudentResult({ ...loaded }).status, "saved");
+  assert.equal(api.saveStoredStudentResult({ id: historical.id, email: "updated@example.invalid" }).status, "saved");
+  const after = api.getStoredStudentById(historical.id);
+  assert.equal(after.email, "updated@example.invalid");
+  assert.equal(after.tariffId, "tariffa-test");
+  assert.deepEqual(after.customSchoolData, historical.customSchoolData);
+  assert.equal(after.phone, historical.phone);
+  assert.equal(after.whatsapp, historical.whatsapp);
+  assert.equal(after.familyContacts[0].legacyAttribute, "preserve");
+  assert.equal(after.teachers[0].historicalRoom, "A1");
+  assert.equal(after.books[0].edition, "storica");
+  assert.equal(after.textbooks.latin, "Latino storico");
+  assert.equal(api.archiveStoredStudentResult(historical.id).status, "saved");
+  assert.equal(api.restoreStoredStudentResult(historical.id).status, "saved");
+  assert.equal(api.getStoredStudentById(historical.id).familyContacts[0].legacyAttribute, "preserve");
+});
+
+test("explicit removals do not resurrect historical contacts, teachers, books or textbooks", () => {
+  const { local, api } = setup();
+  const record = { ...student(), primaryContactId: "madre", familyContacts: [
+    { id: "madre", firstName: "M", lastName: "Test", phone: "111", whatsapp: "222", legacyAttribute: "keep" },
+    { id: "zio", firstName: "Z", lastName: "Test", historicalRole: "remove" },
+  ], teachers: [
+    { id: "prof-1", firstName: "P", lastName: "Test", subject: "Fisica", historicalRoom: "keep" },
+    { id: "prof-2", firstName: "Q", lastName: "Test", subject: "Latino", historicalRoom: "remove" },
+  ], books: [{ title: "Fisica", publisher: "TEST", edition: "keep" },
+    { title: "Latino", publisher: "TEST", edition: "remove" }],
+  textbooks: { math: "Matematica", latin: "Latino storico" } };
+  local.data.set(mainKey, JSON.stringify([record]));
+  const before = api.getStoredStudentById(record.id);
+  const result = api.saveStoredStudentResult({ id: record.id,
+    familyContacts: [{ ...before.familyContacts[0], whatsapp: "" }],
+    teachers: [before.teachers[0]], books: [before.books[0]], textbooks: { math: "Matematica" },
+  }, { replaceFields: ["familyContacts", "teachers", "books", "textbooks"] });
+  assert.equal(result.status, "saved");
+  const after = api.getStoredStudentById(record.id);
+  assert.deepEqual(after.familyContacts.map((item) => item.id), ["madre"]);
+  assert.equal(after.familyContacts[0].whatsapp, "");
+  assert.equal(after.familyContacts[0].legacyAttribute, "keep");
+  assert.deepEqual(after.teachers.map((item) => item.id), ["prof-1"]);
+  assert.equal(after.teachers[0].historicalRoom, "keep");
+  assert.deepEqual(after.books, [before.books[0]]);
+  assert.equal(after.textbooks.latin, undefined);
+  assert.equal(after.primaryContactId, "madre");
+  assert.equal(api.saveStoredStudentResult({ id: record.id, familyContacts: [], primaryContactId: "" },
+    { replaceFields: ["familyContacts", "primaryContactId"] }).status, "saved");
+  assert.deepEqual(api.getStoredStudentById(record.id).familyContacts, []);
+  assert.equal(api.getStoredStudentById(record.id).primaryContactId, undefined);
+});
+
 test("multiple books survive repeated saves and individual removal on the same record", () => {
   const { api } = setup();
   const initial = { ...student(), books: [
@@ -173,6 +243,21 @@ test("session fallback preserves both students and does not resurrect intentiona
   assert.equal(api.loadStoredStudents().length, 2);
 });
 
+test("a newer temporary save does not resurrect explicitly cleared optional fields", () => {
+  const { local, session, api } = setup();
+  local.data.set(mainKey, JSON.stringify([{ ...student(), tariffId: "tariff-TEST", lessonMode: "online",
+    lessonRateCents: 2500, customHistorical: "keep" }]));
+  local.blocked = true;
+  assert.equal(api.saveStoredStudentResult({ id: "fictional-a", tariffId: "", lessonMode: undefined,
+    lessonRateCents: undefined }, { replaceFields: ["tariffId", "lessonMode", "lessonRateCents"] }).status, "temporary");
+  assert(session.getItem(mainKey));
+  const loaded = api.getStoredStudentById("fictional-a");
+  assert.equal(loaded.tariffId, undefined);
+  assert.equal(loaded.lessonMode, undefined);
+  assert.equal(loaded.lessonRateCents, undefined);
+  assert.equal(loaded.customHistorical, "keep");
+});
+
 test("compatibility narrative adapter writes only the main archive", () => {
   const { local, api, adapter } = setup();
   assert(api.saveStoredStudent(student()));
@@ -189,4 +274,71 @@ test("optional fields and invalid family references are handled safely", () => {
   assert.equal(api.saveStoredStudent({ id: "minimal", primaryContactId: "other-student-contact" }), false);
   assert.equal(api.saveStoredStudent({ id: "minimal", teachers: [{ firstName: "Missing ID" }] }), false);
   assert.equal(api.loadStoredStudents()[0].primaryContactId, undefined);
+});
+
+test("legacy draft conversion keeps additional book metadata", () => {
+  const { local, api } = setup();
+  local.data.set("semprini:new-student:personal-data", JSON.stringify({ firstName: "TEST", lastName: "Bozza" }));
+  local.data.set("semprini:new-student:school-subjects-books", JSON.stringify({
+    books: [{ title: "", publisher: "", edition: "storica" }],
+  }));
+  assert.equal(api.buildStudentFromSavedDrafts().books[0].edition, "storica");
+});
+
+test("duplicate contact and teacher identifiers still block writes", () => {
+  const { local, api } = setup();
+  const duplicated = { ...student(), familyContacts: [
+    { id: "same", firstName: "A", lastName: "TEST" },
+    { id: "same", firstName: "B", lastName: "TEST" },
+  ] };
+  const raw = JSON.stringify([duplicated]);
+  local.data.set(mainKey, raw);
+  assert.equal(api.saveStoredStudentResult({ id: duplicated.id, firstName: "Changed" }).status, "failed");
+  assert.equal(local.getItem(mainKey), raw);
+  local.data.set(mainKey, JSON.stringify([{ ...student(), teachers: [
+    { id: "same", firstName: "A", lastName: "TEST", subject: "Fisica" },
+    { id: "same", firstName: "B", lastName: "TEST", subject: "Latino" },
+  ] }]));
+  const teacherRaw = local.getItem(mainKey);
+  assert.equal(api.saveStoredStudentResult({ id: duplicated.id, firstName: "Changed" }).status, "failed");
+  assert.equal(local.getItem(mainKey), teacherRaw);
+});
+
+test("conflicting historical student copies remain untouched instead of being flattened", () => {
+  const { local, session, api } = setup();
+  const older = { ...student(), teachers: [{ id: "prof", firstName: "P", lastName: "TEST",
+    subject: "Fisica", historicalRoom: "A1" }] };
+  const newer = { ...older, updatedAt: "2026-10-28T10:00:00.000Z",
+    teachers: [{ id: "prof", firstName: "P", lastName: "TEST", subject: "Fisica" }] };
+  const oldRaw = JSON.stringify([older]), newRaw = JSON.stringify([newer]);
+  local.data.set(mainKey, oldRaw); session.data.set(mainKey, newRaw);
+  assert.equal(api.inspectStoredStudentsReadOnly().readable, false);
+  assert.deepEqual(api.inspectStoredStudentsReadOnly().conflictIds, [older.id]);
+  assert.equal(api.getStoredStudentById(older.id).teachers[0].historicalRoom, "A1");
+  assert.equal(api.saveStoredStudentResult({ id: older.id, email: "changed@example.invalid" }).status, "failed");
+  assert.equal(local.getItem(mainKey), oldRaw);
+  assert.equal(session.getItem(mainKey), newRaw);
+});
+
+test("a different student remains editable while conflicting historical copies stay separate", () => {
+  const { local, session, api } = setup();
+  const older = { ...student("conflict-test"), familyNotes: "Prima copia TEST" };
+  const newer = { ...older, familyNotes: "Seconda copia TEST", updatedAt: "2026-10-28T10:00:00.000Z" };
+  const other = student("other-test");
+  local.data.set(mainKey, JSON.stringify([older, other]));
+  session.data.set(mainKey, JSON.stringify([newer]));
+  const sessionRaw = session.getItem(mainKey);
+  assert.equal(api.saveStoredStudentResult({ id: other.id, email: "updated@example.invalid" }).status, "saved");
+  assert.equal(api.getStoredStudentById(other.id).email, "updated@example.invalid");
+  assert.deepEqual(JSON.parse(local.getItem(mainKey)).find((item) => item.id === older.id), older);
+  assert.equal(session.getItem(mainKey), sessionRaw);
+  assert.deepEqual(api.inspectStoredStudentsReadOnly().conflictIds, [older.id]);
+});
+
+test("duplicate student identifiers block archive writes", () => {
+  const { local, api } = setup();
+  const raw = JSON.stringify([student(), { ...student(), firstName: "Another" }]);
+  local.data.set(mainKey, raw);
+  assert.equal(api.saveStoredStudentResult({ id: "fictional-a", email: "changed@example.invalid" }).status, "failed");
+  assert.equal(local.getItem(mainKey), raw);
 });

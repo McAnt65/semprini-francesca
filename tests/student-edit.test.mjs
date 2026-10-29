@@ -90,22 +90,54 @@ test("removing one book keeps the other book and its metadata", () => {
   assert.equal(after.books.length, 1);
   assert.equal(after.books[0].edition, "seconda");
 });
-test("removing the last book also prevents a legacy textbook from reappearing", () => {
+
+test("ordinary form save keeps a historical book with metadata only", () => {
+  const c = setup();
+  c.local.setItem("semprini:students", JSON.stringify([{ ...c.original,
+    books: [{ title: "", publisher: "", edition: "storica" }] }]));
+  const before = c.storage.getStoredStudentById(c.original.id);
+  const after = saveEdit(c, { ...before, email: "updated@example.invalid" }, ["email"]);
+  assert.equal(after.books[0].edition, "storica");
+});
+
+test("editing another book keeps a metadata-only historical book", () => {
+  const c = setup();
+  c.local.setItem("semprini:students", JSON.stringify([{ ...c.original,
+    books: [{ title: "", publisher: "", edition: "storica" }, { title: "Fisica", publisher: "TEST" }] }]));
+  const before = c.storage.getStoredStudentById(c.original.id);
+  const changed = c.edit.changeBookField(before, 1, "title", "Fisica aggiornata");
+  const after = saveEdit(c, changed, ["books"]);
+  assert.equal(after.books[0].edition, "storica");
+  assert.equal(after.books[1].title, "Fisica aggiornata");
+});
+test("the last book cannot remove an independent historical textbook implicitly", () => {
   const c = setup();
   let student = c.edit.removeStudentBook(c.storage.getStoredStudentById(c.original.id), 1);
+  const before = student;
+  assert.equal(c.edit.lastBookRemovalIsAmbiguous(student), true);
   student = c.edit.removeStudentBook(student, 0);
-  const after = saveEdit(c, student, ["books", "textbooks"]);
-  assert.deepEqual(after.books, []);
-  assert.deepEqual(after.textbooks, { math: "", physics: "", chemistry: "" });
-  assert.deepEqual(c.edit.booksForEditing(after), []);
+  assert.deepEqual(student, before);
+  const after = saveEdit(c, student, ["books"]);
+  assert.equal(after.textbooks.math, "Libro precedente");
+  assert.equal(after.books.length, 1);
 });
-test("clearing the final book fields does not restore a legacy textbook", () => {
+test("clearing final book fields is rejected while historical textbooks remain", () => {
   const c = setup();
   let student = c.edit.removeStudentBook(c.storage.getStoredStudentById(c.original.id), 1);
   student = c.edit.changeBookField(student, 0, "title", "");
   student = c.edit.changeBookField(student, 0, "publisher", "");
-  const after = saveEdit(c, student, ["books"]);
+  const { record, replaceFields } = c.edit.prepareStudentFormSave(student, student.id, new Set(["books"]));
+  assert.equal(c.storage.saveStoredStudentResult(record, { replaceFields }).status, "failed");
+  assert.equal(c.storage.getStoredStudentById(student.id).textbooks.math, "Libro precedente");
+});
+test("explicitly clearing the historical textbook allows final book removal", () => {
+  const c = setup();
+  let student = c.edit.removeStudentBook(c.storage.getStoredStudentById(c.original.id), 1);
+  student = { ...student, textbooks: { ...student.textbooks, math: "" } };
+  student = c.edit.removeStudentBook(student, 0);
+  const after = saveEdit(c, student, ["books", "textbooks"]);
   assert.deepEqual(after.books, []);
+  assert.equal(after.textbooks.math, "");
   assert.deepEqual(c.edit.booksForEditing(after), []);
 });
 test("clearing phone and email persists empty values", () => {

@@ -14,7 +14,7 @@ require.extensions[".ts"] = (module, filename) => {
 const { collectArchives } = require("../app/data/backup/archives.ts");
 const { makePayload, summarize } = require("../app/data/backup/format.ts");
 const { encryptBackup, decryptBackup } = require("../app/data/backup/encryption.ts");
-const { prepareRestore, restoreArchives } = require("../app/data/backup/restore.ts");
+const { prepareRestore, restoreArchives, validateSafetyExport } = require("../app/data/backup/restore.ts");
 globalThis.indexedDB = { databases: async () => [] };
 
 function memory(initial = {}, fail = () => false) {
@@ -151,6 +151,23 @@ test("encrypted round trip, wrong password and tampering", async () => {
   await assert.rejects(decryptBackup(JSON.stringify(altered), "password-fittizia-lunga"), /versione/);
 });
 
+test("encrypted backup and restore retain historical student attributes and linked records", async () => {
+  const historical = { ...student, tariffId: "tariff-TEST", customOrigin: "storico",
+    familyContacts: [{ id: "madre", firstName: "M", lastName: "TEST", legacyAttribute: "keep" }],
+    teachers: [{ id: "prof", firstName: "P", lastName: "TEST", subject: "Fisica", historicalRoom: "A1" }],
+    books: [{ title: "", publisher: "", edition: "storica" }],
+    textbooks: { math: "Algebra", latin: "Latino" } };
+  const stored = json([historical]);
+  setup({ "semprini:students": stored, "semprini:calendar:appointments:v1": json([lesson]) });
+  const payload = makePayload(await collectArchives(), "TEST");
+  const encrypted = await encryptBackup(payload, "password-TEST-lunga");
+  const restored = await decryptBackup(encrypted, "password-TEST-lunga");
+  const target = setup();
+  await restoreArchives(restored);
+  assert.equal(target.local.getItem("semprini:students"), stored);
+  assert.equal(target.local.getItem("semprini:calendar:appointments:v1"), json([lesson]));
+});
+
 test("incompatible payload version is refused before any write", async () => {
   const c = setup({ "semprini:students": json([student]) });
   const payload = makePayload(await collectArchives(), "TEST");
@@ -176,6 +193,34 @@ test("restore to an empty archive makes a temporary student permanent", async ()
   await restoreArchives(payload);
   assert.equal(c.local.getItem("semprini:students"), json([student]));
   assert.equal(c.session.getItem("semprini:students"), null);
+});
+
+test("restore promotes a complete temporary student without resurrecting cleared fields", async () => {
+  const older = { ...student, tariffId: "old-tariff", updatedAt: "2026-10-27T10:00:00.000Z" };
+  const newer = { ...student, sempriniStudentSnapshotVersion: 1, updatedAt: "2026-10-28T10:00:00.000Z" };
+  const payload = makePayload({ local: { "semprini:students": json([older]) },
+    session: { "semprini:students": json([newer]) }, unknownLocal: {}, unknownSession: {}, legacyPhotos: [] }, "TEST");
+  assert.deepEqual(validateSafetyExport(payload), { studentConflict: false });
+  const target = setup();
+  await restoreArchives(payload);
+  assert.deepEqual(JSON.parse(target.local.getItem("semprini:students")), [newer]);
+  assert.equal(target.session.getItem("semprini:students"), null);
+});
+
+test("restore refuses conflicting historical student copies without writing", async () => {
+  const older = { ...student, teachers: [{ id: "prof", firstName: "P", historicalRoom: "A1" }] };
+  const newer = { ...student, updatedAt: "2026-10-28T10:00:00.000Z",
+    teachers: [{ id: "prof", firstName: "P" }] };
+  const payload = makePayload({ local: { "semprini:students": json([older]) },
+    session: { "semprini:students": json([newer]) }, unknownLocal: {}, unknownSession: {}, legacyPhotos: [] }, "TEST");
+  assert.deepEqual(validateSafetyExport(payload), { studentConflict: true });
+  const encrypted = await encryptBackup(payload, "TEST-password-12345");
+  const recovered = await decryptBackup(encrypted, "TEST-password-12345");
+  assert.equal(recovered.archives.local["semprini:students"], json([older]));
+  assert.equal(recovered.archives.session["semprini:students"], json([newer]));
+  const target = setup();
+  await assert.rejects(restoreArchives(payload), /conflitto/);
+  assert.equal(target.local.writes + target.session.writes, 0);
 });
 
 test("invalid archive aborts before writing", async () => {

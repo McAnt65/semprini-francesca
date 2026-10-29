@@ -251,7 +251,14 @@ export default function GuidedNewStudent({ onSaved }: { onSaved: (student: Stude
     const source = current.kind !== "add" && Object.hasOwn(pending, current.id) ? setValue(student, current.id, value) : student;
     if (source.birthDate && !validDate(source.birthDate, true)) { setMessage("Controlla la data di nascita."); setStepId("birthDate"); return; }
     idRef.current ||= `studente-${crypto.randomUUID()}`;
-    const cleaned = { ...source, books: source.books?.filter((book) => book.title.trim() || book.publisher.trim()), familyContacts: source.familyContacts?.filter((item) => item.firstName || item.lastName || item.phone || item.email), teachers: source.teachers?.filter((item) => item.firstName || item.lastName || item.subject || item.phone) };
+    const cleaned = { ...source,
+      books: source.books?.filter((book) => book.title.trim() || book.publisher.trim() ||
+        Object.keys(book).some((key) => key !== "title" && key !== "publisher")),
+      familyContacts: source.familyContacts?.filter((item) => item.firstName || item.lastName || item.relationship || item.phone || item.whatsapp || item.email ||
+        Object.keys(item).some((key) => !["id", "firstName", "lastName", "relationship", "phone", "whatsapp", "email"].includes(key))),
+      teachers: source.teachers?.filter((item) => item.firstName || item.lastName || item.subject || item.phone || item.email ||
+        Object.keys(item).some((key) => !["id", "firstName", "lastName", "subject", "phone", "email"].includes(key))),
+    };
     if (cleaned.primaryContactId && !cleaned.familyContacts?.some((item) => item.id === cleaned.primaryContactId)) cleaned.primaryContactId = "";
     const { record, replaceFields } = prepareNarratedStudentSave(cleaned, null, idRef.current, new Date().toLocaleDateString("sv-SE"));
     saveLock.current = true; setSaving(true);

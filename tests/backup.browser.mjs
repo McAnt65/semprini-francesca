@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -14,6 +14,7 @@ test("isolated browser exports encrypted TEST archives and restores them with a 
   skip: !baseUrl || !existsSync(chrome) || typeof WebSocket !== "function",
 }, async () => {
   const profile = await mkdtemp(join(tmpdir(), "semprini-backup-test-"));
+  const uploadDir = await mkdtemp(join(tmpdir(), "semprini-backup-upload-test-"));
   const browser = spawn(chrome, ["--headless=new", "--no-sandbox", "--disable-gpu", "--no-first-run",
     "--disable-extensions", "--remote-debugging-port=0", `--user-data-dir=${profile}`, "about:blank"],
   { windowsHide: true, stdio: "ignore" });
@@ -110,6 +111,8 @@ test("isolated browser exports encrypted TEST archives and restores them with a 
     catch (error) { throw new Error(`${error.message}; status=${await evaluate("document.querySelector('[role=status]')?.textContent")}`); }
     const exported = await file();
     const encrypted = await readFile(exported, "utf8");
+    const uploadFile = join(uploadDir, "TEST.frbackup");
+    await writeFile(uploadFile, encrypted);
     assert.equal(encrypted.includes("Prova Fittizia"), false);
     assert.equal(await evaluate(`JSON.stringify({students:localStorage.getItem('semprini:students'),
       lessons:localStorage.getItem('semprini:calendar:appointments:v1'),
@@ -118,7 +121,7 @@ test("isolated browser exports encrypted TEST archives and restores them with a 
       [...document.querySelectorAll('dd')].some(x=>x.textContent==='1')`), true);
     const { root } = await send("DOM.getDocument");
     const { nodeId } = await send("DOM.querySelector", { nodeId: root.nodeId, selector: "input[type=file]" });
-    await send("DOM.setFileInputFiles", { nodeId, files: [exported] });
+    await send("DOM.setFileInputFiles", { nodeId, files: [uploadFile] });
     await input(2, "wrong-password"); await click("VERIFICA E MOSTRA IL CONTENUTO");
     try { await until("document.body.textContent.includes('Password errata')"); }
     catch (error) { throw new Error(`${error.message}; status=${await evaluate("document.querySelector('[role=status]')?.textContent")}`); }
@@ -154,5 +157,6 @@ test("isolated browser exports encrypted TEST archives and restores them with a 
       try { await rm(profile, { recursive: true, force: true }); break; }
       catch { await delay(200); }
     }
+    await rm(uploadDir, { recursive: true, force: true, maxRetries: 5 });
   }
 });

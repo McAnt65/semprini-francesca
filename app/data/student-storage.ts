@@ -7,6 +7,7 @@ export const HOME_FAMILY_DRAFT_KEY = "semprini:new-student:home-family";
 export const NOTES_DRAFT_KEY = "semprini:new-student:notes";
 export const LEGACY_NOTES_DRAFT_KEY = "semprini:new-student:personal-notes";
 export const STUDENTS_STORAGE_KEY = "semprini:students";
+const COMPLETE_SNAPSHOT_VERSION = 1;
 
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
@@ -69,6 +70,7 @@ function normalizeContacts(value: unknown) {
   return value.map((item) => {
     const contact = asObject(item);
     return {
+      ...contact,
       id: text(contact.id), firstName: text(contact.firstName), lastName: text(contact.lastName),
       relationship: text(contact.relationship), phone: text(contact.phone),
       whatsapp: text(contact.whatsapp), email: text(contact.email),
@@ -81,6 +83,7 @@ function normalizeTeachers(value: unknown) {
   return value.map((item) => {
     const teacher = asObject(item);
     return {
+      ...teacher,
       id: text(teacher.id), firstName: text(teacher.firstName), lastName: text(teacher.lastName),
       subject: text(teacher.subject), phone: text(teacher.phone), email: text(teacher.email),
     };
@@ -110,7 +113,7 @@ function normalizeStoredStudent(value: unknown): StudentRecord | null {
     ? student.books.map((book) => {
         const parsedBook = asObject(book);
         return { ...parsedBook, title: text(parsedBook.title), publisher: text(parsedBook.publisher) };
-      }).filter((book) => book.title || book.publisher)
+      }).filter((book) => book.title || book.publisher || Object.keys(book).some((key) => key !== "title" && key !== "publisher"))
     : [];
   const textbooks = asObject(student.textbooks);
 
@@ -152,6 +155,7 @@ function normalizeStoredStudent(value: unknown): StudentRecord | null {
     subjects,
     books,
     textbooks: {
+      ...textbooks,
       math: text(textbooks.math),
       physics: text(textbooks.physics),
       chemistry: text(textbooks.chemistry),
@@ -203,33 +207,41 @@ function mergeStudent(previous: Record<string, unknown>, incoming: Record<string
 function readStudentArchive() {
   const byId = new Map<string, Record<string, unknown>>();
   const storages = availableStorages();
-  let safeToWrite = storages.length > 0;
+  let structurallyValid = storages.length > 0;
+  const conflictIds = new Set<string>();
   for (const storage of storages) {
     try {
       const raw = storage.getItem(STUDENTS_STORAGE_KEY);
       if (raw === null) continue;
       const stored: unknown = JSON.parse(raw);
-      if (!Array.isArray(stored)) { safeToWrite = false; continue; }
+      if (!Array.isArray(stored)) { structurallyValid = false; continue; }
+      const seenInStorage = new Set<string>();
       for (const value of stored) {
         const student = normalizeStoredStudent(value);
-        if (!student) { safeToWrite = false; continue; }
-        if (!validContactLists(asObject(value))) safeToWrite = false;
+        if (!student) { structurallyValid = false; continue; }
+        if (seenInStorage.has(student.id)) structurallyValid = false;
+        seenInStorage.add(student.id);
+        if (!validContactLists(asObject(value))) structurallyValid = false;
         const rawStudent = asObject(value);
         const previous = byId.get(student.id);
         if (!previous) byId.set(student.id, rawStudent);
         else {
           const newer = text(rawStudent.updatedAt) > text(previous.updatedAt) ? rawStudent : previous;
-          const older = newer === rawStudent ? previous : rawStudent;
-          // Stored records can contain deliberate empty values. Only absent fields fall back.
-          byId.set(student.id, { ...older, ...newer });
+          if (newer.sempriniStudentSnapshotVersion !== COMPLETE_SNAPSHOT_VERSION &&
+              JSON.stringify(rawStudent) !== JSON.stringify(previous)) conflictIds.add(student.id);
+          // Do not synthesize a student from two discordant historical copies.
+          // Both raw copies remain available to the encrypted backup.
+          byId.set(student.id, newer.sempriniStudentSnapshotVersion === COMPLETE_SNAPSHOT_VERSION
+            ? newer : previous);
         }
       }
     } catch {
       // Never overwrite an unreadable or malformed archive with a partial copy.
-      safeToWrite = false;
+      structurallyValid = false;
     }
   }
-  return { students: [...byId.values()].map((value) => normalizeStoredStudent(value)!), storages, safeToWrite };
+  return { students: [...byId.values()].map((value) => normalizeStoredStudent(value)!), storages,
+    safeToWrite: structurallyValid && conflictIds.size === 0, structurallyValid, conflictIds };
 }
 
 function validContactLists(student: Record<string, unknown>) {
@@ -314,9 +326,9 @@ export function loadStoredStudents(): StudentRecord[] {
 }
 
 /** Same normalized archive used by the app, without the legacy recovery write. */
-export function inspectStoredStudentsReadOnly(): { students: StudentRecord[]; readable: boolean } {
+export function inspectStoredStudentsReadOnly(): { students: StudentRecord[]; readable: boolean; conflictIds: string[] } {
   const archive = readStudentArchive();
-  return { students: archive.students, readable: archive.safeToWrite };
+  return { students: archive.students, readable: archive.safeToWrite, conflictIds: [...archive.conflictIds] };
 }
 
 export function getStoredStudentById(id: string) {
@@ -336,10 +348,10 @@ export function saveStoredStudentResult(
 ): SaveResult {
   const failed: SaveResult = { status: "failed" };
   const archive = readStudentArchive();
-  if (!archive.safeToWrite || !text(student.id)) return failed;
-  const recovery = recoverNarratives(archive);
-  if (recovery.report.blocked) return failed;
-  const current = recovery.students;
+  if (!archive.structurallyValid || !text(student.id) || archive.conflictIds.has(student.id)) return failed;
+  const recovery = archive.safeToWrite ? recoverNarratives(archive) : null;
+  if (recovery?.report.blocked) return failed;
+  const current = recovery?.students ?? archive.students;
   const previous = current.find((item) => item.id === student.id);
   const merged = mergeStudent(asObject(previous), asObject(student));
   // Explicit replacement is available for intentional clearing/removal in future editors.
@@ -348,9 +360,32 @@ export function saveStoredStudentResult(
   }
   if (previous?.enrollmentDate) merged.enrollmentDate = previous.enrollmentDate;
   if (!validContactLists(asObject(student)) || !validContactLists(merged)) return failed;
-  const normalized = normalizeStoredStudent({ ...merged, updatedAt: nextTimestamp(current) });
+  const normalized = normalizeStoredStudent({ ...merged, updatedAt: nextTimestamp(current),
+    sempriniStudentSnapshotVersion: COMPLETE_SNAPSHOT_VERSION });
   if (!normalized) return failed;
   if (normalized.primaryContactId && !normalized.familyContacts?.some((contact) => contact.id === normalized.primaryContactId)) return failed;
+  if (previous?.books?.length && (options.replaceFields || []).includes("books") && !normalized.books?.length &&
+      Object.values(previous.textbooks).some((value) => typeof value === "string" && value.trim()) &&
+      !(options.replaceFields || []).includes("textbooks")) return failed;
+  if (archive.conflictIds.size) {
+    // Update only the selected record in one raw copy; never rewrite the other copy.
+    for (const storage of archive.storages) {
+      try {
+        let persistent = false;
+        try { persistent = storage === window.localStorage; } catch { /* Local storage denied. */ }
+        if (options.requirePersistent && !persistent) continue;
+        const raw = storage.getItem(STUDENTS_STORAGE_KEY);
+        const records: unknown[] = raw === null ? [] : JSON.parse(raw);
+        if (!Array.isArray(records)) return failed;
+        const nextRecords = records.filter((item) => text(asObject(item).id) !== student.id);
+        nextRecords.unshift(normalized);
+        if (writeAndVerify(storage, STUDENTS_STORAGE_KEY, JSON.stringify(nextRecords))) {
+          return { status: persistent ? "saved" : "temporary" };
+        }
+      } catch { /* Try the other storage if available. */ }
+    }
+    return failed;
+  }
   const next = [normalized, ...current.filter((item) => item.id !== student.id)];
   if (options.requirePersistent) {
     try { return writeStudentArchive(next, [window.localStorage]); } catch { return failed; }
@@ -437,8 +472,8 @@ export function buildStudentFromSavedDrafts(): StudentRecord {
   const books = Array.isArray(school.books)
     ? school.books.map((book) => {
         const parsedBook = asObject(book);
-        return { title: text(parsedBook.title), publisher: text(parsedBook.publisher) };
-      }).filter((book) => book.title || book.publisher)
+        return { ...parsedBook, title: text(parsedBook.title), publisher: text(parsedBook.publisher) };
+      }).filter((book) => book.title || book.publisher || Object.keys(book).some((key) => key !== "title" && key !== "publisher"))
     : [];
   const bookLabels = books.map((book) => [book.title, book.publisher].filter(Boolean).join(" — "));
 

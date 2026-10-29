@@ -58,13 +58,28 @@ test("G9K: sparse and complete student narratives read cleanly on Android viewpo
     // Keep selectors independent of CSS module names.
     const action = (label) => `[...document.querySelectorAll('button')].find(x => x.textContent.trim() === ${JSON.stringify(label)})`;
     const visibleText = `document.querySelector('[aria-label="Diario dello studente"]').innerText`;
+    async function goTo(label, chapter) {
+      for (let i = 0; i < 100; i++) {
+        if (await evaluate(`document.querySelector('#question-title')?.textContent.trim().replace(/\\s*\\*$/, '') === ${JSON.stringify(label)} && (!${JSON.stringify(chapter || '')} || document.querySelector('[class*="progress"]')?.textContent.includes(${JSON.stringify(chapter || '')}))`)) return;
+        await evaluate(`(${action("SALTA DATO")} || ${action("AVANTI")}).click()`);
+        await delay(30);
+      }
+      throw Error(`Step not found: ${chapter || ''} ${label}`);
+    }
+    async function edit(label, chapter) {
+      const selector = `[...document.querySelectorAll('[aria-label=${JSON.stringify('Modifica ' + label)}]')].find(x => !${JSON.stringify(chapter || '')} || x.closest('section')?.querySelector('h3')?.textContent === ${JSON.stringify(chapter || '')})`;
+      assert.equal(await evaluate(`!!${selector}`), true, `editable ${label}`);
+      await evaluate(`${selector}.click()`);
+      await until(`document.querySelector('#question-title')?.textContent.includes(${JSON.stringify(label)})`);
+    }
     async function fill(label, value) {
-      const selector = `document.querySelector('[aria-label=${JSON.stringify(label)}]')`;
-      assert.equal(await evaluate(`!!${selector}`), true, `field ${label} exists`);
-      await evaluate(`(() => { const element = ${selector}; const type = element.tagName === 'TEXTAREA' ? HTMLTextAreaElement : HTMLInputElement;
-        Object.getOwnPropertyDescriptor(type.prototype, 'value').set.call(element, ${JSON.stringify(value)});
-        element.dispatchEvent(new Event('input', { bubbles: true })); })()`);
-      await until(`${selector}.value === ${JSON.stringify(value)}`);
+      await goTo(label);
+      await evaluate(`document.querySelector('#guided-answer').focus(); document.querySelector('#guided-answer').select()`);
+      await send("Input.insertText", { text: value });
+      await until(`document.querySelector('#guided-answer').value === ${JSON.stringify(value)}`);
+    }
+    async function choose(value) {
+      await evaluate(`(() => { const element = document.querySelector('#guided-answer'); element.value = ${JSON.stringify(value)}; element.dispatchEvent(new Event('change', { bubbles: true })); })()`);
     }
     async function viewport(width, height, file) {
       await send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: true });
@@ -81,12 +96,14 @@ test("G9K: sparse and complete student narratives read cleanly on Android viewpo
     await send("Runtime.enable");
     await send("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
     await send("Page.navigate", { url: new URL("/studenti/nuovo", baseUrl).href });
-    await until(`!!document.querySelector('input[aria-label="Nome dello studente"]')`);
-    await until(`document.querySelector('section[aria-labelledby="nuovo-allievo"]')?.textContent.includes(String(new Date().getFullYear()))`);
+    await until(`document.querySelector('#question-title')?.textContent.includes("Nome dello studente")`);
     await fill("Nome dello studente", "G9K Pochi");
     await evaluate(`${action("AVANTI")}.click()`);
-    await until(`!!document.querySelector('input[aria-label="Cognome dello studente"]')`);
+    await until(`document.querySelector('#question-title')?.textContent.includes("Cognome dello studente")`);
     await fill("Cognome dello studente", "Campi");
+    await evaluate(`${action("AVANTI")}.click()`);
+    await until(`document.querySelector('#guided-answer')?.type === 'date'`);
+    assert.equal(await evaluate(`document.querySelector('#guided-answer').max.startsWith(String(new Date().getFullYear()))`), true);
     await evaluate(`${action("SALVA")}.click()`);
     await until(`document.querySelector('[role="status"]')?.textContent.includes('Studente custodito nel registro')`);
     await until(`!!document.querySelector('button[aria-label="Modifica i dati dello studente"]')`);
@@ -99,10 +116,15 @@ test("G9K: sparse and complete student narratives read cleanly on Android viewpo
     await viewport(430, 764, "sparse-430x764.png");
 
     await evaluate(`document.querySelector('button[aria-label="Modifica i dati dello studente"]').click()`);
-    await until(`!!document.querySelector('input[aria-label="Indirizzo email"]')`);
+    await until(`!!document.querySelector('#guided-answer')`);
     assert.equal(await evaluate(`!!${action("MODIFICA")} && !!${action("SALVA")}`), false);
-    assert.equal(await evaluate(`!!document.querySelector('input[aria-label="Numero di cellulare della madre"]')`), true);
-    await fill("Indirizzo email", "pochi@example.invalid");
+    await goTo("Cellulare", "Madre");
+    assert.equal(await evaluate(`document.querySelector('#guided-answer').type`), "tel");
+    await evaluate(`${action("ANNULLA")}.click()`);
+    await until(`!!document.querySelector('button[aria-label="Modifica i dati dello studente"]')`);
+    await evaluate(`document.querySelector('button[aria-label="Modifica i dati dello studente"]').click()`);
+    await until(`!!document.querySelector('#guided-answer')`);
+    await fill("Email studente", "pochi@example.invalid");
     await evaluate(`${action("SALVA")}.click()`);
     await until(`!!document.querySelector('button[aria-label="Modifica i dati dello studente"]')`);
     const partial = await evaluate(visibleText);
@@ -111,7 +133,7 @@ test("G9K: sparse and complete student narratives read cleanly on Android viewpo
 
     const sparseRecord = await evaluate(`JSON.parse(localStorage.getItem('semprini:students')).find(x => x.firstName === 'G9K Pochi')`);
     const partialRecord = { ...sparseRecord, address: "Via Breve 2", familyContacts: [
-      { id: "madre", relationship: "madre", firstName: "", lastName: "", whatsapp: "3330001111" },
+      { id: "madre", relationship: "madre", firstName: "", lastName: "", whatsapp: "3330001111", email: "legacy@example.invalid", legacyAttribute: "preserve" },
     ], teachers: [{ id: "solo-materia", subject: "Fisica", firstName: "", lastName: "" }] };
     await evaluate(`localStorage.setItem('semprini:students', JSON.stringify(JSON.parse(localStorage.getItem('semprini:students')).map(x => x.id === ${JSON.stringify(sparseRecord.id)} ? ${JSON.stringify(partialRecord)} : x)))`);
     await send("Page.navigate", { url: new URL(`/studenti/nuovo?id=${encodeURIComponent(sparseRecord.id)}`, baseUrl).href });
@@ -123,11 +145,22 @@ test("G9K: sparse and complete student narratives read cleanly on Android viewpo
     assert.match(partialSections, /La materia di riferimento a scuola è Fisica\./);
     assert.doesNotMatch(partialSections, /\.\.\.|…|si chiama \.|insegnante di  è/);
     await evaluate(`document.querySelector('button[aria-label="Modifica i dati dello studente"]').click()`);
-    await until(`!!document.querySelector('input[aria-label="Numero di cellulare della madre"]')`);
-    await evaluate(`document.querySelectorAll('input[type="checkbox"][aria-label="Usa anche WhatsApp"]')[1].click()`);
+    await until(`!!document.querySelector('#guided-answer')`);
+    await edit("Cellulare", "Madre");
+    assert.equal(await evaluate(`document.querySelector('#guided-answer').value`), "3330001111");
+    await edit("Usa WhatsApp?", "Madre");
+    await evaluate(`${action("RIMUOVI DATO")}.click()`);
+    assert.equal(await evaluate(`document.querySelector('#guided-answer').value`), "no");
     await evaluate(`${action("SALVA")}.click()`);
     await until(`!!document.querySelector('button[aria-label="Modifica i dati dello studente"]')`);
     assert.deepEqual(await evaluate(`(() => { const p = JSON.parse(localStorage.getItem('semprini:students')).find(x => x.id === ${JSON.stringify(sparseRecord.id)}).familyContacts[0]; return [p.phone, p.whatsapp]; })()`), ["3330001111", ""]);
+
+    const legacySaved = await evaluate(`JSON.parse(localStorage.getItem('semprini:students')).find(x => x.id === ${JSON.stringify(sparseRecord.id)})`);
+    const legacyBefore = partialRecord.familyContacts[0];
+    assert.deepEqual(legacySaved.familyContacts[0], { ...legacyBefore, phone: "3330001111", whatsapp: "" }, "WhatsApp removal preserves the historical number and all contact attributes");
+    await send("Page.reload", { ignoreCache: true });
+    await until(`document.querySelector('[aria-label="Diario dello studente"]')?.innerText.includes('3330001111')`);
+    assert.equal(await evaluate(`!!document.querySelector('[aria-label="Diario dello studente"] a[href="https://wa.me/393330001111"]')`), false);
 
     const complete = { ...sparseRecord, id: "g9k-completo", firstName: "G9K Completo", lastName: "Profilo", birthDate: "2010-04-12",
       gradeClass: "3° anno", section: "B", schoolName: "Liceo Aurora", city: "Rimini", studyCourse: "scientifico",
@@ -156,17 +189,24 @@ test("G9K: sparse and complete student narratives read cleanly on Android viewpo
     assert.equal(await evaluate(`!!${action("SALVA")}`), false);
     assert.deepEqual(await evaluate(`JSON.parse(localStorage.getItem('semprini:students')).find(x => x.id === 'g9k-completo')`), complete);
     await evaluate(`document.querySelector('button[aria-label="Modifica i dati dello studente"]').click()`);
-    await until(`!!document.querySelector('input[aria-label="Indirizzo email"]')`);
+    await until(`!!document.querySelector('#guided-answer')`);
     assert.equal(await evaluate(`document.querySelectorAll('input[type="tel"][aria-label*="WhatsApp"]').length`), 0);
-    assert.equal(await evaluate(`document.querySelectorAll('input[type="checkbox"][aria-label="Usa anche WhatsApp"]').length`), 3);
-    assert.equal(await evaluate(`document.querySelectorAll('input[type="checkbox"][aria-label="Usa anche WhatsApp"]')[2].disabled`), true);
-    await fill("Numero di cellulare", "3335556666");
-    await fill("Numero di cellulare del padre", "3334445555");
-    await evaluate(`document.querySelectorAll('input[type="checkbox"][aria-label="Usa anche WhatsApp"]')[2].click()`);
-    await fill("Indirizzo email", "aggiornato@example.invalid");
+    await edit("Usa WhatsApp sul cellulare?");
+    assert.equal(await evaluate(`document.querySelector('#guided-answer').value`), "yes");
+    await edit("Usa WhatsApp?", "Madre");
+    assert.equal(await evaluate(`document.querySelector('#guided-answer').value`), "yes");
+    await edit("Usa WhatsApp?", "Padre");
+    assert.equal(await evaluate(`document.querySelector('#guided-answer option[value="yes"]').disabled`), true);
+    await edit("Cellulare studente");
+    await fill("Cellulare studente", "3335556666");
+    await evaluate(`${action("AVANTI")}.click()`);
+    await edit("Usa WhatsApp sul cellulare?"); await evaluate(`${action("RIMUOVI DATO")}.click()`); await choose("yes"); await evaluate(`${action("AVANTI")}.click()`);
+    await edit("Cellulare", "Padre"); await fill("Cellulare", "3334445555"); await evaluate(`${action("AVANTI")}.click()`);
+    await edit("Usa WhatsApp?", "Padre"); await choose("yes"); await evaluate(`${action("AVANTI")}.click()`);
+    await edit("Email studente"); await fill("Email studente", "aggiornato@example.invalid");
     await send("Emulation.setDeviceMetricsOverride", { width: 390, height: 520, deviceScaleFactor: 1, mobile: true });
-    await evaluate(`document.querySelector('input[aria-label="Indirizzo email"]').focus()`);
-    await until(`(() => { const r = document.querySelector('input[aria-label="Indirizzo email"]').getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight; })()`);
+    await evaluate(`document.querySelector('#guided-answer').focus()`);
+    await until(`(() => { const r = document.querySelector('#guided-answer').getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight; })()`);
     assert.equal(await evaluate(`document.documentElement.scrollWidth <= innerWidth`), true);
     await send("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
     await evaluate(`${action("SALVA")}.click()`);
@@ -188,18 +228,17 @@ test("G9K: sparse and complete student narratives read cleanly on Android viewpo
     assert.equal(await evaluate(`document.querySelector('section[aria-labelledby="percorso"]').innerText.includes('le frazioni')`), true);
     await viewport(430, 764, "complete-bottom-430x764.png");
     await send("Page.navigate", { url: new URL("/studenti/nuovo", baseUrl).href });
-    await until(`!!document.querySelector('input[aria-label="Nome dello studente"]')`);
+    await until(`document.querySelector('#question-title')?.textContent.includes("Nome dello studente")`);
     await fill("Nome dello studente", "G9K Nuovo");
     await evaluate(`${action("AVANTI")}.click()`);
-    await until(`!!document.querySelector('input[aria-label="Cognome dello studente"]')`);
+    await until(`document.querySelector('#question-title')?.textContent.includes("Cognome dello studente")`);
     await fill("Cognome dello studente", "Contatto");
-    for (let i = 0; i < 7; i++) { await evaluate(`${action("AVANTI")}.click()`); await delay(30); }
-    await until(`!!document.querySelector('input[aria-label="Numero di cellulare"]')`);
-    await fill("Numero di cellulare", "+39 333 777 8888");
     await evaluate(`${action("AVANTI")}.click()`);
-    await until(`!!document.querySelector('input[type="checkbox"][aria-label="Usa anche WhatsApp"]')`);
+    await fill("Cellulare studente", "+39 333 777 8888");
+    await evaluate(`${action("AVANTI")}.click()`);
+    await until(`document.querySelector('#question-title')?.textContent.includes('Usa WhatsApp')`);
     assert.equal(await evaluate(`document.querySelectorAll('input[type="tel"][aria-label*="WhatsApp"]').length`), 0);
-    await evaluate(`document.querySelector('input[type="checkbox"][aria-label="Usa anche WhatsApp"]').click()`);
+    await choose("yes");
     await evaluate(`${action("SALVA")}.click()`);
     await until(`!!document.querySelector('button[aria-label="Modifica i dati dello studente"]')`);
     assert.equal(await evaluate(`document.querySelector('[aria-label="Diario dello studente"] a[href="https://wa.me/393337778888"]')?.textContent`), "WhatsApp");

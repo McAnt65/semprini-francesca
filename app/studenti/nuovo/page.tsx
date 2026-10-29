@@ -4,15 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type KeyboardEventHandler, type Ref } from "react";
 import type { StudentFamilyContact, StudentRecord, StudentTeacher } from "../../data/students";
-import { getStoredStudentById, saveStoredStudentResult } from "../../data/student-storage";
+import { getStoredStudentById, inspectStoredStudentsReadOnly, saveStoredStudentResult } from "../../data/student-storage";
 import { TEMPORARY_SAVE_WARNING, type SaveResult } from "../../data/save-result";
-import { addStudentBook, booksForEditing, changeBookField, removeStudentBook } from "../student-edit";
+import { addStudentBook, booksForEditing, changeBookField, lastBookRemovalIsAmbiguous, removeStudentBook } from "../student-edit";
 import { loadTariffs } from "../../data/tariffario/tariff-storage";
 import type { Tariff } from "../../data/tariffario/tariff-types";
 import { prepareNarratedStudentSave } from "./narrated-student-save";
 import { StudentReadChapter, StudentReadSections, WhatsAppLink } from "./student-narrative-read";
 import { contactPhone, whatsappNumber } from "./contact-links";
 import GuidedNewStudent from "./guided-new-student";
+import GuidedEditStudent from "./guided-edit-student";
 import styles from "./nuovo.module.css";
 
 const EMPTY: StudentRecord = {
@@ -170,7 +171,7 @@ function ConfirmedOpeningValue({ value, label, onEdit }: { value: string; label:
 
 export default function NewStudentPage() {
   const [student, setStudent] = useState<StudentRecord>(EMPTY);
-  const [routeMode, setRouteMode] = useState<"loading" | "new" | "existing">("loading");
+  const [routeMode, setRouteMode] = useState<"loading" | "new" | "existing" | "conflict">("loading");
   const [saved, setSaved] = useState<StudentRecord | null>(null);
   const [editing, setEditing] = useState(true);
   const [openingStep, setOpeningStep] = useState(0);
@@ -216,6 +217,7 @@ export default function NewStudentPage() {
       setToday(localDate());
       setTariffs(loadTariffs());
       const id = new URLSearchParams(window.location.search).get("id");
+      if (id && inspectStoredStudentsReadOnly().conflictIds.includes(id)) { setRouteMode("conflict"); return; }
       const existing = id ? getStoredStudentById(id) : null;
       if (existing) { setStudent(existing); setSaved(existing); setEditing(false); nextId.current = existing.id; }
       setRouteMode(id ? "existing" : "new");
@@ -577,6 +579,10 @@ export default function NewStudentPage() {
     setOpeningEdit("books");
   }
   function removeBook(index: number) {
+    if (lastBookRemovalIsAmbiguous(student)) {
+      setMessage("Questo libro e i libri storici potrebbero essere indipendenti. Conserva una copia cifrata; la rimozione è sospesa per non perdere dati.");
+      return;
+    }
     setStudent((current) => removeStudentBook(current, index));
     setBookEditIndex(null);
     setOpeningEdit(null);
@@ -627,7 +633,10 @@ export default function NewStudentPage() {
   const contactDetailsVisible = phoneVisible || whatsappVisible || emailVisible;
   const subjectsVisible = showChapterField("subjects", 11, student.subjects.join(", "));
   if (routeMode === "loading") return null;
+  if (routeMode === "conflict") return <main className={styles.page}><div role="alert">Due copie storiche di questo studente sono discordanti. La modifica è sospesa; le copie restano intatte. <Link href="/impostazioni/salvataggio">SCARICA COPIA CIFRATA</Link> <Link href="/studenti/elenco">ALTRI STUDENTI</Link></div></main>;
   if (routeMode === "new") return <GuidedNewStudent onSaved={(record) => { setStudent(record); setSaved(record); setEditing(false); setMessage("Studente custodito nel registro."); setRouteMode("existing"); }} />;
+  if (routeMode === "existing" && !saved) return <main className={styles.page}><div role="alert">Studente non trovato. Salvataggio non disponibile. <Link href="/studenti">STUDENTI</Link></div></main>;
+  if (saved && editing) return <GuidedEditStudent key={saved.id} original={saved} onCancel={cancel} onSaved={(record) => { setStudent(record); setSaved(record); setEditing(false); setMessage("Modifiche custodite nel registro."); }} />;
   return (
     <main ref={pageRef} className={styles.page}>
       <div className={styles.sheet}>

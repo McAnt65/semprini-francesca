@@ -62,7 +62,9 @@ test("G10G: guided entry, draft and saved edit on both Android viewports", { ski
     await until("!!document.querySelector('#guided-answer')");
     await viewport(390, 844);
     await viewport(390, 450);
-    assert.equal(await evaluate("document.querySelector('main').scrollHeight > document.querySelector('main').clientHeight"), true, "short viewport remains scrollable");
+    await until("Math.round(document.querySelector('main').getBoundingClientRect().height) === 450");
+    const shortViewport = await evaluate("(() => { const main = document.querySelector('main'); const work = main.querySelector('[class*=workArea]'); return { mainHeight: main.clientHeight, mainScroll: main.scrollHeight, workHeight: work?.clientHeight, workScroll: work?.scrollHeight, innerHeight }; })()");
+    assert.equal(shortViewport.mainScroll > shortViewport.mainHeight, true, `short viewport remains scrollable: ${JSON.stringify(shortViewport)}`);
     await viewport(390, 844);
     assert.equal(await evaluate(`${button("SALVA")}.disabled`), true);
     await evaluate("document.querySelector('#guided-answer').focus()");
@@ -78,6 +80,11 @@ test("G10G: guided entry, draft and saved edit on both Android viewports", { ski
     await until("document.querySelector('#question-title')?.textContent.includes('Anno scolastico')");
     assert.equal(await evaluate("document.body.innerText.includes('G10G') && document.body.innerText.includes('Prova')"), true);
     assert.equal(await evaluate("JSON.parse(localStorage.getItem('semprini:student-guided-draft:v1')).version"), 1);
+    await evaluate(`(() => { const key='semprini:student-guided-draft:v1'; const draft=JSON.parse(localStorage.getItem(key));
+      draft.student.familyContacts=[{id:'legacy-contact',firstName:'',lastName:'',whatsapp:'3330001111',legacyAttribute:'keep'},
+        {id:'legacy-relation',firstName:'',lastName:'',relationship:'nonno'}];
+      draft.student.teachers=[{id:'legacy-teacher',firstName:'',lastName:'',subject:'',email:'teacher@example.invalid'}];
+      draft.student.books=[{title:'',publisher:'',edition:'legacy'}];localStorage.setItem(key,JSON.stringify(draft));})()`);
     await send("Page.reload", { ignoreCache: true });
     await until("document.body.innerText.includes('Una bozza ti aspetta')");
     await click("RIPRENDI");
@@ -86,6 +93,10 @@ test("G10G: guided entry, draft and saved edit on both Android viewports", { ski
     await click("SALVA");
     await until("location.search.includes('id=') && document.body.innerText.includes('Studente custodito nel registro')");
     assert.equal(await evaluate("localStorage.getItem('semprini:student-guided-draft:v1')"), null);
+    assert.deepEqual(await evaluate(`(() => { const student=JSON.parse(localStorage.getItem('semprini:students'))[0];
+      return [student.familyContacts[0].legacyAttribute,student.familyContacts[0].whatsapp,
+        student.familyContacts[1].relationship,
+        student.teachers[0].email,student.books[0].edition];})()`), ["keep","3330001111","nonno","teacher@example.invalid","legacy"]);
     assert.equal(await evaluate("!![...document.querySelectorAll('button')].find(x => x.textContent.trim()==='MODIFICA')"), true);
     await send("Page.navigate", { url: new URL("/studenti/nuovo", url).href });
     await until("document.querySelector('#question-title')?.textContent.includes('Nome dello studente')");

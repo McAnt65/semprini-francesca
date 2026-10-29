@@ -10,7 +10,7 @@ import { loadTariffs } from "../data/tariffario/tariff-storage";
 import type { Tariff } from "../data/tariffario/tariff-types";
 import StudentSurface from "./StudentSurface";
 import styles from "./students.module.css";
-import { addStudentBook, booksForEditing, changeBookField, prepareStudentFormSave, removeStudentBook } from "./student-edit";
+import { addStudentBook, booksForEditing, changeBookField, lastBookRemovalIsAmbiguous, prepareStudentFormSave, removeStudentBook } from "./student-edit";
 import artwork from "../../design-approved-phase3/09-studenti-nuovo-final.png";
 
 const SUBJECTS = ["Matematica", "Fisica", "Chimica"];
@@ -95,8 +95,11 @@ export default function StudentForm({ studentId, tabbed = false }: { studentId?:
     setStudent(addStudentBook);
   }
   function removeBook(index: number) {
+    if (lastBookRemovalIsAmbiguous(student)) {
+      setMessage("Il libro e i dati storici potrebbero essere indipendenti. Conserva una copia cifrata; rimozione sospesa.");
+      return;
+    }
     editedFields.current.add("books");
-    if (booksForEditing(student).length === 1) editedFields.current.add("textbooks");
     setStudent((current) => removeStudentBook(current, index));
   }
 

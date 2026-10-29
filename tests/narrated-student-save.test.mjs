@@ -34,6 +34,25 @@ test("lesson preferences update without changing appointments", () => { const c 
 test("temporary save and failure leave the draft available", () => { const c = setup(); const draft = { ...c.base, firstName: "Bozza" }; c.local.blocked = true; assert.equal(c.save(draft).status, "temporary"); assert.equal(draft.firstName, "Bozza"); c.session.blocked = true; assert.equal(c.save({ ...draft, firstName: "Seconda bozza" }).status, "failed"); assert.equal(draft.firstName, "Bozza"); });
 test("unexposed historical fields survive a narrated edit", () => { const c = setup(); const original = { ...c.base, postalCode: "47800", province: "RN", familyNotes: "Nota storica", usefulReferences: "Riferimento storico" }; c.save(original); const before = c.storage.getStoredStudentById(original.id); const { record, replaceFields } = c.prepare({ ...before, personalNotes: "Nota aggiornata" }, before, before.id, "2026-10-18"); for (const key of ["postalCode", "province", "familyNotes", "usefulReferences"]) assert(!replaceFields.includes(key)); assert.equal(c.storage.saveStoredStudentResult(record, { replaceFields }).status, "saved"); const after = c.storage.getStoredStudentById(original.id); for (const key of ["postalCode", "province", "familyNotes", "usefulReferences"]) assert.equal(after[key], original[key]); assert.equal(after.personalNotes, "Nota aggiornata"); });
 
+test("narrated edits retain historical school, metadata-only entries and explicit teacher removal", () => {
+  const c = setup();
+  const original = { ...c.base, school: "Scuola storica TEST", schoolName: "Scuola attuale TEST",
+    teachers: [{ id: "prof-legacy", firstName: "", lastName: "", subject: "", note: "storica" },
+      { id: "prof-empty", firstName: "", lastName: "", subject: "" }],
+    books: [{ title: "", publisher: "", edition: "storica" }], textbooks: { latin: "Libro TEST" } };
+  c.local.setItem("semprini:students", JSON.stringify([original]));
+  const before = c.storage.getStoredStudentById(original.id);
+  assert.equal(c.save({ ...before, personalNotes: "Modificata" }, before).status, "saved");
+  const after = c.storage.getStoredStudentById(original.id);
+  assert.equal(after.school, original.school);
+  assert.equal(after.teachers[0].note, "storica");
+  assert.equal(after.teachers[1].id, "prof-empty");
+  assert.equal(after.books[0].edition, "storica");
+  assert.equal(after.textbooks.latin, "Libro TEST");
+  assert.equal(c.save({ ...after, teachers: [] }, after).status, "saved");
+  assert.deepEqual(c.storage.getStoredStudentById(original.id).teachers, []);
+});
+
 test("a missing legacy photo Blob never blocks editing, reloading or archiving", () => {
   const c = setup();
   const reference = "student-photo:v1:narrated-test:missing-blob";

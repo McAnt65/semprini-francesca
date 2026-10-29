@@ -14,9 +14,11 @@ export function prepareNarratedStudentSave(student: StudentRecord, saved: Studen
     ...student, id, status: student.status || "active",
     enrollmentDate: saved?.enrollmentDate || student.enrollmentDate || today,
     firstName: student.firstName.trim(), lastName: student.lastName.trim(),
-    school: student.schoolName || student.school,
+    school: saved && student.schoolName === saved.schoolName ? student.school : student.schoolName || student.school,
     subjects: student.subjects.map((subject) => subject.trim()).filter(Boolean),
-    teachers: student.teachers?.filter((teacher) => teacher.firstName || teacher.lastName || teacher.subject || teacher.phone || teacher.email),
+    teachers: student.teachers?.filter((teacher) => teacher.firstName || teacher.lastName || teacher.subject || teacher.phone || teacher.email ||
+      saved?.teachers?.some((previous) => previous.id === teacher.id) ||
+      Object.keys(teacher).some((key) => !["id", "firstName", "lastName", "subject", "phone", "email"].includes(key))),
     familyContacts: student.familyContacts,
     primaryContactId: student.primaryContactId || "",
   };
