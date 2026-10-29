@@ -1,0 +1,37 @@
+.page { min-height: 100dvh; display: grid; place-items: center; overflow: hidden; background: linear-gradient(180deg, #fdf3df, #fdf1e0); color: #4b3024; }
+body:has(.page) button[aria-controls="context-help"] { left: auto; right: max(8px, calc((100vw - 560px) / 2 + 8px)); transform: none; }
+.sheet { position: relative; container-type: inline-size; width: min(100%, 560px, calc(100dvh * 941 / 1672)); aspect-ratio: 941 / 1672; overflow: hidden; }
+.artwork { object-fit: contain; pointer-events: none; user-select: none; }
+.topNav { position: absolute; top: 34.3%; left: 9%; right: 9%; display: flex; justify-content: space-between; align-items: center; }
+.topNav a { display: grid; place-items: center; min-width: 72px; min-height: 44px; color: #741d32; font: italic 400 clamp(15px, 3.6cqw, 20px)/1.2 "Berenis ADF Pro Oggi", Georgia, serif; text-decoration: none; }
+.workspace { position: absolute; top: 40%; bottom: 6.5%; left: 10.5%; right: 10.5%; display: flex; flex-direction: column; min-height: 0; overflow: hidden; font: 400 clamp(14px, 3.3cqw, 17px)/1.37 var(--font-entry-elegant), Georgia, serif; }
+.identity { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 0 2px 5px; border-bottom: 1px solid rgb(130 78 63 / 35%); }
+.identity h2 { min-width: 0; margin: 0; color: #8d3049; font: italic 400 clamp(22px, 5.1cqw, 30px)/1.1 "Berenis ADF Pro Oggi", Georgia, serif; overflow-wrap: anywhere; }
+.identity span { flex: 0 0 auto; color: #6f5745; font-size: .8em; }
+.scroll { min-height: 0; flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: none; padding: 0 3px 10px; }
+.scroll::-webkit-scrollbar { display: none; }
+.section { padding: 11px 0 13px; border-bottom: 1px solid rgb(130 78 63 / 27%); overflow-wrap: anywhere; }
+.section:last-child { border-bottom: 0; }
+.section h3 { margin: 0 0 7px; color: #832a41; font: italic 400 clamp(19px, 4.4cqw, 24px)/1.12 "Berenis ADF Pro Oggi", Georgia, serif; }
+.section p { margin: 4px 0; white-space: pre-wrap; }
+.section dl, .contact dl { display: grid; gap: 4px; margin: 0; }
+.field { display: grid; grid-template-columns: minmax(90px, 38%) minmax(0, 1fr); gap: 8px; }
+.field dt { color: #6f5745; }
+.field dd { min-width: 0; margin: 0; color: #4b3024; white-space: pre-wrap; overflow-wrap: anywhere; }
+.lessonList, .paymentList { margin: 0; padding: 0; list-style: none; }
+.lesson { padding: 7px 0 8px; border-bottom: 1px solid rgb(130 78 63 / 19%); }
+.lesson:last-child { border-bottom: 0; }
+.lessonHead { display: flex; flex-wrap: wrap; column-gap: 8px; color: #792b40; }
+.lessonHead strong, .lesson b { font-weight: 600; }
+.paymentList li { padding: 3px 0; }
+.contact { margin-top: 10px; }
+.contact strong { display: block; margin-bottom: 3px; color: #792b40; }
+.section a, .contextNav a, .notice a { color: #741d32; text-underline-offset: 3px; }
+.section a { display: inline-flex; align-items: center; min-height: 44px; }
+.contextNav { display: grid; grid-template-columns: 1fr 1fr; flex: 0 0 auto; border-top: 1px solid rgb(130 78 63 / 35%); }
+.contextNav a { display: grid; place-items: center; min-height: 44px; text-align: center; font: italic 400 clamp(14px, 3.4cqw, 18px)/1.2 "Berenis ADF Pro Oggi", Georgia, serif; }
+.notice { padding: 12px 4px; }
+.notice p { margin: 0 0 8px; }
+.notice a { display: inline-flex; align-items: center; min-height: 44px; }
+.page a:focus-visible, .scroll:focus-visible { outline: 2px solid #741d32; outline-offset: 2px; }
+@media (max-width: 560px) { .sheet { width: min(100%, calc(100dvh * 941 / 1672)); } }
