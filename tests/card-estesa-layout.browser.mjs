@@ -56,10 +56,13 @@ test("Card Estesa stays usable at both Android viewports", { skip: !baseUrl || !
     const url = new URL("/studenti/card-estesa-TEST/estesa", baseUrl).href;
     await send("Page.navigate", { url });
     await until("document.querySelector('main') !== null");
-    const record = { id: "card-estesa-TEST", firstName: "Ada", lastName: "TEST", subjects: ["Fisica"],
+    const record = { id: "card-estesa-TEST", firstName: "Ada", lastName: "TEST", phone: "", email: "", whatsapp: "", subjects: ["Fisica"],
       textbooks: {}, familyContacts: [{ id: "madre-TEST", firstName: "Maria", lastName: "TEST", phone: "000000" }],
       personalNotes: "Nota esclusivamente TEST. ".repeat(18), learningGoals: "Obiettivo TEST. ".repeat(12) };
-    const raw = JSON.stringify([record]);
+    const records = [record,
+      { ...record, id: "card-estesa-ALTRO-TEST", firstName: "Bea", personalNotes: "Nota di Bea TEST" },
+      { ...record, id: "card-estesa-TERZO-TEST", firstName: "Ciro", personalNotes: "Nota di Ciro TEST" }];
+    const raw = JSON.stringify(records);
     await evaluate(`localStorage.setItem('semprini:students', ${JSON.stringify(raw)})`);
     await send("Page.reload", { ignoreCache: true });
     await until("document.querySelector('[aria-label^=\"Fascicolo di\"]') !== null && document.querySelector('button[aria-controls=\"context-help\"]') !== null");
@@ -107,6 +110,36 @@ test("Card Estesa stays usable at both Android viewports", { skip: !baseUrl || !
     await until("document.querySelector('aside#context-help') !== null");
     await evaluate("document.querySelector('button[aria-label=\"Chiudi aiuto\"]').click()");
     await until("document.querySelector('aside#context-help') === null");
+    assert.equal(await evaluate("localStorage.getItem('semprini:students')"), raw);
+    for (const [width, height] of [[390, 844], [430, 764]]) {
+      await send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: true });
+      await until(`innerWidth === ${width} && innerHeight === ${height}`);
+      for (const student of records) {
+        const basePath = `/studenti/${encodeURIComponent(student.id)}`;
+        const targetPath = `${basePath}/estesa`;
+        await send("Page.navigate", { url: new URL(basePath, baseUrl).href });
+        await until(`document.querySelector('nav[aria-label="Schede dello studente"] a[href="${targetPath}"]') !== null`);
+        const link = await evaluate(`(() => {
+          const nav = document.querySelector('nav[aria-label="Schede dello studente"]');
+          const links = [...nav.querySelectorAll('a')];
+          const active = links.find((item) => item.textContent.trim() === 'CARD ESTESA');
+          const box = active.getBoundingClientRect();
+          return { hrefs: links.map((item) => item.getAttribute('href')), disabled: active.getAttribute('aria-disabled'),
+            label: active.textContent.trim(), width: box.width, height: box.height,
+            horizontal: document.documentElement.scrollWidth > innerWidth || document.body.scrollWidth > innerWidth };
+        })()`);
+        assert.deepEqual(link.hrefs, [`/studenti/nuovo?id=${encodeURIComponent(student.id)}`, `${basePath}/lezioni`, targetPath]);
+        assert.equal(link.label, "CARD ESTESA");
+        assert.equal(link.disabled, null);
+        assert(link.width >= 44 && link.height >= 44);
+        assert.equal(link.horizontal, false);
+        await evaluate(`document.querySelector('a[href="${targetPath}"]').focus()`);
+        assert.equal(await evaluate(`document.activeElement.getAttribute('href') === '${targetPath}'`), true);
+        await send("Input.dispatchKeyEvent", { type: "keyDown", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13 });
+        await send("Input.dispatchKeyEvent", { type: "keyUp", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13 });
+        await until(`location.pathname === '${targetPath}' && document.querySelector('[aria-label="Fascicolo di ${student.firstName} TEST"]') !== null`);
+      }
+    }
     assert.equal(await evaluate("localStorage.getItem('semprini:students')"), raw);
     if (process.env.CARD_ESTESA_SHOTS) {
       await send("Page.navigate", { url: new URL("/studenti/card-estesa-TEST", baseUrl).href });

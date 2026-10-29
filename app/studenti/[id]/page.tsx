@@ -77,7 +77,7 @@ function CardContent({ student, next, payment, suggestArchiving }: CardData) {
           <nav className={styles.actions} aria-label="Schede dello studente">
             <Link href={`/studenti/nuovo?id=${encodeURIComponent(student.id)}`}>SCHEDA NARRATA</Link>
             <Link href={`${base}/lezioni`}>DIARIO STUDENTE</Link>
-            <span className={styles.pending} aria-disabled="true" aria-label="Card estesa, non ancora disponibile" title="Vista completa in preparazione">CARD ESTESA</span>
+            <Link href={`${base}/estesa`}>CARD ESTESA</Link>
           </nav>
           {student.status !== "archived" && <div className={styles.archiveAction}>
             <button type="button" onClick={archive}>ARCHIVIA STUDENTE</button>
