@@ -48,7 +48,7 @@ export function StudentReadChapter({ student, today }: { student: StudentRecord;
       {grade && <>Frequenta il <Value>{grade}</Value>. </>}
       {section && <>È nella sezione <Value>{section}</Value>. </>}
       {school && <>Studia presso <Value>{school}</Value>. </>}
-      {city && <>Studia a <Value>{city}</Value>. </>}
+      {city && <>Studia nella città di <Value>{city}</Value>. </>}
       {course && <>Segue l&apos;indirizzo di studi <Value>{course}</Value>.</>}
     </p>}
     {(phone || email) && <p>

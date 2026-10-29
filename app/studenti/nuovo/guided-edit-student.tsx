@@ -87,6 +87,9 @@ function setValue(student: StudentRecord, id: string, raw: string): StudentRecor
   if (id.startsWith("book:")) { const [, number, key] = id.split(":"); return { ...student, books: (student.books || []).map((book, index) => index === Number(number) ? { ...book, [key]: value } : book) }; }
   if (id.startsWith("teacher:")) { const [, personId, key] = id.split(":"); return { ...student, teachers: (student.teachers || []).map((person) => person.id === personId ? { ...person, [key]: value } : person) }; }
   if (id === "subjects") return { ...student, subjects: value.split(",").map((item) => item.trim()).filter(Boolean) };
+  // A historical record may display its school from `school` when `schoolName` is empty.
+  // An explicit removal must clear both sources so the fallback cannot restore it.
+  if (id === "schoolName") return { ...student, schoolName: value, ...(value ? {} : { school: "" }) };
   if (id === "phone") return { ...student, phone: value };
   if (id === "whatsapp") return { ...student, whatsapp: value === "yes" ? student.phone : "" };
   if (id === "lessonDurationMinutes" || id === "lessonRateCents") return { ...student, [id]: value ? Number(value) : undefined };
