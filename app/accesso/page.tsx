@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { acceptInvite, getUser, handleAuthCallback, login, logout, oauthLogin, updateUser } from "@netlify/identity";
+import { acceptInvite, handleAuthCallback, login, logout, oauthLogin, updateUser } from "@netlify/identity";
 import styles from "../impostazioni/settings.module.css";
 import { authenticationFailure } from "./auth-feedback";
+import { resumeSession } from "./resume-session";
 
 export default function AccessoPage() {
   const started = useRef(false);
@@ -32,7 +33,7 @@ export default function AccessoPage() {
           setInvite(result.token); setMessage("Scegli una password per accettare l’invito."); return;
         }
         if (result?.type === "recovery") { setRecovery(true); setMessage("Scegli la nuova password."); return; }
-        if (await getUser()) {
+        if (await resumeSession()) {
           // Keep the explicit account-exit screen open instead of immediately
           // redirecting an authenticated visitor away from the logout control.
           if (new URLSearchParams(window.location.search).get("azione") === "esci") {

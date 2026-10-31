@@ -19,6 +19,8 @@ Il prototipo è `https://registro-francesca-prova-accesso.netlify.app/`, ramo `p
 
 ## Verifiche ancora necessarie
 
+Il collaudatore ha riferito che dopo circa tre ore viene richiesto un nuovo accesso Google, completato senza difficoltà. Non è una misura della durata esatta della sessione. Nel pacchetto installato `@netlify/identity` 2.0.0 è stato verificato che `hydrateSession()` restituisce immediatamente null sul server: il controllo Edge è stato corretto per usare `refreshSession()` prima di `getUser()`. Il browser richiede il rinnovo anche al ritorno in primo piano e condivide la richiesta tra layout e pagina di accesso per evitare rinnovi concorrenti dello stesso token. Nessuna modifica alla durata dei token, alla registrazione su invito o all'ID autorizzato. Il comportamento dopo diverse ore richiede ancora un riscontro reale dopo questa correzione.
+
 - Riapertura della PWA dopo diverse ore e dopo riavvio; non promettere login permanente in base alla riapertura immediata.
 - Logout dalla PWA Android e blocco degli indirizzi diretti dopo l'uscita; il caso desktop è verificato tramite il collaudatore.
 - Accettazione dell'invito con password: il primo tentativo ha fallito e la causa non è accertata. Google funziona; il flusso password/invito non va dichiarato collaudato o offerto come percorso principale finché non è risolto.
