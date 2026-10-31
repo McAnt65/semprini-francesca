@@ -32,8 +32,13 @@ export default function AccessoPage() {
           setInvite(result.token); setMessage("Scegli una password per accettare l’invito."); return;
         }
         if (result?.type === "recovery") { setRecovery(true); setMessage("Scegli la nuova password."); return; }
-        if (await getUser()) await enter();
-        else setMessage("Accesso riservato all’account invitato.");
+        if (await getUser()) {
+          // Keep the explicit account-exit screen open instead of immediately
+          // redirecting an authenticated visitor away from the logout control.
+          if (new URLSearchParams(window.location.search).get("azione") === "esci") {
+            setMessage("Sei già entrato. Premi “Esci dall’account” per terminare l’accesso.");
+          } else await enter();
+        } else setMessage("Accesso riservato all’account invitato.");
       } catch (error) { setMessage(error instanceof Error ? error.message : "Accesso momentaneamente non disponibile."); }
       finally { setBusy(false); }
     })();
