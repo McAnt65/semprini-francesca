@@ -4,12 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import todayBackground from "./assets/today-diary-watercolor.webp";
+import IdentityCallback from "./components/IdentityCallback";
 
 export default function Home() {
   const [transizione, setTransizione] = useState(false);
 
   return (
     <main className="relative h-dvh w-full overflow-x-hidden bg-[#f4eddf]">
+      <IdentityCallback />
 
       {/* SCHERMATA HOME */}
       <div

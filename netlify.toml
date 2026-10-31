@@ -1,0 +1,17 @@
+# PROTOTYPE ONLY: deploy to a separate Netlify project, never the official site.
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[edge_functions]]
+  function = "registro-access"
+  path = "/*"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Referrer-Policy = "same-origin"
+    X-Content-Type-Options = "nosniff"
