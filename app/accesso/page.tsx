@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { acceptInvite, getUser, handleAuthCallback, login, logout, oauthLogin, updateUser } from "@netlify/identity";
 import styles from "../impostazioni/settings.module.css";
+import { authenticationFailure } from "./auth-feedback";
 
 export default function AccessoPage() {
   const started = useRef(false);
@@ -44,8 +45,16 @@ export default function AccessoPage() {
       if (invite) await acceptInvite(invite, password);
       else if (recovery) await updateUser({ password });
       else await login(email, password);
-      setPassword(""); await enter();
-    } catch { setMessage("Accesso non riuscito. Controlla le credenziali o la validità dell’invito."); }
+    } catch (error) {
+      setMessage(authenticationFailure(error, Boolean(invite)));
+      setBusy(false);
+      return;
+    }
+    // The invite is single-use: never offer to submit it again after acceptance,
+    // even if the following server authorization or network request fails.
+    setInvite(undefined); setRecovery(false); setPassword("");
+    try { await enter(); }
+    catch (error) { setMessage(error instanceof Error ? error.message : "Account verificato, ma il Registro non è ancora raggiungibile."); }
     finally { setBusy(false); }
   }
 

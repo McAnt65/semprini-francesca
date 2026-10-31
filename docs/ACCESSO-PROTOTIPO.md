@@ -72,3 +72,10 @@ Fonti: [Identity nelle funzioni](https://docs.netlify.com/manage/security/secure
 - Schermata di accesso osservata nel browser a 390×844; campi disposti successivamente su un'unica colonna per aumentarne la leggibilità. Verifica visiva finale a entrambe le dimensioni: ancora da completare.
 - Verifica online del controllo Edge, login Google, invito, logout e installazione Android: NON ANCORA ESEGUITA. Nessuna prova locale viene presentata come collaudo del runtime Netlify.
 - Nessuna modifica al sito ufficiale o ai dati operativi. Pubblicazione autorizzata esclusivamente per il ramo separato del prototipo.
+
+### Primo collaudo online
+
+Origine separata: `https://registro-francesca-prova-accesso.netlify.app/`.
+Il controllo `check-auth-preview.mjs` ha superato copertina, manifest, icone e 34 richieste anonime, incluse richieste con cookie inventato e prefetch.
+Le impostazioni pubbliche Identity confermano Google abilitato, registrazione libera disabilitata e conferma email richiesta; `/api/auth/session` senza sessione risponde 401.
+L'accettazione del primo invito ha mostrato un errore generico nel browser del collaudatore: causa non ancora determinata. Il feedback viene distinto per fase e stato HTTP senza esporre messaggi del servizio, token, email o password. Un invito accettato viene rimosso dallo stato del modulo prima della verifica successiva per impedirne la ripetizione involontaria. Login reale e logout restano da completare.
